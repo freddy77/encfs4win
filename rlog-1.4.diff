@@ -1,0 +1,60 @@
+diff -ru rlog-1.4/rlog/Makefile.am rlog-1.4.my/rlog/Makefile.am
+--- rlog-1.4/rlog/Makefile.am	2007-12-19 10:18:51.000000000 +0100
++++ rlog-1.4.my/rlog/Makefile.am	2010-12-07 16:58:03.517665998 +0100
+@@ -15,8 +15,7 @@
+     RLogNode.cpp \
+     RLogPublisher.cpp \
+     RLogTime.cpp \
+-    StdioNode.cpp \
+-    SyslogNode.cpp
++    StdioNode.cpp
+ 
+ librlog_la_LDFLAGS = -version-info $(LIBRLOG_VERSION) $(USER_LDFLAGS)
+ 
+diff -ru rlog-1.4/rlog/Makefile.in rlog-1.4.my/rlog/Makefile.in
+--- rlog-1.4/rlog/Makefile.in	2008-06-15 07:48:47.000000000 +0200
++++ rlog-1.4.my/rlog/Makefile.in	2010-12-07 16:58:50.867665996 +0100
+@@ -60,7 +60,7 @@
+ librlog_la_LIBADD =
+ am_librlog_la_OBJECTS = rlog.lo rloginit.lo rloglocation.lo Error.lo \
+ 	RLogChannel.lo RLogNode.lo RLogPublisher.lo RLogTime.lo \
+-	StdioNode.lo SyslogNode.lo
++	StdioNode.lo
+ librlog_la_OBJECTS = $(am_librlog_la_OBJECTS)
+ librlog_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+ 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+@@ -233,8 +233,7 @@
+     RLogNode.cpp \
+     RLogPublisher.cpp \
+     RLogTime.cpp \
+-    StdioNode.cpp \
+-    SyslogNode.cpp
++    StdioNode.cpp
+ 
+ librlog_la_LDFLAGS = -version-info $(LIBRLOG_VERSION) $(USER_LDFLAGS)
+ librlogincludedir = $(includedir)/rlog
+diff -ru rlog-1.4/rlog/RLogTime.h rlog-1.4.my/rlog/RLogTime.h
+--- rlog-1.4/rlog/RLogTime.h	2008-06-15 07:48:32.000000000 +0200
++++ rlog-1.4.my/rlog/RLogTime.h	2010-12-07 16:54:08.497666002 +0100
+@@ -27,6 +27,8 @@
+ 
+ #ifdef _WIN32
+ 
++#include <windows.h>
++
+ typedef __int64 rlog_time_interval;
+ typedef LARGE_INTEGER rlog_time;
+ 
+diff -ru rlog-1.4/rlog/Error.h rlog-1.4.my/rlog/RLogTime.h
+--- rlog-1.4/rlog/Error.h	2010-12-31 15:53:45.503596002 +0100
++++ rlog-1.4.my/rlog/Error.h	2010-12-31 15:53:33.353596001 +0100
+@@ -60,7 +60,9 @@
+ #define _ERROR_IMPL( COMPONENT, MSG ) \
+     rlog::Error( STR(COMPONENT), __FILE__, __FUNCTION__, __LINE__, MSG )
+ 
++#undef ERROR
+ #define ERROR( MSG ) _ERROR_IMPL( RLOG_COMPONENT, MSG )
++#define RLOG_ERROR( MSG ) _ERROR_IMPL( RLOG_COMPONENT, MSG )
+ 
+ #if C99_VARIADAC_MACROS
+ #define _ERROR_IMPL_VA( COMPONENT, FMT, ... ) \

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 NAME=boost_1_40_0
-OUT=$PWD/out
+OUT=$PWD/../out
 
 rm -rf $NAME
 tar jxvf $NAME.tar.bz2

@@ -1,0 +1,27 @@
+opening excel file fails due to lock problems (not implemented)
+copy paste same file cause file to be written again :( (cause second open success)
+  createfile does not support all flags required...
+open excel and changing... save different file and rename ??
+
+
+
+
+locking encfs
+
+map<filename, impl_file_handle>
+
+class impl_file_handle
+{
+	std::string name_;
+	bool is_dir_;
+	uint64_t fh_;
+}
+
+{ filename, mutex } -> { is_dir, handle, locks, access, share }
+map per filename, riferimento file in file_handle, lista file_handle da file
+
+set_file_time with SetFileTime and CreateFile ??
+rename
+delete
+not open file if no read/write
+

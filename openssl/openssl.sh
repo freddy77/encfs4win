@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 NAME=openssl-0.9.8l
-OUT=$PWD/out
+OUT=$PWD/../out
 rm -rf $NAME
 tar zxvf $NAME.tar.gz
 patch -p0 < $NAME.diff

@@ -15,7 +15,7 @@ int dummy_fwprintf(FILE*, const wchar_t*, ...)
 #define FWPRINTF fwprintf
 #endif
 
-static impl_fuse_context * the_impl=NULL;
+#define the_impl reinterpret_cast<impl_fuse_context*>(DokanFileInfo->DokanOptions->GlobalContext)
 
 extern "C" BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 {
@@ -444,12 +444,12 @@ int do_fuse_loop(struct fuse *fs, bool mt)
 
 	impl_fuse_context impl(&fs->ops,fs->user_data, fs->conf.debug!=0, 
 		fileumask, dirumask, fs->conf.fsname, fs->conf.volname);
-	the_impl=&impl;
 
 	//Parse Dokan options
 	PDOKAN_OPTIONS dokanOptions = (PDOKAN_OPTIONS)malloc(sizeof(DOKAN_OPTIONS));
 	ZeroMemory(dokanOptions, sizeof(DOKAN_OPTIONS));
 	dokanOptions->Options |= DOKAN_OPTION_KEEP_ALIVE;
+	dokanOptions->GlobalContext = reinterpret_cast<ULONG64>(&impl);
 
 	wchar_t mount[MAX_PATH+1];
 	mbstowcs(mount,fs->ch->mountpoint.c_str(),MAX_PATH);

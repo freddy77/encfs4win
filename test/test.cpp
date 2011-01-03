@@ -54,6 +54,13 @@ int main()
 	CloseHandle(h1);
 	CloseHandle(h2);
 
+	// excel need locking to open a file
+	printf("locking should succeed\n");
+	h1 = CreateFile(fn, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+	CHECK(h1 != INVALID_HANDLE_VALUE, NULL);
+	CHECK(LockFile(h1, 0, 0, 10, 0), "lock failed");
+	CloseHandle(h1);
+
 	printf("deleting while open\n");
 	h1 = CreateFile(fn, FILE_READ_ATTRIBUTES, FILE_SHARE_DELETE, NULL, OPEN_EXISTING, 0, NULL);
 	CHECK(h1 != INVALID_HANDLE_VALUE, NULL);

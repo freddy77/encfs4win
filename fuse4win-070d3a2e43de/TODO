@@ -1,0 +1,7 @@
+1. Currently special entries '.' and '..' in walk_directory/walk_directory_getdir are not 
+processed correctly. Particularly, they have incorrect timestamps. Fix this.
+
+2. Try to emulate Unix permissions using Windows ACLs.
+
+3. Fix symlink handling.
+

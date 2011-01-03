@@ -1,0 +1,47 @@
+diff sshfs-fuse-2.0-orig/sshfs.c sshfs-fuse-2.0/sshfs.c
+997,1006c997,1003
+< 	struct addrinfo *ai;
+< 	struct addrinfo hint;
+< 
+< 	memset(&hint, 0, sizeof(hint));
+< 	hint.ai_family = PF_INET;
+< 	hint.ai_socktype = SOCK_STREAM;
+< 	err = getaddrinfo(host, port, &hint, &ai);
+< 	if (err) {
+< 		fprintf(stderr, "failed to resolve %s:%s: %s\n", host, port,
+< 			gai_strerror(err));
+---
+>     unsigned short int serverPort;
+>     struct sockaddr_in serverAddress={0};
+>     struct hostent *hostInfo;
+> 
+>     hostInfo = gethostbyname(host);
+> 	if (hostInfo==NULL) {
+> 		perror("failed to get host name");
+1009c1006,1007
+< 	sock = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
+---
+> 
+> 	sock = socket(AF_INET, SOCK_STREAM, 0);
+1014c1012,1018
+< 	err = connect(sock, ai->ai_addr, ai->ai_addrlen);
+---
+> 
+> 	serverAddress.sin_family = hostInfo->h_addrtype;
+> 	memcpy((char *) &serverAddress.sin_addr.s_addr,
+>        hostInfo->h_addr_list[0], hostInfo->h_length);
+> 	serverAddress.sin_port = htons(atoi(port));
+> 
+> 	err = connect(sock, (struct sockaddr *) &serverAddress, sizeof(serverAddress));
+1024,1025d1027
+< 	freeaddrinfo(ai);
+< 
+3001,3002c3003,3007
+< 			      MAP_PRIVATE | MAP_ANONYMOUS | MAP_LOCKED,
+< 			      -1, 0);
+---
+> 			      MAP_PRIVATE | MAP_ANONYMOUS 
+> #ifndef __CYGWIN__
+> 			      | MAP_LOCKED
+> #endif
+> 			      , -1, 0);

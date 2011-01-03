@@ -1,0 +1,21 @@
+diff -r bindfs-1.6.1-orig/configure bindfs-1.6.1/configure
+19792c19792
+< CFLAGS="${CFLAGS} -Wall -D_REENTRANT -D_FILE_OFFSET_BITS=64 -DFUSE_USE_VERSION=25"
+---
+> CFLAGS="${CFLAGS} -Wall -D_REENTRANT -D_FILE_OFFSET_BITS=64 -DFUSE_USE_VERSION=27"
+diff -r bindfs-1.6.1-orig/src/bindfs.c bindfs-1.6.1/src/bindfs.c
+302a303
+> 	fprintf(stderr, "Readdir:%s!\n",path);
+310a312
+> 		fprintf(stderr, "Stat\n");
+311a314
+> #ifndef __CYGWIN__
+312a316
+> #endif
+316a321,322
+> 	fprintf(stderr, "Read - exit:%s!\n",path);
+> 
+1113c1119
+<     fuse_main_return = fuse_main(args.argc, args.argv, &bindfs_oper);
+---
+>     fuse_main_return = fuse_main(args.argc, args.argv, &bindfs_oper, sizeof(bindfs_oper));

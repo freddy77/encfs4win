@@ -1,0 +1,22 @@
+2008-10-29 Alex Besogonov <Alex.Besogonov@gmail.com>
+
+	* Fixed compilation errors in Cygwin and MSVC.
+	* Fixed signals usage, added support for fsname and volname options.
+	* Fixed hidden files handling.
+	* Some small code cleanups.
+
+2008-10-29 Alex Besogonov <Alex.Besogonov@gmail.com>
+
+	* Fixed incorrect file time setting.
+	* Added fileumask/dirumask/umask options support.
+	* Some small code cleanups.
+
+2008-10-27 Alex Besogonov <Alex.Besogonov@gmail.com>
+
+	* Fixed a lot of bugs related to write support and incorrect flags usage.
+	* Add FUSE behavior emulation in getdir() callback.
+
+2008-06-19 Alex Besogonov <Alex.Besogonov@gmail.com>
+
+	* Initial public release.
+

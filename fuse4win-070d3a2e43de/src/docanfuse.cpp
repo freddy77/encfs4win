@@ -79,6 +79,101 @@ static int DOKAN_CALLBACK FuseDeleteDirectory(
 	return -errno_to_win32_error(impl->delete_directory(FileName,DokanFileInfo));
 }
 
+
+struct Constant {
+	DWORD	value;
+	const char *name;
+};
+
+#define CONST_START(name) Constant name[] = {
+#define CONST_VAL(val) { val, #val },
+#define CONST_END(name) {0, NULL} };
+
+CONST_START(cAccessMode)
+	CONST_VAL(GENERIC_READ)
+	CONST_VAL(GENERIC_WRITE)
+	CONST_VAL(GENERIC_ALL)
+	CONST_VAL(GENERIC_EXECUTE)
+	CONST_VAL(DELETE)
+	CONST_VAL(READ_CONTROL)
+	CONST_VAL(WRITE_DAC)
+	CONST_VAL(WRITE_OWNER)
+	CONST_VAL(SYNCHRONIZE)
+	CONST_VAL(FILE_GENERIC_EXECUTE)
+	CONST_VAL(FILE_GENERIC_READ)
+	CONST_VAL(FILE_GENERIC_WRITE)
+	CONST_VAL(FILE_EXECUTE)
+	CONST_VAL(FILE_READ_ATTRIBUTES)
+	CONST_VAL(STANDARD_RIGHTS_EXECUTE)
+	CONST_VAL(FILE_READ_ATTRIBUTES)
+	CONST_VAL(FILE_READ_DATA)
+	CONST_VAL(FILE_READ_EA)
+	CONST_VAL(STANDARD_RIGHTS_READ)
+	CONST_VAL(FILE_APPEND_DATA)
+	CONST_VAL(FILE_WRITE_ATTRIBUTES)
+	CONST_VAL(FILE_WRITE_DATA)
+	CONST_VAL(FILE_WRITE_EA)
+	CONST_VAL(STANDARD_RIGHTS_WRITE)
+	CONST_VAL(FILE_ADD_FILE)
+	CONST_VAL(FILE_ADD_SUBDIRECTORY)
+	CONST_VAL(FILE_ALL_ACCESS)
+	CONST_VAL(FILE_APPEND_DATA)
+	CONST_VAL(FILE_CREATE_PIPE_INSTANCE)
+	CONST_VAL(FILE_DELETE_CHILD)
+	CONST_VAL(FILE_LIST_DIRECTORY)
+	CONST_VAL(FILE_TRAVERSE)
+CONST_END(cAccessMode)
+
+CONST_START(cShareMode)
+	CONST_VAL(FILE_SHARE_DELETE)
+	CONST_VAL(FILE_SHARE_READ)
+	CONST_VAL(FILE_SHARE_WRITE)
+CONST_END(cShareMode)
+
+CONST_START(cDisposition)
+	CONST_VAL(CREATE_ALWAYS)
+	CONST_VAL(CREATE_NEW)
+	CONST_VAL(OPEN_ALWAYS)
+	CONST_VAL(OPEN_EXISTING)
+	CONST_VAL(TRUNCATE_EXISTING)
+CONST_END(cDisposition)
+
+void DebugConstant(const char *name, DWORD value, Constant *c)
+{
+	while (c->name != NULL && c->value != value)
+		++c;
+	fprintf(stderr, "%s: %s (%d)\n", name, c->name ? c->name : "unknown!", value);
+}
+
+void DebugConstantBit(const char *name, DWORD value, Constant *cs)
+{
+	// check sorted and sort
+	for (Constant *c = cs; c[1].name; ) {
+		if (c[0].value < c[1].value) {
+			std::swap(c[0], c[1]);
+			c = cs;
+			continue;
+		}
+		++c;
+	}
+
+	DWORD left = value;
+	bool started = false;
+	const char *sep = "";
+	fprintf(stderr, "%s: ", name);
+	for (Constant *c = cs; c->name; ++c) {
+		if ((value & c->value) == c->value && (left & c->value) != 0) {
+			fprintf(stderr, "%s%s", sep, c->name);
+			sep = "|";
+			left &= ~c->value;
+			started = true;
+		}
+	}
+	if (left || !started)
+		fprintf(stderr, "%s0x%lX", sep, (long unsigned) left);
+	fprintf(stderr, "\n");
+}
+
 static int DOKAN_CALLBACK FuseCreateFile(
 				 LPCWSTR				FileName,
 				 DWORD					AccessMode,
@@ -88,9 +183,13 @@ static int DOKAN_CALLBACK FuseCreateFile(
 				 PDOKAN_FILE_INFO		DokanFileInfo)
 {
 	impl_fuse_context *impl=the_impl;
-	if (impl->debug()) FWPRINTF(stderr, L"CreateFile : %s AccessMode: %c%c\n", FileName, 
-										(AccessMode & GENERIC_READ) != 0 ? 'r' :' ',
-										(AccessMode & GENERIC_WRITE) != 0 ? 'w' :' ');
+	if (impl->debug()) {
+		FWPRINTF(stderr, L"CreateFile : %s\n", FileName);
+		DebugConstantBit("\tAccessMode", AccessMode,  cAccessMode);
+		DebugConstantBit("\tShareMode",  ShareMode,   cShareMode);
+		DebugConstant("\tDisposition",   CreationDisposition, cDisposition);
+		fflush(stderr);
+	}
 	
 	impl_chain_guard guard(impl,DokanFileInfo->ProcessId);
 	return -errno_to_win32_error(impl->create_file(FileName,AccessMode,ShareMode,

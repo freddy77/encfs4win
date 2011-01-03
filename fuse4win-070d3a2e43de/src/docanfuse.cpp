@@ -382,7 +382,7 @@ static int DOKAN_CALLBACK GetVolumeInformation(
 		PDOKAN_FILE_INFO DokanFileInfo)
 {
 	impl_fuse_context *impl=the_impl;
-	if (impl->debug()) FWPRINTF(stderr, L"Unmount\n");
+	if (impl->debug()) FWPRINTF(stderr, L"GetVolumeInformation\n");
 
 	impl_chain_guard guard(impl,DokanFileInfo->ProcessId);
 	return -errno_to_win32_error(impl->get_volume_information(VolumeNameBuffer,VolumeNameSize,

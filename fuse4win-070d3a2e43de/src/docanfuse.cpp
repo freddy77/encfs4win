@@ -3,6 +3,7 @@
 #include "fusemain.h"
 #include "ScopeGuard.h"
 #include "docanfuse.h"
+#include <stdio.h>
 
 #ifdef __CYGWIN__
 #define FWPRINTF dummy_fwprintf

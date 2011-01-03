@@ -321,6 +321,7 @@ static DOKAN_OPERATIONS dokanOperations = {
 	FuseDeleteDirectory,
 	FuseMoveFile,
 	FuseSetEndOfFile,
+	NULL,
 	FuseLockFile,
 	FuseUnlockFile,
 	FuseGetDiskFreeSpace,
@@ -348,7 +349,7 @@ int do_fuse_loop(struct fuse *fs, bool mt)
 	//Parse Dokan options
 	PDOKAN_OPTIONS dokanOptions = (PDOKAN_OPTIONS)malloc(sizeof(DOKAN_OPTIONS));
 	ZeroMemory(dokanOptions, sizeof(DOKAN_OPTIONS));
-	dokanOptions->UseKeepAlive=1;
+	dokanOptions->Options |= DOKAN_OPTION_KEEP_ALIVE;
 
 	wchar_t mount[MAX_PATH+1];
 	mbstowcs(mount,fs->ch->mountpoint.c_str(),MAX_PATH);
@@ -357,8 +358,8 @@ int do_fuse_loop(struct fuse *fs, bool mt)
 	dokanOptions->ThreadCount = mt?FUSE_THREAD_COUNT:1;
 	
 	//Debug
-	dokanOptions->DebugMode = fs->conf.debug;
-	dokanOptions->UseStdErr= fs->conf.debug;	
+	if (fs->conf.debug)
+		dokanOptions->Options |= DOKAN_OPTION_DEBUG|DOKAN_OPTION_STDERR;
 
 	//Load Dokan DLL
 	if (!fs->ch->init())

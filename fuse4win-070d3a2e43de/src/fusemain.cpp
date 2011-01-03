@@ -418,6 +418,9 @@ int impl_fuse_context::create_file(LPCWSTR file_name, DWORD access_mode,
 			{
 				if (!ops_.truncate) return -EINVAL;
 				CHECKED(ops_.truncate(fname.c_str(),0));
+			} else if (creation_disposition==CREATE_NEW)
+			{
+				return -EEXIST;
 			}
 
 			return do_open_file(file_name,access_mode,dokan_file_info);

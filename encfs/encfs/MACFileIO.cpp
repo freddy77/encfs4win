@@ -71,6 +71,7 @@ MACFileIO::~MACFileIO()
 {
 }
 
+#undef interface
 rel::Interface MACFileIO::interface() const
 {
     return MACFileIO_iface;
@@ -219,7 +220,7 @@ ssize_t MACFileIO::readOneBlock( const IORequest &req ) const
                     if( !warnOnly )
                     {
                         MemoryPool::release( mb );
-                        throw ERROR(
+                        throw RLOG_ERROR(
                                 _("MAC comparison failure, refusing to read"));
                     }
                     break;

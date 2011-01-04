@@ -75,21 +75,21 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libencfs_la_DEPENDENCIES =
 am__libencfs_la_SOURCES_DIST = readpassphrase.cpp base64.cpp \
-	ConfigReader.cpp ConfigVar.cpp Context.cpp Cipher.cpp \
+	ConfigReader.cpp compatwin.cpp ConfigVar.cpp Context.cpp Cipher.cpp \
 	CipherKey.cpp FileIO.cpp RawFileIO.cpp BlockFileIO.cpp \
 	CipherFileIO.cpp MACFileIO.cpp NameIO.cpp StreamNameIO.cpp \
 	BlockNameIO.cpp NullNameIO.cpp Interface.cpp MemoryPool.cpp \
 	NullCipher.cpp DirNode.cpp FileNode.cpp FileUtils.cpp \
-	openssl.cpp ../intl/autosprintf.cpp SSL_Cipher.cpp
+	openssl.cpp ../intl/autosprintf.cpp vasprintf.c SSL_Cipher.cpp
 @BUILD_OPENSSL_TRUE@@BUILD_SSLCIPHER_TRUE@am__objects_1 =  \
 @BUILD_OPENSSL_TRUE@@BUILD_SSLCIPHER_TRUE@	SSL_Cipher.lo
-am__objects_2 = autosprintf.lo $(am__objects_1)
+am__objects_2 = autosprintf.lo vasprintf.lo $(am__objects_1)
 am_libencfs_la_OBJECTS = readpassphrase.lo base64.lo ConfigReader.lo \
 	ConfigVar.lo Context.lo Cipher.lo CipherKey.lo FileIO.lo \
 	RawFileIO.lo BlockFileIO.lo CipherFileIO.lo MACFileIO.lo \
 	NameIO.lo StreamNameIO.lo BlockNameIO.lo NullNameIO.lo \
 	Interface.lo MemoryPool.lo NullCipher.lo DirNode.lo \
-	FileNode.lo FileUtils.lo openssl.lo $(am__objects_2)
+	FileNode.lo FileUtils.lo openssl.lo $(am__objects_2) compatwin.lo
 libencfs_la_OBJECTS = $(am_libencfs_la_OBJECTS)
 libencfs_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -320,11 +320,12 @@ makeKey_LDADD = libencfs.la $(ALL_LDFLAGS)
 #
 libencfs_la_LDFLAGS = -version-info 5:0:1
 libencfs_la_LIBADD = -lrlog
-EXTRASRC = ../intl/autosprintf.cpp $(am__append_3)
+EXTRASRC = ../intl/autosprintf.cpp vasprintf.c $(am__append_3)
 libencfs_la_SOURCES = \
     readpassphrase.cpp \
     base64.cpp \
     ConfigReader.cpp \
+    compatwin.cpp \
     ConfigVar.cpp \
     Context.cpp \
     Cipher.cpp \

@@ -95,8 +95,6 @@ struct EncFSConfig
     }
 
     CipherKey getUserKey(bool useStdin);
-    CipherKey getUserKey(const std::string &passwordProgram,
-                         const std::string &rootDir);
     CipherKey getNewUserKey();
     
     shared_ptr<Cipher> getCipher() const;

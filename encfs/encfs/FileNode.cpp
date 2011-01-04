@@ -180,6 +180,7 @@ int FileNode::mknod(mode_t mode, dev_t rdev, uid_t uid, gid_t gid)
     Lock _lock( mutex );
 
     int res;
+#if 0
     int olduid = -1;
     int oldgid = -1;
     if(uid != 0)
@@ -200,25 +201,37 @@ int FileNode::mknod(mode_t mode, dev_t rdev, uid_t uid, gid_t gid)
             return -EPERM;
         }
     }
+#endif
 
     /*
      * cf. xmp_mknod() in fusexmp.c
      * The regular file stuff could be stripped off if there
      * were a create method (advised to have)
      */
-    if (S_ISREG( mode )) {
+printf("mknod %o\n", mode);
+    if (S_ISREG( mode ) || !(mode & _S_IFMT)) {
+	printf("open name %s\n", _cname.c_str());
         res = ::open( _cname.c_str(), O_CREAT | O_EXCL | O_WRONLY, mode );
         if (res >= 0)
             res = ::close( res );
+#if 0
     } else if (S_ISFIFO( mode ))
         res = ::mkfifo( _cname.c_str(), mode );
     else
         res = ::mknod( _cname.c_str(), mode, rdev );
+#else
+   } else {
+	errno = ENOSYS;
+	res = -1;
+   }
+#endif
 
+#if 0
     if(olduid >= 0)
 	setfsuid( olduid );
     if(oldgid >= 0)
 	setfsgid( oldgid );
+#endif
 
     if(res == -1)
     {
@@ -269,7 +282,7 @@ ssize_t FileNode::read( off_t offset, unsigned char *data, ssize_t size ) const
 bool FileNode::write(off_t offset, unsigned char *data, ssize_t size)
 {
     rLog(Info, "FileNode::write offset %" PRIi64 ", data size %i",
-	    offset, (int)size);
+	    (long long int) offset, (int)size);
 
     IORequest req;
     req.offset = offset;

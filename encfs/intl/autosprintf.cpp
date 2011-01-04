@@ -33,6 +33,9 @@
 //#include "lib-asprintf.h"
 #include <stdio.h>
 
+extern "C" int vasprintf(char **ret, const char *fmt, va_list ap);
+
+
 namespace gnu
 {
 

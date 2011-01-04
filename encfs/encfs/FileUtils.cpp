@@ -42,8 +42,8 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
+//#include <sys/socket.h>
+//#include <sys/wait.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <cctype>
@@ -259,7 +259,7 @@ bool isDirectory( const char *fileName )
 
 bool isAbsolutePath( const char *fileName )
 {
-    if(fileName && fileName[0] != '\0' && fileName[0] == '/')
+    if(fileName && fileName[0] != '\0' && isalpha((unsigned char) fileName[0]) && fileName[1] == ':')
 	return true;
     else
 	return false;
@@ -1136,8 +1136,6 @@ RootPtr createV6Config( EncFS_Context *ctx, const std::string &rootDir,
     rDebug( "useStdin: %i", useStdin );
     if(useStdin)
 	userKey = config.getUserKey( useStdin );
-    else if(!passwordProgram.empty())
-	userKey = config.getUserKey( passwordProgram, rootDir );
     else
 	userKey = config.getNewUserKey();
 
@@ -1436,6 +1434,7 @@ std::string readPassword( int FD )
     return result;
 }
 
+#if 0
 CipherKey EncFSConfig::getUserKey( const std::string &passProg,
         const std::string &rootDir )
 {
@@ -1515,6 +1514,7 @@ CipherKey EncFSConfig::getUserKey( const std::string &passProg,
 
     return result;
 }
+#endif
 
 CipherKey EncFSConfig::getNewUserKey()
 {
@@ -1582,12 +1582,8 @@ RootPtr initFS( EncFS_Context *ctx, const shared_ptr<EncFS_Opts> &opts )
 	// get user key
 	CipherKey userKey;
 
-        if(opts->passwordProgram.empty())
-        {
-            rDebug( "useStdin: %i", opts->useStdin );
-            userKey = config.getUserKey( opts->useStdin );
-        } else
-            userKey = config.getUserKey( opts->passwordProgram, opts->rootDir );
+        rDebug( "useStdin: %i", opts->useStdin );
+        userKey = config.getUserKey( opts->useStdin );
 
 	if(!userKey)
 	    return rootInfo;

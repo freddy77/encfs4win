@@ -34,11 +34,13 @@
 #include <cstring>
 #include <ctime>
 
-#include <sys/mman.h>
+//#include <sys/mman.h>
 #include <sys/time.h>
 
 #include <rlog/rlog.h>
 #include <rlog/Error.h>
+
+#include <pthread.h>
 
 #include "i18n.h"
 

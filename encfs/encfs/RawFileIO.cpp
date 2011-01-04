@@ -31,6 +31,8 @@
 
 #include <cerrno>
 
+#include <pthread.h>
+
 using namespace std;
 
 static rel::Interface RawFileIO_iface("FileIO/Raw", 1, 0, 0);
@@ -80,8 +82,10 @@ RawFileIO::~RawFileIO()
     
     if( _fd != -1 )
 	close( _fd );
+rDebug("closed raw %s", name.c_str());
 }
 
+#undef interface
 rel::Interface RawFileIO::interface() const
 {
     return RawFileIO_iface;
@@ -103,7 +107,7 @@ static int open_readonly_workaround(const char *path, int flags)
     {
 	// make sure user has read/write permission..
 	chmod( path , stbuf.st_mode | 0600 );
-	fd = ::open( path , flags );
+	fd = ::my_open( path , flags );
 	chmod( path , stbuf.st_mode );
     } else
     {
@@ -146,7 +150,8 @@ int RawFileIO::open(int flags)
 #warning O_LARGEFILE not supported
 #endif
 
-	int newFd = ::open( name.c_str(), finalFlags );
+	int newFd = ::my_open( name.c_str(), finalFlags );
+rDebug("opened raw %s", name.c_str());
 	
 	rDebug("open file with flags %i, result = %i", finalFlags, newFd);
 
@@ -233,7 +238,7 @@ ssize_t RawFileIO::read( const IORequest &req ) const
     if(readSize < 0)
     {
 	rInfo("read failed at offset %" PRIi64 " for %i bytes: %s",
-		req.offset, req.dataLen, strerror( errno ));
+		(long long int) req.offset, req.dataLen, strerror( errno ));
     }
 
     return readSize;
@@ -257,7 +262,7 @@ bool RawFileIO::write( const IORequest &req )
 	{
 	    knownSize = false;
 	    rInfo("write failed at offset %" PRIi64 " for %i bytes: %s",
-		    offset, (int)bytes, strerror( errno ));
+		    (long long int) offset, (int)bytes, strerror( errno ));
 	    return false;
 	}
 	    
@@ -303,7 +308,7 @@ int RawFileIO::truncate( off_t size )
     {
 	int eno = errno;
 	rInfo("truncate failed for %s (%i) size %" PRIi64 ", error %s",
-		name.c_str(), fd, size, strerror(eno));
+		name.c_str(), fd, (long long int) size, strerror(eno));
 	res = -eno;
 	knownSize = false;
     } else

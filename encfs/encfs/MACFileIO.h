@@ -54,7 +54,6 @@ public:
     virtual bool isWritable() const;
 
     virtual void allowHoles( bool allow );
-
 private:
     virtual ssize_t readOneBlock( const IORequest &req ) const;
     virtual bool writeOneBlock( const IORequest &req );

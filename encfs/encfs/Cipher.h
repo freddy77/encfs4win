@@ -81,6 +81,7 @@ public:
     Cipher();
     virtual ~Cipher();
 
+#undef interface
     virtual rel::Interface interface() const =0;
 
     // create a new key based on a password

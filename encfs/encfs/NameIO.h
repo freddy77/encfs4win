@@ -26,6 +26,7 @@
 #include "Interface.h"
 #include "CipherKey.h"
 
+#undef interface
 using boost::shared_ptr;
 class Cipher;
 

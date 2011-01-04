@@ -25,6 +25,8 @@
 #include <unistd.h>
 #include <cstring>
 
+#include <pthread.h>
+
 
 using namespace std;
 using namespace rlog;

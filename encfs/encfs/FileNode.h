@@ -25,6 +25,8 @@
 #include <sys/types.h>
 #include <string>
 
+#include <pthread.h>
+
 class Cipher;
 class FileIO;
 class DirNode;

@@ -183,7 +183,7 @@ void CipherFileIO::initHeader( )
     off_t rawSize = base->getSize();
     if(rawSize >= HEADER_SIZE)
     {
-	rDebug("reading existing header, rawSize = %" PRIi64, rawSize);
+//	rDebug("reading existing header, rawSize = %" PRIi64, (long long int) rawSize);
 	// has a header.. read it
 	unsigned char buf[8] = {0};
 
@@ -231,7 +231,7 @@ void CipherFileIO::initHeader( )
 	} else
 	    rDebug("base not writable, IV not written..");
     }
-    rDebug("initHeader finished, fileIV = %" PRIu64 , fileIV);
+//    rDebug("initHeader finished, fileIV = %" PRIu64 , fileIV);
 }
 
 bool CipherFileIO::writeHeader( )
@@ -302,11 +302,11 @@ ssize_t CipherFileIO::readOneBlock( const IORequest &req ) const
 	if(!ok)
 	{
 	    rDebug("decodeBlock failed for block %" PRIi64 ", size %i",
-		    blockNum, (int)readSize );
+		    (long long int)blockNum, (int)readSize );
 	    readSize = -1;
 	}
     } else
-	rDebug("readSize zero for offset %" PRIi64, req.offset);
+	rDebug("readSize zero for offset %" PRIi64, (long long int)req.offset);
 
     return readSize;
 }
@@ -343,7 +343,7 @@ bool CipherFileIO::writeOneBlock( const IORequest &req )
     } else
     {
 	rDebug("encodeBlock failed for block %" PRIi64 ", size %i",
-		blockNum, req.dataLen);
+		(long long int)blockNum, req.dataLen);
 	ok = false;
     }
     return ok;

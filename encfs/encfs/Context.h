@@ -28,6 +28,8 @@
 #include <map>
 #endif
 
+#include <pthread.h>
+
 using boost::shared_ptr;
 struct EncFS_Args;
 struct EncFS_Opts;

@@ -45,12 +45,12 @@ endif
 libencfs_la_LDFLAGS = -version-info 5:0:1
 libencfs_la_LIBADD = -lrlog
 
-EXTRASRC = ../intl/autosprintf.cpp
-if BUILD_OPENSSL
-if BUILD_SSLCIPHER
+EXTRASRC = ../intl/autosprintf.cpp vasprintf.c
+#if BUILD_OPENSSL
+#if BUILD_SSLCIPHER
 EXTRASRC += SSL_Cipher.cpp
-endif
-endif
+#endif
+#endif
 
 libencfs_la_SOURCES = \
     readpassphrase.cpp \
@@ -76,6 +76,7 @@ libencfs_la_SOURCES = \
     FileNode.cpp \
     FileUtils.cpp \
     openssl.cpp \
+    compatwin.cpp \
     ${EXTRASRC}
 
 

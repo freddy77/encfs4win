@@ -33,7 +33,8 @@
 
 unsigned long pthreads_thread_id()
 {
-    return (unsigned long)pthread_self();
+	return GetCurrentThreadId();
+//    return (unsigned long)pthread_self();
 }
 
 static pthread_mutex_t *crypto_locks = NULL;

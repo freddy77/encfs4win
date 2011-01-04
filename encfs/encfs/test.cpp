@@ -436,8 +436,12 @@ bool runTests(const shared_ptr<Cipher> &cipher, bool verbose)
 }
 
 
+void init_mpool_mutex();
+
 int main(int argc, char *argv[])
 {
+    init_mpool_mutex();
+
     RLogInit( argc, argv );
 
     StdioNode stdLog( STDERR_FILENO );

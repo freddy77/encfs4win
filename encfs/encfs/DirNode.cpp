@@ -562,19 +562,23 @@ int DirNode::mkdir(const char *plaintextPath, mode_t mode,
     rLog( Info, "mkdir on %s", cyName.c_str() );
 
     // if uid or gid are set, then that should be the directory owner
+#if 0
     int olduid = -1;
     int oldgid = -1;
     if(uid != 0)
 	olduid = setfsuid( uid );
     if(gid != 0)
 	oldgid = setfsgid( gid );
+#endif
 
-    int res = ::mkdir( cyName.c_str(), mode );
+    int res = ::mkdir( cyName.c_str() );
 
+#if 0
     if(olduid >= 0)
 	setfsuid( olduid );
     if(oldgid >= 0)
 	setfsgid( oldgid );
+#endif
 
     if(res == -1)
     {
@@ -623,6 +627,7 @@ DirNode::rename( const char *fromPlaintext, const char *toPlaintext )
     try
     {
 	renameNode( fromPlaintext, toPlaintext );
+	toNode.reset();
 	res = ::rename( fromCName.c_str(), toCName.c_str() );
 
 	if(res == -1)
@@ -668,11 +673,14 @@ int DirNode::link( const char *from, const char *to )
 	rLog(Info, "hard links not supported with external IV chaining!");
     } else
     {
+	res = -ENOSYS;
+#if 0
 	res = ::link( fromCName.c_str(), toCName.c_str() );
 	if(res == -1)
 	    res = -errno;
 	else
 	    res = 0;
+#endif
     }
 
     return res;
@@ -803,6 +811,7 @@ int DirNode::unlink( const char *plaintextName )
     Lock _lock( mutex );
    
     int res = 0;
+#if 0
     if(ctx && ctx->lookupNode( plaintextName ))
     {
 	// If FUSE is running with "hard_remove" option where it doesn't
@@ -812,6 +821,7 @@ int DirNode::unlink( const char *plaintextName )
 		"is probably in effect", cyName.c_str() );
 	res = -EBUSY;
     } else
+#endif
     {
 	string fullName = rootDir + cyName;
 	res = ::unlink( fullName.c_str() );

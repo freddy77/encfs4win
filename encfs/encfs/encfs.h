@@ -30,6 +30,7 @@
 #ifndef linux
 #include <cerrno>
 
+#if 0
 static __inline int setfsuid(uid_t uid)
 {
     uid_t olduid = geteuid();
@@ -53,6 +54,7 @@ static __inline int setfsgid(gid_t gid)
 
     return oldgid;
 }
+#endif
 #endif
 
 int encfs_getattr(const char *path, struct stat *stbuf);

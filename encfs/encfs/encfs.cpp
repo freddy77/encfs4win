@@ -23,7 +23,7 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include <cerrno>
-#include <sys/statvfs.h>
+//#include <sys/statvfs.h>
 #include <sys/time.h>
 
 #include <sys/types.h>
@@ -158,6 +158,7 @@ static int withFileNode( const char *opName,
 int _do_getattr(FileNode *fnode, struct stat *stbuf)
 {
     int res = fnode->getAttr(stbuf);
+#if 0
     if(res == ESUCCESS && S_ISLNK(stbuf->st_mode))
     {
 	EncFS_Context *ctx = context();
@@ -181,6 +182,7 @@ int _do_getattr(FileNode *fnode, struct stat *stbuf)
                 res = -errno;
 	}
     }
+#endif
 
     return res;
 }
@@ -366,6 +368,8 @@ int _do_readlink(EncFS_Context *ctx, const string &cyName,
     char *buf = data.get<0>();
     size_t size = data.get<1>();
 
+	return -EINVAL;
+#if 0
     int res = ESUCCESS;
     shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
     if(!FSRoot)
@@ -394,6 +398,7 @@ int _do_readlink(EncFS_Context *ctx, const string &cyName,
 	rWarning("Error decoding link");
 	return -1;
     }
+#endif
 }
 
 int encfs_readlink(const char *path, char *buf, size_t size)
@@ -406,6 +411,8 @@ int encfs_symlink(const char *from, const char *to)
 {
     EncFS_Context *ctx = context();
 
+	return -EIO;
+#if 0
     int res = -EIO;
     shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
     if(!FSRoot)
@@ -445,6 +452,7 @@ int encfs_symlink(const char *from, const char *to)
 	err.log( _RLWarningChannel );
     }
     return res;
+#endif
 }
 
 int encfs_link(const char *from, const char *to)
@@ -500,8 +508,11 @@ int encfs_chmod(const char *path, mode_t mode)
 int _do_chown(EncFS_Context *, const string &cyName, 
 	tuple<uid_t, gid_t> data)
 {
+#if 0
     int res = lchown( cyName.c_str(), data.get<0>(), data.get<1>() );
     return (res == -1) ? -errno : ESUCCESS;
+#endif
+	return ESUCCESS;
 }
 
 int encfs_chown(const char *path, uid_t uid, gid_t gid)
@@ -675,6 +686,7 @@ int encfs_statfs(const char *path, struct statvfs *st)
 {
     EncFS_Context *ctx = context();
 
+#if 0
     int res = -EIO;
     try
     {
@@ -697,6 +709,8 @@ int encfs_statfs(const char *path, struct statvfs *st)
 	err.log( _RLWarningChannel );
     }
     return res;
+#endif
+	return -EIO;
 }
 
 #ifdef HAVE_XATTR

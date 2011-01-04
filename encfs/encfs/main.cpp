@@ -39,7 +39,7 @@
 #include <rlog/rlog.h>
 #include <rlog/Error.h>
 #include <rlog/RLogChannel.h>
-#include <rlog/SyslogNode.h>
+#include <rlog/rloglocation.h>
 #include <rlog/StdioNode.h>
 
 #include "ConfigReader.h"
@@ -53,8 +53,8 @@
 
 // Fuse version >= 26 requires another argument to fuse_unmount, which we
 // don't have.  So use the backward compatible call instead..
-extern "C" void fuse_unmount_compat22(const char *mountpoint);
-#    define fuse_unmount fuse_unmount_compat22
+//extern "C" void fuse_unmount_compat22(const char *mountpoint);
+//#    define fuse_unmount fuse_unmount_compat22
 
 #include <locale.h>
 
@@ -219,8 +219,6 @@ bool processArgs(int argc, char *argv[], const shared_ptr<EncFS_Args> &out)
 	{"anykey", 0, 0, 'k'}, // skip key checks
 	{"no-default-flags", 0, 0, 'N'}, // don't use default fuse flags
 	{"ondemand", 0, 0, 'm'}, // mount on-demand
-	{"public", 0, 0, 'P'}, // public mode
-	{"extpass", 1, 0, 'p'}, // external password program
 	// {"single-thread", 0, 0, 's'}, // single-threaded mode
 	{"stdinpass", 0, 0, 'S'}, // read password from stdin
 	{"verbose", 0, 0, 'v'}, // verbose mode
@@ -288,21 +286,6 @@ bool processArgs(int argc, char *argv[], const shared_ptr<EncFS_Args> &out)
 	case 'o':
 	    PUSHARG("-o");
 	    PUSHARG( optarg );
-	    break;
-	case 'p':
-	    out->opts->passwordProgram.assign( optarg );
-	    break;
-	case 'P':
-	    if(geteuid() != 0)
-		rWarning(_("option '--public' ignored for non-root user"));
-	    else
-	    {
-		out->opts->ownerCreate = true;
-		// add 'allow_other' option
-		// add 'default_permissions' option (default)
-		PUSHARG("-o");
-		PUSHARG("allow_other");
-	    }
 	    break;
 	case 'V':
 	    // xgroup(usage)
@@ -474,8 +457,12 @@ void encfs_destroy( void *_ctx )
     }
 }
 
+void init_mpool_mutex();
+
 int main(int argc, char *argv[])
 {
+    init_mpool_mutex();
+
     // initialize the logging library
     RLogInit( argc, argv );
 
@@ -487,7 +474,7 @@ int main(int argc, char *argv[])
 
     // log to stderr by default..
     scoped_ptr<StdioNode> slog( new StdioNode( STDERR_FILENO ) );
-    scoped_ptr<SyslogNode> logNode;
+    scoped_ptr<rlog::FileNode> logNode;
 
     // show error and warning output
     slog->subscribeTo( GetGlobalChannel("error") );
@@ -594,9 +581,9 @@ int main(int argc, char *argv[])
 	if(encfsArgs->isDaemon)
 	{
 	    // switch to logging just warning and error messages via syslog
-	    logNode.reset( new SyslogNode( "encfs" ) );
-	    logNode->subscribeTo( GetGlobalChannel("warning") );
-	    logNode->subscribeTo( GetGlobalChannel("error") );
+	    logNode.reset( new rlog::FileNode( "encfs", "c:\\encfs.txt" ) );
+//	    logNode->subscribeTo( GetGlobalChannel("warning") );
+//	    logNode->subscribeTo( GetGlobalChannel("error") );
 
 	    // disable stderr reporting..
 	    slog.reset();
@@ -735,7 +722,7 @@ static bool unmountFS(EncFS_Context *ctx)
 	// xgroup(diag)
 	rWarning(_("Unmounting filesystem %s due to inactivity"),
 		arg->mountPoint.c_str());
-	fuse_unmount( arg->mountPoint.c_str() );
+	fuse_unmount( arg->mountPoint.c_str(), NULL );
 	return true;
     }
 }

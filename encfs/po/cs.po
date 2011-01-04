@@ -1,0 +1,878 @@
+# Czech translation for Encrypted Filesystem for Linux
+# Copyright (c) (c) 2005 Canonical Ltd, and Rosetta Contributors 2005
+# This file is distributed under the same license as the Encrypted Filesystem for Linux package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2005.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Encrypted Filesystem for Linux\n"
+"Report-Msgid-Bugs-To: https://translations.launchpad.net/encfs/main/+pots/"
+"encfs\n"
+"POT-Creation-Date: 2008-09-09 22:55-0700\n"
+"PO-Revision-Date: 2007-10-08 14:39+0000\n"
+"Last-Translator: Tomas Kindl\n"
+"Language-Team: Czech <cs@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Launchpad-Export-Date: 2008-01-05 22:32+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
+"X-Rosetta-Version: 0.1\n"
+
+#: encfs/encfsctl.cpp:82
+msgid "  -- show information (Default command)"
+msgstr "  -- zobraz informace (Výchozí příkaz)"
+
+#: encfs/encfsctl.cpp:85
+msgid "  -- show key"
+msgstr ""
+
+#: encfs/encfsctl.cpp:88
+#, fuzzy
+msgid "  -- change password for volume"
+msgstr "  -- změnit heslo svazku"
+
+#: encfs/encfsctl.cpp:91
+#, fuzzy
+msgid ""
+"  -- change password for volume, taking password from standard input.\n"
+"\tNo prompts are issued."
+msgstr ""
+"  -- změnit heslo svazku, heslo bude načteno ze standardního vstupu.\n"
+"\tUživatel nebude na nic tázán."
+
+#: encfs/encfsctl.cpp:96
+msgid "  -- show undecodable filenames in the volume"
+msgstr "  -- ukázat nedekódovatelné názvy souborů ve svazku"
+
+#: encfs/encfsctl.cpp:99
+#, fuzzy
+msgid "  -- decodes the file and cats it to standard out"
+msgstr "  -- dekóduje soubor a vypíše jej na standardní výstup"
+
+#: encfs/encfsctl.cpp:102
+msgid "  -- decodes name and prints plaintext version"
+msgstr "  -- dekóduje jméno a ukáže jeho čitelnou verzi"
+
+#: encfs/encfsctl.cpp:105
+#, fuzzy
+msgid "  -- encodes a filename and print result"
+msgstr "  -- zakóduje název souboru a zobrazí výsledek"
+
+#: encfs/encfsctl.cpp:108
+#, fuzzy
+msgid "  -- decrypts a volume and writes results to path"
+msgstr "  -- dešifruje svazek a výsledek vypíše na cestu"
+
+#: encfs/encfsctl.cpp:111
+#, fuzzy
+msgid "  -- print version number and exit"
+msgstr "  -- vypíše číslo verze a skončí"
+
+#: encfs/encfsctl.cpp:120 encfs/encfsctl.cpp:164
+#, fuzzy, c-format
+msgid "encfsctl version %s"
+msgstr "encfsctl verze %s"
+
+#: encfs/encfsctl.cpp:121
+#, fuzzy
+msgid "Usage:\n"
+msgstr "Použití:\n"
+
+#: encfs/encfsctl.cpp:124
+#, fuzzy, c-format
+msgid ""
+"%s (root dir)\n"
+"  -- displays information about the filesystem, or \n"
+msgstr ""
+"%s (kořenový adresář)\n"
+"  -- zobrazí informace o systému souborů, nebo \n"
+
+#: encfs/encfsctl.cpp:141
+#, fuzzy, c-format
+msgid ""
+"Example: \n"
+"%s info ~/.crypt\n"
+msgstr ""
+"Příklad: \n"
+"%s info ~/.crypt\n"
+
+#: encfs/encfsctl.cpp:149
+#, fuzzy, c-format
+msgid "directory %s does not exist.\n"
+msgstr "adresář %s neexistuje.\n"
+
+#: encfs/encfsctl.cpp:184 encfs/encfsctl.cpp:656
+#, fuzzy
+msgid "Unable to load or parse config file\n"
+msgstr "Nemohu nahrát nebo analyzovat konfigurační soubor\n"
+
+#: encfs/encfsctl.cpp:188
+#, fuzzy
+msgid ""
+"A really old EncFS filesystem was found. \n"
+"It is not supported in this EncFS build.\n"
+msgstr ""
+"Byl nalezen velmi starý souborový systém EncFS. \n"
+"V tomto sestavení EncFS není podporován.\n"
+
+#: encfs/encfsctl.cpp:193
+#, fuzzy, c-format
+msgid "Version 3 configuration; created by %s\n"
+msgstr "Konfigurace verze 3; vytvořil %s\n"
+
+#: encfs/encfsctl.cpp:198
+#, c-format
+msgid "Version 4 configuration; created by %s\n"
+msgstr "Konfigurace verze 4; vytvořil %s\n"
+
+#: encfs/encfsctl.cpp:203
+#, c-format
+msgid "Version 5 configuration; created by %s (revision %i)\n"
+msgstr "Konfigurace verze 5; vytvořil %s (revize %i)\n"
+
+#: encfs/encfsctl.cpp:209
+#, fuzzy, c-format
+msgid "Version 6 configuration; created by %s (revision %i)\n"
+msgstr "Konfigurace verze 5; vytvořil %s (revize %i)\n"
+
+#: encfs/encfsctl.cpp:235
+msgid "Unable to initialize encrypted filesystem - check path.\n"
+msgstr "Nelze inicializovat zašifrovaný systém souborů - zkontrolujte cestu.\n"
+
+#: encfs/encfsctl.cpp:590
+#, fuzzy, c-format
+msgid "In directory %s: \n"
+msgstr "V adresáři %s: \n"
+
+#: encfs/encfsctl.cpp:638
+#, c-format
+msgid "Found %i invalid file."
+msgid_plural "Found %i invalid files."
+msgstr[0] "Nalezen %i chybný soubor."
+msgstr[1] "Nalezeny %i chybné soubory."
+msgstr[2] "Nalezeno %i chybných souborů."
+
+#: encfs/encfsctl.cpp:665
+#, c-format
+msgid "Unable to find specified cipher \"%s\"\n"
+msgstr "Nemohu najít určenou šifru \"%s\"\n"
+
+#: encfs/encfsctl.cpp:671
+#, fuzzy
+msgid "Enter current Encfs password\n"
+msgstr "Vložte současné heslo pro Encfs\n"
+
+#: encfs/encfsctl.cpp:682
+#, fuzzy
+msgid "Invalid password\n"
+msgstr "Neplatné heslo\n"
+
+#: encfs/encfsctl.cpp:688
+#, fuzzy
+msgid "Enter new Encfs password\n"
+msgstr "Vložte nové heslo pro Encfs\n"
+
+#: encfs/encfsctl.cpp:714
+msgid "Volume Key successfully updated.\n"
+msgstr "Klíč svazku úspěšně aktualizován.\n"
+
+#: encfs/encfsctl.cpp:718
+msgid "Error saving modified config file.\n"
+msgstr "Chyba při ukládání změněného konfiguračního souboru.\n"
+
+#: encfs/encfsctl.cpp:722
+msgid "Error creating key\n"
+msgstr ""
+
+#: encfs/encfsctl.cpp:787
+#, fuzzy, c-format
+msgid "invalid command: \"%s\""
+msgstr "neplatný příkaz: \"%s\""
+
+#: encfs/encfsctl.cpp:794
+#, c-format
+msgid "Incorrect number of arguments for command \"%s\""
+msgstr "Nesprávný počet parametrů příkazu \"%s\""
+
+#: encfs/FileUtils.cpp:288
+#, c-format
+msgid "The directory \"%s\" does not exist. Should it be created? (y,n) "
+msgstr "Adresář \"%s\" neexistuje, má být vytvořen? (\"y\"-ano, \"n\"-ne) "
+
+#: encfs/FileUtils.cpp:297
+#, fuzzy
+msgid "Unable to create directory: "
+msgstr "Nelze vytvořit adresář: "
+
+#: encfs/FileUtils.cpp:304
+#, fuzzy
+msgid "Directory not created."
+msgstr "Adresář nebyl vytvořen."
+
+#: encfs/FileUtils.cpp:326
+#, c-format
+msgid "Found config file %s, but failed to load"
+msgstr "Byl nalezen konfigurační soubor %s, ale nelze ho načíst"
+
+#: encfs/FileUtils.cpp:402
+#, c-format
+msgid ""
+"Config subversion %i found, but this version of encfs only supports up to "
+"version %i."
+msgstr ""
+"Podverze %i konfigurace nalezena, avšak tato verze \"encfs\" podporuje pouze "
+"podverze do %i."
+
+#: encfs/FileUtils.cpp:409
+msgid ""
+"This version of EncFS doesn't support filesystems created before 2004-08-13"
+msgstr ""
+
+#: encfs/FileUtils.cpp:607
+msgid "The following cipher algorithms are available:"
+msgstr "Následující šifrovací algoritmy jsou dostupné:"
+
+#: encfs/FileUtils.cpp:619
+#, c-format
+msgid " -- key length %i bits"
+msgstr " -- délka klíče %i bitů"
+
+#: encfs/FileUtils.cpp:626
+#, c-format
+msgid " -- Supports key lengths of %i to %i bits"
+msgstr " -- Podporuje délku klíče od %i do %i bitů"
+
+#: encfs/FileUtils.cpp:635
+#, c-format
+msgid " -- block size %i bytes"
+msgstr " -- délka bloku %i bajtů"
+
+#: encfs/FileUtils.cpp:642
+#, c-format
+msgid " -- Supports block sizes of %i to %i bytes"
+msgstr " -- Podporuje délku bloku od %i do %i bajtů"
+
+#: encfs/FileUtils.cpp:648 encfs/FileUtils.cpp:693
+msgid "Enter the number corresponding to your choice: "
+msgstr "Vložte číslo odpovídaící vaší volbě: "
+
+#: encfs/FileUtils.cpp:656 encfs/FileUtils.cpp:701
+msgid "Invalid selection."
+msgstr "Neplatná volba."
+
+#: encfs/FileUtils.cpp:667 encfs/FileUtils.cpp:710
+#, c-format
+msgid "Selected algorithm \"%s\""
+msgstr "Zvolen algoritmus \"%s\""
+
+#: encfs/FileUtils.cpp:681
+msgid "The following filename encoding algorithms are available:"
+msgstr "Následující algoritmy kódování názvů souborů jsou dostupné :"
+
+#: encfs/FileUtils.cpp:722 encfs/FileUtils.cpp:769
+#, c-format
+msgid "Using key size of %i bits"
+msgstr "Používám klíč o velikosti %i bitů"
+
+#: encfs/FileUtils.cpp:729
+#, c-format
+msgid ""
+"Please select a key size in bits.  The cipher you have chosen\n"
+"supports sizes from %i to %i bits in increments of %i bits.\n"
+"For example: "
+msgstr ""
+"Prosím zvolte velikost klíče v bitech. Zvolená šifra\n"
+"podporuje velikost od %i bitů do %i bitů s krokem %i bitů.\n"
+"Např.: "
+
+#: encfs/FileUtils.cpp:759
+msgid "Selected key size: "
+msgstr "Zvolená velikost klíče "
+
+#: encfs/FileUtils.cpp:781 encfs/FileUtils.cpp:808
+#, c-format
+msgid "Using filesystem block size of %i bytes"
+msgstr "Pro souborový systém používám bloky o velikosti %i bajtů"
+
+#: encfs/FileUtils.cpp:788
+#, c-format
+msgid ""
+"Select a block size in bytes.  The cipher you have chosen\n"
+"supports sizes from %i to %i bytes in increments of %i.\n"
+"Or just hit enter for the default (%i bytes)\n"
+msgstr ""
+"Prosím zvolte velikost bloku v bajtech. Zvolená šifra\n"
+"podporuje velikosti od %i bajtů do %i bajtů s krokem %i.\n"
+"Stisknutím \"Enter\" zvolíte výchozí hodnotu (%i bajtů)\n"
+
+#: encfs/FileUtils.cpp:795
+msgid "filesystem block size: "
+msgstr "Velikost bloku souborového systému: "
+
+#: encfs/FileUtils.cpp:818
+msgid ""
+"The default here is No.\n"
+"Any response that does not begin with 'y' will mean No: "
+msgstr ""
+
+#: encfs/FileUtils.cpp:836
+#, fuzzy
+msgid ""
+"Enable block authentication code headers\n"
+"on every block in a file?  This adds about 12 bytes per block\n"
+"to the storage requirements for a file, and significantly affects\n"
+"performance but it also means [almost] any modifications or errors\n"
+"within a block will be caught and will cause a read error."
+msgstr ""
+"Povolit hlavičku autentizačního kódu pro všechny\n"
+"bloky souboru? Tím se zvětší prostor potřebný pro uložení\n"
+"každého bloku o 12 bajtů a významně se sníží výkon, zároveň\n"
+"ale bude odhalena téměř každá změna nebo chyba bloku.\n"
+"Takto odhalená chyba pak vyústí v chybu čtení.\n"
+"Výchozí hodnota je \"No\" (Ne).  \n"
+"Všechny odpovědi nezačínající na 'y' znamenají \"Ne\": "
+
+#: encfs/FileUtils.cpp:847
+msgid ""
+"Add random bytes to each block header?\n"
+"This adds a performance penalty, but ensures that blocks\n"
+"have different authentication codes.  Note that you can\n"
+"have the same benefits by enabling per-file initialization\n"
+"vectors, which does not come with as great of performance\n"
+"penalty. \n"
+"Select a number of bytes, from 0 (no random bytes) to 8: "
+msgstr ""
+"Přidat náhodné bajty ke všem hlavičkám bloku?\n"
+"Dojde ke snížení výkonu, ale bude zajištěno, že bloky\n"
+"budou mít rozdílné autentizační kódy.\n"
+"Téhož efektu, avšak s nižším snížením výkonu,\n"
+"lze dosáhnout povolením inicializačních vektorů\n"
+"pro jednotlivé soubory. \n"
+"Zvolte počet bajtů, od 0 (žádné náhodné bajty) do 8: "
+
+#: encfs/FileUtils.cpp:878
+msgid ""
+"The default here is Yes.\n"
+"Any response that does not begin with 'n' will mean Yes: "
+msgstr ""
+
+#: encfs/FileUtils.cpp:896
+#, fuzzy
+msgid ""
+"Enable per-file initialization vectors?\n"
+"This adds about 8 bytes per file to the storage requirements.\n"
+"It should not affect performance except possibly with applications\n"
+"which rely on block-aligned file io for performance."
+msgstr ""
+"Povolit inicializační vektory pro jednotlivé soubory?\n"
+"Prostorové nároky každého souboru se tím zvýší\n"
+"o 8 bajtů. Nemělo by dojít k ovlivnění výkonu, s výjimkou\n"
+"aplikací spoléhajících na blokové zarovnání\n"
+"vstupně-výstupních operací.\n"
+"Výchozí hodnota je \"Yes\" (Ano).  \n"
+"Jakákoliv odpověď nezačínající \"n\" znamená \"Yes\" (Ano):\" "
+
+#: encfs/FileUtils.cpp:907
+#, fuzzy
+msgid ""
+"Enable filename initialization vector chaining?\n"
+"This makes filename encoding dependent on the complete path, \n"
+"rather then encoding each path element individually."
+msgstr ""
+"Povolit řetězení inicializačních vektorů názvů souborů?\n"
+"Výsledkem je závislost zakódování názvu souboru\n"
+"na úplné cestě, namísto zakódování každého úseku\n"
+"cesty individuálně. To je většinou žádoucí, takže výchozí\n"
+"hodnota je \"Yes\" (Ano).\n"
+"Jakákoliv odpověď nezačínající \"n\" znamená \"Yes\" (Ano):\" "
+
+#: encfs/FileUtils.cpp:917
+#, fuzzy
+msgid ""
+"Enable filename to IV header chaining?\n"
+"This makes file data encoding dependent on the complete file path.\n"
+"If a file is renamed, it will not decode sucessfully unless it\n"
+"was renamed by encfs with the proper key.\n"
+"If this option is enabled, then hard links will not be supported\n"
+"in the filesystem."
+msgstr ""
+"Povolit řetězení názvů souborů a inicializačních vektorů\n"
+"hlaviček?\n"
+"Důsledkem je závislost zakódování obsahu souboru na\n"
+"úplné cestě. Pokud bude soubor přejmenován bez použití\n"
+"\"encfs\" se správným klíčem, nebude možné jeho obsah rozkódovat.\n"
+"Dalším důsledkem je vyřazení \"hard-linků\" z provozu.\n"
+"Výchozí hodnota je \"No\" (Ne) \n"
+"Jakákoliv odpověď nezačínající \"y\" znamená \"No\" (Ne):\" "
+
+#: encfs/FileUtils.cpp:930
+msgid ""
+"Enable file-hole pass-through?\n"
+"This avoids writing encrypted blocks when file holes are created."
+msgstr ""
+
+#: encfs/FileUtils.cpp:944
+msgid "Creating new encrypted volume."
+msgstr "Vytvářím nový zašifrovaný svazek."
+
+#: encfs/FileUtils.cpp:947
+msgid ""
+"Please choose from one of the following options:\n"
+" enter \"x\" for expert configuration mode,\n"
+" enter \"p\" for pre-configured paranoia mode,\n"
+" anything else, or an empty line will select standard mode.\n"
+"?> "
+msgstr ""
+"Vyberte prosím jednu z následujících voleb:\n"
+"\"x\" pro expertní režim konfigurace,\n"
+"\"p\" pro přednastavený režim \"paranoia\",\n"
+"cokoliv jiného (včetně prázdné řádky) zvolí standardní režim.\n"
+"?> "
+
+#: encfs/FileUtils.cpp:982
+#, fuzzy
+msgid "Paranoia configuration not supported for --reverse"
+msgstr "Zvolena paranoidní konfigurace"
+
+#: encfs/FileUtils.cpp:987
+msgid "Paranoia configuration selected."
+msgstr "Zvolena paranoidní konfigurace"
+
+#: encfs/FileUtils.cpp:1007
+msgid "Standard configuration selected."
+msgstr "Zvolena standardní konfigurace"
+
+#: encfs/FileUtils.cpp:1019 encfs/FileUtils.cpp:1050
+msgid "--reverse specified, not using unique/chained IV"
+msgstr ""
+
+#: encfs/FileUtils.cpp:1033
+msgid ""
+"Sorry, unable to locate cipher for predefined configuration...\n"
+"Falling through to Manual configuration mode."
+msgstr ""
+"Šifra pro předdefinovanou konfiguraci nenalezena...\n"
+"Přecházím do režimu ruční konfigurace."
+
+#: encfs/FileUtils.cpp:1039
+msgid "Manual configuration mode selected."
+msgstr "Zvolena ruční konfigurace"
+
+#: encfs/FileUtils.cpp:1060
+#, fuzzy
+msgid ""
+"External chained IV disabled, as both 'IV chaining'\n"
+"and 'unique IV' features are required for this option."
+msgstr ""
+"Vnější zřetězený inicializační vektor nebyl povolen,\n"
+"neboť alespoň jedna z vyžadovaných voleb\n"
+"('řetězení inicializačních vektorů' a \n"
+"'jednoznačné inicializační vektory') není aktivní."
+
+#: encfs/FileUtils.cpp:1073
+#, fuzzy, c-format
+msgid "Unable to instanciate cipher %s, key size %i, block size %i"
+msgstr "Není možné vytvořit šifru %s s velikostí klíče %i a velikostí bloku %i"
+
+#: encfs/FileUtils.cpp:1104
+#, fuzzy
+msgid ""
+"Configuration finished.  The filesystem to be created has\n"
+"the following properties:"
+msgstr ""
+"Konfigurace dokončena. Systém souborů, který bude vytvořen,\n"
+"bude mít následující vlastnosti:"
+
+#: encfs/FileUtils.cpp:1111
+#, fuzzy
+msgid "-------------------------- WARNING --------------------------\n"
+msgstr "-------------------------- VAROVÁNÍ --------------------------\n"
+
+#: encfs/FileUtils.cpp:1113
+#, fuzzy
+msgid ""
+"The external initialization-vector chaining option has been\n"
+"enabled.  This option disables the use of hard links on the\n"
+"filesystem. Without hard links, some programs may not work.\n"
+"The programs 'mutt' and 'procmail' are known to fail.  For\n"
+"more information, please see the encfs mailing list.\n"
+"If you would like to choose another configuration setting,\n"
+"please press CTRL-C now to abort and start over."
+msgstr ""
+"Vnější řetězení inicializačních vektorů bylo povoleno.\n"
+"Tím je znemožněno použití hard-linků na příslušném systému souborů.\n"
+"Některé programy (např. 'mutt' nebo 'procmail') bez hard-linků\n"
+"nefungují. Více informací získáte v e-mailové konferenci \"encfs\".\n"
+"Pokud chcete použít jiné nastavení, stiskněte CTRL-C a začnete znovu."
+
+#: encfs/FileUtils.cpp:1124
+#, fuzzy
+msgid ""
+"Now you will need to enter a password for your filesystem.\n"
+"You will need to remember this password, as there is absolutely\n"
+"no recovery mechanism.  However, the password can be changed\n"
+"later using encfsctl.\n"
+"\n"
+msgstr ""
+"Nyní zadejte heslo pro váš systém souborů.\n"
+"Toto heslo si zapamatujte - v případě jeho ztráty\n"
+"není možné jím chráněná data dešifrovat.\n"
+"Heslo je možné později změnit programem \"encfsctl\".\n"
+"\n"
+
+#: encfs/FileUtils.cpp:1152
+msgid "Failure generating new volume key! Please report this error."
+msgstr "Nelze vytvořit nový klíč svazku! Oznamte prosím tuto chybu."
+
+#: encfs/FileUtils.cpp:1165
+msgid "Name coding interface not supported"
+msgstr "Rozhraní pro kódování jmen není podporováno"
+
+#: encfs/FileUtils.cpp:1166
+msgid "The filename encoding interface requested is not available"
+msgstr "Požadované rozhraní pro kódování jmen není dostupné"
+
+#: encfs/FileUtils.cpp:1204
+#, fuzzy, c-format
+msgid "Filesystem cipher: \"%s\", version %i:%i:%i"
+msgstr "Šifra systému souborů: \"%s\", verze %i:%i:%i"
+
+#: encfs/FileUtils.cpp:1209 encfs/FileUtils.cpp:1235 encfs/FileUtils.cpp:1254
+#, fuzzy
+msgid " (NOT supported)\n"
+msgstr " (NENÍ podporováno)\n"
+
+#: encfs/FileUtils.cpp:1217 encfs/FileUtils.cpp:1242
+#, c-format
+msgid " (using %i:%i:%i)\n"
+msgstr " (používá %i:%i:%i)\n"
+
+#: encfs/FileUtils.cpp:1225
+#, fuzzy, c-format
+msgid "Filename encoding: \"%s\", version %i:%i:%i"
+msgstr "Kódování jmen souborů: \"%s\", verze %i:%i:%i"
+
+#: encfs/FileUtils.cpp:1249
+#, fuzzy, c-format
+msgid "Key Size: %i bits"
+msgstr "Velikost klíče: %i bitů"
+
+#: encfs/FileUtils.cpp:1260
+#, c-format
+msgid "Using PBKDF2, with %i iterations"
+msgstr ""
+
+#: encfs/FileUtils.cpp:1262
+#, fuzzy, c-format
+msgid "Salt Size: %i bits"
+msgstr "Velikost klíče: %i bitů"
+
+#: encfs/FileUtils.cpp:1271
+#, fuzzy, c-format
+msgid "Block Size: %i bytes + %i byte MAC header"
+msgstr "Velikost bloku: %i bajtů + %i bajtů hlavičky MAC"
+
+#: encfs/FileUtils.cpp:1279
+#, c-format
+msgid "Block Size: %i bytes, including %i byte MAC header"
+msgstr "Délka bloku: %i bajtů, včetně %i-bajtové hlavičky MAC"
+
+#: encfs/FileUtils.cpp:1286
+#, c-format
+msgid "Block Size: %i bytes"
+msgstr "Délka bloku: %i bajtů"
+
+#: encfs/FileUtils.cpp:1293
+msgid "Each file contains 8 byte header with unique IV data.\n"
+msgstr ""
+"Každý soubor obsahuje 8-bajtovou hlavičku s jedinečným inicializačním "
+"vektorem.\n"
+
+#: encfs/FileUtils.cpp:1298
+msgid "Filenames encoded using IV chaining mode.\n"
+msgstr "Jména souborů zakódována řetězením inicializačních vektorů.\n"
+
+#: encfs/FileUtils.cpp:1303
+msgid "File data IV is chained to filename IV.\n"
+msgstr ""
+"Inicializační vektor obsahu souboru je zřetězen s inicializačním vektorem "
+"jména souboru.\n"
+
+#: encfs/FileUtils.cpp:1308
+msgid "File holes passed through to ciphertext.\n"
+msgstr ""
+
+#: encfs/FileUtils.cpp:1369
+msgid "Error creating salt\n"
+msgstr ""
+
+#: encfs/FileUtils.cpp:1398
+msgid "EncFS Password: "
+msgstr "Heslo pro EncFS: "
+
+#: encfs/FileUtils.cpp:1404
+msgid "Zero length password not allowed\n"
+msgstr "Prázdné heslo není povoleno\n"
+
+#: encfs/FileUtils.cpp:1450
+msgid "Internal error: socketpair() failed"
+msgstr "Interní chyba: selhání \"socketpair()\""
+
+#: encfs/FileUtils.cpp:1458
+msgid "Internal error: fork() failed"
+msgstr "Interní chyba: selhání \"fork()\""
+
+#: encfs/FileUtils.cpp:1500
+msgid "Internal error: failed to exec program"
+msgstr "Interní chyba: spuštění programu selhalo"
+
+#: encfs/FileUtils.cpp:1528
+msgid "New Encfs Password: "
+msgstr "Nové heslo pro EncFS: "
+
+#: encfs/FileUtils.cpp:1531
+msgid "Verify Encfs Password: "
+msgstr "Zopakujte heslo pro EncFS: "
+
+#: encfs/FileUtils.cpp:1540
+#, fuzzy
+msgid "Passwords did not match, please try again\n"
+msgstr "Zadaná hesla se liší, zkuste to prosím znovu\n"
+
+#: encfs/FileUtils.cpp:1563
+msgid "The configuration loaded is not compatible with --reverse\n"
+msgstr ""
+
+#: encfs/FileUtils.cpp:1572
+#, c-format
+msgid "Unable to find cipher %s, version %i:%i:%i"
+msgstr "Šifra %s, verze %i:%i:%i nenalezena"
+
+#: encfs/FileUtils.cpp:1578
+#, fuzzy
+msgid "The requested cipher interface is not available\n"
+msgstr "Požadované rozhraní šifry není dostupné\n"
+
+#: encfs/FileUtils.cpp:1604
+#, fuzzy
+msgid "Error decoding volume key, password incorrect\n"
+msgstr "Chyba při dekódování klíče svazku, chybné heslo\n"
+
+#: encfs/FileUtils.cpp:1612
+#, fuzzy, c-format
+msgid "Unable to find nameio interface %s, version %i:%i:%i"
+msgstr "Nenalezeno \"nameio\" rozhraní %s, verze %i:%i:%i"
+
+#: encfs/FileUtils.cpp:1618
+#, fuzzy
+msgid "The requested filename coding interface is not available\n"
+msgstr "Požadované rozhraní pro kódování názvů souborů není dostupné\n"
+
+#: encfs/FileUtils.cpp:1670
+msgid "Remount failed"
+msgstr ""
+
+#: encfs/BlockFileIO.cpp:419
+#, fuzzy, c-format
+msgid "truncate failure: read %i bytes, partial block of %i"
+msgstr "chyba v ukončování souboru: přečteno %i bajtů, neúplný blok %i"
+
+#: encfs/StreamNameIO.cpp:39
+msgid "Stream encoding, keeps filenames as short as possible"
+msgstr "Proudové kódování, zachovává nejkratší možnou délku jmen souborů"
+
+#: encfs/SSL_Cipher.cpp:199
+msgid "8 byte block cipher"
+msgstr "Bloková šifra o velikosti 8 bajtů"
+
+#: encfs/BlockNameIO.cpp:50
+msgid "Block encoding, hides file name size somewhat"
+msgstr "Blokové kódování, zamlžuje délku jména souboru"
+
+#: encfs/main.cpp:127
+#, fuzzy, c-format
+msgid "Build: encfs version %s"
+msgstr "Sestavení: encfs verze %s"
+
+#: encfs/main.cpp:130
+#, fuzzy, c-format
+msgid "Usage: %s [options] rootDir mountPoint [-- [FUSE Mount Options]]"
+msgstr ""
+"Použití: %s [volby] kořenovýAdresář bodPřipojení [-- [Volby připojení FUSE]]"
+
+#: encfs/main.cpp:132
+msgid ""
+"Common Options:\n"
+"  -H\t\t\tshow optional FUSE Mount Options\n"
+"  -s\t\t\tdisable multithreaded operation\n"
+"  -f\t\t\trun in foreground (don't spawn daemon).\n"
+"\t\t\tError messages will be sent to stderr\n"
+"\t\t\tinstead of syslog.\n"
+msgstr ""
+"Běžné volby:\n"
+"  -H\t\t\tUkázat volitelné přepínače FUSE\n"
+"  -s\t\t\tZakázat operace ve více vláknech\n"
+"  -f\t\t\tSpustit na popředí (nezavádět démona).\n"
+"\t\t\tChybová hlášení budou vypisována na obrazovku\n"
+"\t\t\tmísto do systémového souboru záznamů.\n"
+
+#: encfs/main.cpp:140
+#, fuzzy
+msgid ""
+"  -v, --verbose\t\tverbose: output encfs debug messages\n"
+"  -i, --idle=MINUTES\tAuto unmount after period of inactivity\n"
+"  --anykey\t\tDo not verify correct key is being used\n"
+"  --forcedecode\t\tdecode data even if an error is detected\n"
+"\t\t\t(for filesystems using MAC block headers)\n"
+msgstr ""
+"  -v, --verbose\t\tSdílný: zobrazovat ladící zprávy \"encfs\"\n"
+"  -i, --idle=MINUT\tAutomaticky odpojit po uvedeném čase v klidu\n"
+"  --anykey\t\tNeověřovat správnost použitého klíče\n"
+"  --forcedecode\t\tDekódovat data i přes zjištění chyby\n"
+"\t\t\t(pro systémy souborů používající MAC hlavičky bloků)\n"
+
+#: encfs/main.cpp:145
+#, fuzzy
+msgid ""
+"  --public\t\tact as a typical multi-user filesystem\n"
+"\t\t\t(encfs must be run as root)\n"
+msgstr ""
+"  --public\t\tchovat se jako typický víceuživatelský souborový systém\n"
+"\t\t\t(\"encfs\" musí být spuštěn s právy superuživatele)\n"
+
+#: encfs/main.cpp:147
+msgid "  --reverse\t\treverse encryption\n"
+msgstr ""
+
+#: encfs/main.cpp:150
+#, fuzzy
+msgid ""
+"  --extpass=program\tUse external program for password prompt\n"
+"\n"
+"Example, to mount at ~/crypt with raw storage in ~/.crypt :\n"
+"    encfs ~/.crypt ~/crypt\n"
+"\n"
+msgstr ""
+"  --extpass=program\tPoužít program pro dotaz na heslo\n"
+"\n"
+"Např. připojení ~/crypt s hostitelským úložištěm v ~/.crypt :\n"
+"encfs ~/.crypt ~/crypt\n"
+"\n"
+
+#: encfs/main.cpp:156
+msgid "For more information, see the man page encfs(1)"
+msgstr "Více informací získáte v manuálu \"encfs(1)\""
+
+#: encfs/main.cpp:164
+#, fuzzy
+msgid ""
+"encfs [options] rootDir mountPoint -- [FUSE Mount Options]\n"
+"valid FUSE Mount Options follow:\n"
+msgstr ""
+"encfs [volby] kořenovýAdresář přípojnýBod -- [Volby připojení FUSE]\n"
+"Přípustné volby připojení FUSE následují:\n"
+
+#: encfs/main.cpp:297
+#, fuzzy
+msgid "option '--public' ignored for non-root user"
+msgstr ""
+"volba '--public' není pro běžného uživatele (bez práv superuživatele) brána "
+"v úvahu"
+
+#: encfs/main.cpp:309
+#, c-format
+msgid "encfs version %s"
+msgstr "encfs verze %s"
+
+#: encfs/main.cpp:323
+#, fuzzy, c-format
+msgid "getopt error: %i"
+msgstr "chyba getopt: %i"
+
+#: encfs/main.cpp:348
+#, fuzzy
+msgid "Missing one or more arguments, aborting."
+msgstr "Jeden nebo více parametrů chybí, nepokračuji."
+
+#: encfs/main.cpp:373
+#, fuzzy
+msgid ""
+"When specifying daemon mode, you must use absolute paths (beginning with '/')"
+msgstr ""
+"Spuštění na pozadí vyžaduje uvedení absolutních cest (začínají na \"/\")"
+
+#: encfs/main.cpp:389
+#, fuzzy
+msgid "The raw directory may not be a subdirectory of the mount point."
+msgstr "Hostitelské úložiště nesmí být podadresářem přípojného bodu."
+
+#: encfs/main.cpp:399
+msgid "Must set password program when using mount-on-demand"
+msgstr ""
+
+#: encfs/main.cpp:408
+#, fuzzy
+msgid "Unable to locate root directory, aborting."
+msgstr "Kořenový adresář nenalezen, nepokračuji."
+
+#: encfs/main.cpp:414
+#, fuzzy
+msgid "Unable to locate mount point, aborting."
+msgstr "Přípojný bod nenalezen, nepokračuji."
+
+#: encfs/main.cpp:584
+#, fuzzy
+msgid ""
+"Note: requested single-threaded mode, but an idle\n"
+"timeout was specified.  The filesystem will operate\n"
+"single-threaded, but threads will still be used to\n"
+"implement idle checking."
+msgstr ""
+"Pozn.: byl zvolen jednovláknový režim, ale také\n"
+"perioda neaktivity. Systém souborů bude pracovat\n"
+"v jediném vlákně, avšak další vlákna budou použita\n"
+"pro zjišťování neaktivity."
+
+#: encfs/main.cpp:635
+#, fuzzy, c-format
+msgid ""
+"fuse failed.  Common problems:\n"
+" - fuse kernel module not installed (modprobe fuse)\n"
+" - invalid options -- see usage message\n"
+msgstr ""
+"FUSE selhalo. Běžné příčiny:\n"
+" - jaderný modul \"fuse\" není zaveden (modprobe fuse)\n"
+" - neplatné volby -- viz \"Použití\"\n"
+
+#: encfs/main.cpp:642
+#, c-format
+msgid "Internal error: Caught exception from main loop: %s"
+msgstr "Interní chyba: zachycena výjimka vyvolaná v hlavní smyčce: %s"
+
+#: encfs/main.cpp:646
+msgid "Internal error: Caught unexpected exception"
+msgstr "Interní chyba: zachycena neočekávaná výjimka"
+
+#: encfs/main.cpp:736
+#, fuzzy, c-format
+msgid "Unmounting filesystem %s due to inactivity"
+msgstr "Odpojuji systém souborů %s kvůli neaktivitě"
+
+#: encfs/MACFileIO.cpp:217
+#, fuzzy, c-format
+msgid "MAC comparison failure in block %li"
+msgstr "Porovnání MAC selhalo v bloku %li"
+
+#: encfs/MACFileIO.cpp:223
+#, fuzzy
+msgid "MAC comparison failure, refusing to read"
+msgstr "Porovnání MAC selhalo, odmítám číst"
+
+#~ msgid "Error opening key file %s for write: %s"
+#~ msgstr "Chyba při otevírání souboru klíčů %s pro zápis: %s"
+
+#, fuzzy
+#~ msgid "algorithm compatible with EncFS 0.2-0.6"
+#~ msgstr "algoritmus kompatibilní s EncFS 0.2-0.6"

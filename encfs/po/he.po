@@ -1,0 +1,830 @@
+# Hebrew translation for Encrypted Filesystem for Linux
+# Copyright (c) (c) 2005 Canonical Ltd, and Rosetta Contributors 2005
+# This file is distributed under the same license as the Encrypted Filesystem for Linux package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2005.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Encrypted Filesystem for Linux\n"
+"Report-Msgid-Bugs-To: https://translations.launchpad.net/encfs/main/+pots/"
+"encfs\n"
+"POT-Creation-Date: 2008-09-09 22:55-0700\n"
+"PO-Revision-Date: 2007-11-22 17:46+0000\n"
+"Last-Translator: Nir Lavi\n"
+"Language-Team: Hebrew <he@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Launchpad-Export-Date: 2008-01-05 22:32+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
+"X-Rosetta-Version: 0.1\n"
+
+#: encfs/encfsctl.cpp:82
+msgid "  -- show information (Default command)"
+msgstr "  -- הצג מידע (פקודת ברירת מחדל)"
+
+#: encfs/encfsctl.cpp:85
+msgid "  -- show key"
+msgstr ""
+
+#: encfs/encfsctl.cpp:88
+msgid "  -- change password for volume"
+msgstr "  -- שנה סיסמא לנפח"
+
+#: encfs/encfsctl.cpp:91
+msgid ""
+"  -- change password for volume, taking password from standard input.\n"
+"\tNo prompts are issued."
+msgstr ""
+"  -- שנה סיסמא עבור הערך, לוקח סיסמא מקלט סטנדרטי.\n"
+"\tהצעות לא הופקו."
+
+#: encfs/encfsctl.cpp:96
+msgid "  -- show undecodable filenames in the volume"
+msgstr "  -- הצג שמות קבצים בלתי ניתנים לפענוח בכרך"
+
+#: encfs/encfsctl.cpp:99
+msgid "  -- decodes the file and cats it to standard out"
+msgstr "  -- פענח את הקובץ והוצא אותו ביציאה סטנדרטית"
+
+#: encfs/encfsctl.cpp:102
+msgid "  -- decodes name and prints plaintext version"
+msgstr "  -- מפענח שם ומדפיס אותו בגירסת טקסט פשוט"
+
+#: encfs/encfsctl.cpp:105
+msgid "  -- encodes a filename and print result"
+msgstr "  -- קודד את שם הקובץ והדפס את התוצאה"
+
+#: encfs/encfsctl.cpp:108
+msgid "  -- decrypts a volume and writes results to path"
+msgstr "  -- מפענח את הערך וכותב את התוצאות לנתיב"
+
+#: encfs/encfsctl.cpp:111
+msgid "  -- print version number and exit"
+msgstr "  -- מדפיס את מספר הגירסה ויוצא"
+
+#: encfs/encfsctl.cpp:120 encfs/encfsctl.cpp:164
+#, c-format
+msgid "encfsctl version %s"
+msgstr "encfsctl גירסה %s"
+
+#: encfs/encfsctl.cpp:121
+msgid "Usage:\n"
+msgstr "שימוש:\n"
+
+#: encfs/encfsctl.cpp:124
+#, c-format
+msgid ""
+"%s (root dir)\n"
+"  -- displays information about the filesystem, or \n"
+msgstr ""
+"%s (root dir)\n"
+"  -- מציג מידע אודות מערכת הקבצים, או \n"
+
+#: encfs/encfsctl.cpp:141
+#, c-format
+msgid ""
+"Example: \n"
+"%s info ~/.crypt\n"
+msgstr ""
+"דוגמא:\n"
+"%s info ~/.crypt\n"
+
+#: encfs/encfsctl.cpp:149
+#, c-format
+msgid "directory %s does not exist.\n"
+msgstr "תקייה %s אינה קיימת.\n"
+
+#: encfs/encfsctl.cpp:184 encfs/encfsctl.cpp:656
+msgid "Unable to load or parse config file\n"
+msgstr "אין אפשרות לטעון או לנתח קובץ הגדרות\n"
+
+#: encfs/encfsctl.cpp:188
+msgid ""
+"A really old EncFS filesystem was found. \n"
+"It is not supported in this EncFS build.\n"
+msgstr ""
+"מערכת קבצים EncFS מאוד ישנה ממצאה.\n"
+"מערכת זו אינה נתמכת ע\"י EncFS.\n"
+
+#: encfs/encfsctl.cpp:193
+#, c-format
+msgid "Version 3 configuration; created by %s\n"
+msgstr "תצורת גירסה 3; נוצרה ע\"י %s\n"
+
+#: encfs/encfsctl.cpp:198
+#, c-format
+msgid "Version 4 configuration; created by %s\n"
+msgstr "תצורת גירסה 4; נוצרה ע\"י %s\n"
+
+#: encfs/encfsctl.cpp:203
+#, c-format
+msgid "Version 5 configuration; created by %s (revision %i)\n"
+msgstr "תצורת גירסה 3; נוצרה ע\"י %s (תיקון %i)\n"
+
+#: encfs/encfsctl.cpp:209
+#, fuzzy, c-format
+msgid "Version 6 configuration; created by %s (revision %i)\n"
+msgstr "תצורת גירסה 3; נוצרה ע\"י %s (תיקון %i)\n"
+
+#: encfs/encfsctl.cpp:235
+msgid "Unable to initialize encrypted filesystem - check path.\n"
+msgstr "נכשל לאתחל מערכת קבצים מוצפנת - בדוק נתיב.\n"
+
+#: encfs/encfsctl.cpp:590
+#, c-format
+msgid "In directory %s: \n"
+msgstr "בתקייה %s: \n"
+
+#: encfs/encfsctl.cpp:638
+#, c-format
+msgid "Found %i invalid file."
+msgid_plural "Found %i invalid files."
+msgstr[0] "נמצא %i קובץ לא חוקי."
+msgstr[1] "נמצאו %i קבצים לא חוקיים."
+
+#: encfs/encfsctl.cpp:665
+#, c-format
+msgid "Unable to find specified cipher \"%s\"\n"
+msgstr "נכשל במציאת הצופן מצויין \"%s\"\n"
+
+#: encfs/encfsctl.cpp:671
+msgid "Enter current Encfs password\n"
+msgstr "הכנס את הסיסמא הנוכחית עבור Encfs\n"
+
+#: encfs/encfsctl.cpp:682
+msgid "Invalid password\n"
+msgstr "סיסמא שגויה\n"
+
+#: encfs/encfsctl.cpp:688
+msgid "Enter new Encfs password\n"
+msgstr "הכנס סיסמא חדשה עבור Encfs\n"
+
+#: encfs/encfsctl.cpp:714
+msgid "Volume Key successfully updated.\n"
+msgstr "מפתח הכרך עודכן בהצלחה.\n"
+
+#: encfs/encfsctl.cpp:718
+msgid "Error saving modified config file.\n"
+msgstr "שגיאה בשמירת קובץ ה-config ששונה\n"
+
+#: encfs/encfsctl.cpp:722
+msgid "Error creating key\n"
+msgstr ""
+
+#: encfs/encfsctl.cpp:787
+#, c-format
+msgid "invalid command: \"%s\""
+msgstr "פקודה לא חוקית: \"%s\""
+
+#: encfs/encfsctl.cpp:794
+#, c-format
+msgid "Incorrect number of arguments for command \"%s\""
+msgstr "מספר שגוי של ארגומנטים עבור הפקודה \"%s\""
+
+#: encfs/FileUtils.cpp:288
+#, c-format
+msgid "The directory \"%s\" does not exist. Should it be created? (y,n) "
+msgstr "התקייה \"%s\" אינה קיימת. האם ליצור אותה? (y,n) "
+
+#: encfs/FileUtils.cpp:297
+msgid "Unable to create directory: "
+msgstr "נכשל ביצירת התקייה: "
+
+#: encfs/FileUtils.cpp:304
+msgid "Directory not created."
+msgstr "התקייה לא נוצרה"
+
+#: encfs/FileUtils.cpp:326
+#, c-format
+msgid "Found config file %s, but failed to load"
+msgstr "נמצא קובץ config %s, אך נכשל בטעינתו"
+
+#: encfs/FileUtils.cpp:402
+#, c-format
+msgid ""
+"Config subversion %i found, but this version of encfs only supports up to "
+"version %i."
+msgstr ""
+"נמצא תת-גירסא %i ל-Config, אך הגירסא הזו של encfs תומכת רק עד גירסא %i."
+
+#: encfs/FileUtils.cpp:409
+msgid ""
+"This version of EncFS doesn't support filesystems created before 2004-08-13"
+msgstr ""
+
+#: encfs/FileUtils.cpp:607
+msgid "The following cipher algorithms are available:"
+msgstr "אלגוריתמי ההצפנה הבאים זמינים:"
+
+#: encfs/FileUtils.cpp:619
+#, c-format
+msgid " -- key length %i bits"
+msgstr " -- אורך מפתח %i ביטים"
+
+#: encfs/FileUtils.cpp:626
+#, c-format
+msgid " -- Supports key lengths of %i to %i bits"
+msgstr " -- תומך באורכי מפתחות של %i עד %i ביטים"
+
+#: encfs/FileUtils.cpp:635
+#, c-format
+msgid " -- block size %i bytes"
+msgstr " -- גודל בלוק %i בתים"
+
+#: encfs/FileUtils.cpp:642
+#, c-format
+msgid " -- Supports block sizes of %i to %i bytes"
+msgstr " -- גודל בלוק נתמך %i עד %i בתים"
+
+#: encfs/FileUtils.cpp:648 encfs/FileUtils.cpp:693
+msgid "Enter the number corresponding to your choice: "
+msgstr "הכנס מספר התואם לבחירתך: "
+
+#: encfs/FileUtils.cpp:656 encfs/FileUtils.cpp:701
+msgid "Invalid selection."
+msgstr "בחירה שגויה"
+
+#: encfs/FileUtils.cpp:667 encfs/FileUtils.cpp:710
+#, c-format
+msgid "Selected algorithm \"%s\""
+msgstr "האלגוריתם \"%s\" נבחר"
+
+#: encfs/FileUtils.cpp:681
+msgid "The following filename encoding algorithms are available:"
+msgstr "האלגוריתמים הבאים להצפנת שם הקובץ זמינים:"
+
+#: encfs/FileUtils.cpp:722 encfs/FileUtils.cpp:769
+#, c-format
+msgid "Using key size of %i bits"
+msgstr "מפתח בגודל %i ביטים נמצא בשימוש"
+
+#: encfs/FileUtils.cpp:729
+#, c-format
+msgid ""
+"Please select a key size in bits.  The cipher you have chosen\n"
+"supports sizes from %i to %i bits in increments of %i bits.\n"
+"For example: "
+msgstr ""
+"אנא בחר את גודל הקובץ בביטים. הצופן שבחרת\n"
+"תומך בגדלים מ %i עד %i ביטים בגידול של %i ביטים.\n"
+"לדוגמא: "
+
+#: encfs/FileUtils.cpp:759
+msgid "Selected key size: "
+msgstr "בחר גודל מפתח: "
+
+#: encfs/FileUtils.cpp:781 encfs/FileUtils.cpp:808
+#, c-format
+msgid "Using filesystem block size of %i bytes"
+msgstr "גודל בלוק במערכת קבצים של %i בתים נמצא בשימוש"
+
+#: encfs/FileUtils.cpp:788
+#, c-format
+msgid ""
+"Select a block size in bytes.  The cipher you have chosen\n"
+"supports sizes from %i to %i bytes in increments of %i.\n"
+"Or just hit enter for the default (%i bytes)\n"
+msgstr ""
+"אנא בחר את גודל הבלוק בבייטים. הצופן שבחרת\n"
+"תומך בגדלים מ %i עד %i בייטים בגידול של %i ביטים.\n"
+"או פשוט לחץ אנטר עבור ברירת המחדל (%i בייטים).\n"
+
+#: encfs/FileUtils.cpp:795
+msgid "filesystem block size: "
+msgstr "גודל בלוג במערכת קבצים: "
+
+#: encfs/FileUtils.cpp:818
+msgid ""
+"The default here is No.\n"
+"Any response that does not begin with 'y' will mean No: "
+msgstr ""
+
+#: encfs/FileUtils.cpp:836
+#, fuzzy
+msgid ""
+"Enable block authentication code headers\n"
+"on every block in a file?  This adds about 12 bytes per block\n"
+"to the storage requirements for a file, and significantly affects\n"
+"performance but it also means [almost] any modifications or errors\n"
+"within a block will be caught and will cause a read error."
+msgstr ""
+"אפשר ראשי מקטעי קוד אימות\n"
+"על כל קטע בקובץ? זה מוסיף \n"
+"בערך 12 בייטים לקטע כדי\n"
+"לדרישות האיחסון של הקובץ,\n"
+"ומשפיע בצורה משמעותית על\n"
+"הביצועים אבל זה גם אומר [כמעט]\n"
+"שכל השינויים או השגיאות במקטע\n"
+"יתפסו ויגמרו לשגיאת כתיבה.\n"
+"ברירת המחדל היא לא.  \n"
+"כל תגובה שאינה מתחילה ב 'y' \n"
+"מציינת לא: "
+
+#: encfs/FileUtils.cpp:847
+msgid ""
+"Add random bytes to each block header?\n"
+"This adds a performance penalty, but ensures that blocks\n"
+"have different authentication codes.  Note that you can\n"
+"have the same benefits by enabling per-file initialization\n"
+"vectors, which does not come with as great of performance\n"
+"penalty. \n"
+"Select a number of bytes, from 0 (no random bytes) to 8: "
+msgstr ""
+"להוסיף בייטים אקראיים לכל ראש מקטע?\n"
+"זה גורע מהביצועים, אבל מוודא שלמקטעים יהיו קודי אימות שונים.\n"
+"שים לב שאתה יכולות להיות לך אותן הטבות ע\"י הפעלת וקטורי \n"
+"איתחול לכל קובץ, אשר אינו כוללים גריעה רבה מהביצועים. \n"
+"בחר את מספר הבייטים, מ 0 (בלי בייטים אקראים) ל 8: "
+
+#: encfs/FileUtils.cpp:878
+msgid ""
+"The default here is Yes.\n"
+"Any response that does not begin with 'n' will mean Yes: "
+msgstr ""
+
+#: encfs/FileUtils.cpp:896
+#, fuzzy
+msgid ""
+"Enable per-file initialization vectors?\n"
+"This adds about 8 bytes per file to the storage requirements.\n"
+"It should not affect performance except possibly with applications\n"
+"which rely on block-aligned file io for performance."
+msgstr ""
+"אפשר וקטורי איתחול קדם-קבציים?\n"
+"זה מוסיף בערך 8 בייטים לכל דרישות האיחסון של קובץ.\n"
+"זה לא אמור להשפיע על הביצועים מלבד האפשרות בקבצים\n"
+"אשר מסתמכים על קובץ מקטע-מסודר io לביצועים.\n"
+"ערך ברירת המחדל הוא Yes.  \n"
+"כל תגובה שאינה מתחיל ב 'n' תתפרש כ Yes: "
+
+#: encfs/FileUtils.cpp:907
+#, fuzzy
+msgid ""
+"Enable filename initialization vector chaining?\n"
+"This makes filename encoding dependent on the complete path, \n"
+"rather then encoding each path element individually."
+msgstr ""
+"אפשר שישור וקטורי איתחול עם שם-קובץ?\n"
+"זה יהפוך את קידוד שמות הקובץ לתלוי בנתיב המלא, \n"
+"בניגוד לקידוד התלוי בכל אלמנט נתיב אינדיוידואלי. \n"
+"זה רצוי במצב נורמלי, לכן אפשרות ברירת המחדל היא כן. \n"
+"כל תגובה אחרת שאינה מתחיל ב'n' תתפרש ככן: "
+
+#: encfs/FileUtils.cpp:917
+#, fuzzy
+msgid ""
+"Enable filename to IV header chaining?\n"
+"This makes file data encoding dependent on the complete file path.\n"
+"If a file is renamed, it will not decode sucessfully unless it\n"
+"was renamed by encfs with the proper key.\n"
+"If this option is enabled, then hard links will not be supported\n"
+"in the filesystem."
+msgstr ""
+"אפשר שם-קובץ לשירשור \"ראש\" IV?\n"
+"זה יוצר קידוד קובץ מידע שתלוי בנתיב המלא.\n"
+"אם שם הקובץ משונה, הוא לא יפוענח בהצלחה אלא\n"
+"אם השם שונה ע\"י encfs עם מפתח מתאים.\n"
+"אם אפשרות זו מופעלת, אז קישורים קשים לא יתמכו\n"
+"במערכת הקבצים.\n"
+"אפשרות ברירת המחדל היא לא. \n"
+"כל תגובה אחרת שאינה מתחיל ב'y' תתפרש כלא: "
+
+#: encfs/FileUtils.cpp:930
+msgid ""
+"Enable file-hole pass-through?\n"
+"This avoids writing encrypted blocks when file holes are created."
+msgstr ""
+
+#: encfs/FileUtils.cpp:944
+msgid "Creating new encrypted volume."
+msgstr "יוצר כרך מוצפן חדש"
+
+#: encfs/FileUtils.cpp:947
+msgid ""
+"Please choose from one of the following options:\n"
+" enter \"x\" for expert configuration mode,\n"
+" enter \"p\" for pre-configured paranoia mode,\n"
+" anything else, or an empty line will select standard mode.\n"
+"?> "
+msgstr ""
+"בחר אפשרות מהאפשרויות הבאות:\n"
+" \"x\" - מצב הגדרות מקצועיות,\n"
+" \"p\" - הגדרות מראש או מצב פראנויה,\n"
+" כל דבר אחר, או שורה ריקה יגיעו למצב רגיל "
+
+#: encfs/FileUtils.cpp:982
+#, fuzzy
+msgid "Paranoia configuration not supported for --reverse"
+msgstr "הגדרות פראנויה נבחרו"
+
+#: encfs/FileUtils.cpp:987
+msgid "Paranoia configuration selected."
+msgstr "הגדרות פראנויה נבחרו"
+
+#: encfs/FileUtils.cpp:1007
+msgid "Standard configuration selected."
+msgstr "הגדרות רגילות נבחרו"
+
+#: encfs/FileUtils.cpp:1019 encfs/FileUtils.cpp:1050
+msgid "--reverse specified, not using unique/chained IV"
+msgstr ""
+
+#: encfs/FileUtils.cpp:1033
+msgid ""
+"Sorry, unable to locate cipher for predefined configuration...\n"
+"Falling through to Manual configuration mode."
+msgstr ""
+"סליחה, נכשל באיתור הצופן עבור עיצוב המוגדר מראש...\n"
+"עוקב אחר מצב העיצוב הידני."
+
+#: encfs/FileUtils.cpp:1039
+msgid "Manual configuration mode selected."
+msgstr "הגדרות ידניות נבחרו"
+
+#: encfs/FileUtils.cpp:1060
+msgid ""
+"External chained IV disabled, as both 'IV chaining'\n"
+"and 'unique IV' features are required for this option."
+msgstr ""
+"IV משורשר חיצוני מבוטל, בנוסף לאפשרויות 'שירשור IV'\n"
+"ן 'IV ייחודי' נדרשות לאפשרות זו."
+
+#: encfs/FileUtils.cpp:1073
+#, c-format
+msgid "Unable to instanciate cipher %s, key size %i, block size %i"
+msgstr "נכשל בדגימת צופן %s, גודל מפתח %i, גודל קטע %i"
+
+#: encfs/FileUtils.cpp:1104
+msgid ""
+"Configuration finished.  The filesystem to be created has\n"
+"the following properties:"
+msgstr ""
+"עיצוב הסתיים. למערכת הקבצים שנוצרה יש\n"
+"את המאפיינים הבאים:"
+
+#: encfs/FileUtils.cpp:1111
+msgid "-------------------------- WARNING --------------------------\n"
+msgstr "-------------------------- אזהרה--------------------------\n"
+
+#: encfs/FileUtils.cpp:1113
+msgid ""
+"The external initialization-vector chaining option has been\n"
+"enabled.  This option disables the use of hard links on the\n"
+"filesystem. Without hard links, some programs may not work.\n"
+"The programs 'mutt' and 'procmail' are known to fail.  For\n"
+"more information, please see the encfs mailing list.\n"
+"If you would like to choose another configuration setting,\n"
+"please press CTRL-C now to abort and start over."
+msgstr ""
+"אפשרות חיצונית לאיתחול וקטורי שירשור הופעלה.\n"
+"אפשרות זו מנטרלת את השימוש בקישורים קשים\n"
+"במערכת הקבצים. בלי הקישורים הקשים, חלק\n"
+"מהתוכנות עלולות לא לעבוד. ידוע שהתוכנות 'mutt' ו\n"
+"'procmail' יכשלו. למידע נוסף, אנא עיין ברשימת\n"
+"הדיוור של encfs. אם אתה רוצה לבחור אפשרות\n"
+"הגדרה אחרת, אנא לחץ כעת על CTRL-C לביטול\n"
+"והתחל מחדש."
+
+#: encfs/FileUtils.cpp:1124
+msgid ""
+"Now you will need to enter a password for your filesystem.\n"
+"You will need to remember this password, as there is absolutely\n"
+"no recovery mechanism.  However, the password can be changed\n"
+"later using encfsctl.\n"
+"\n"
+msgstr ""
+"כעת אתה נדרש להכניס סיסמה עבור מערכת הקבצים שלך.\n"
+"תצטרך לזכור את הסיסמא, זאת מכיוון שאין כלל אפשרות\n"
+"מכנית לשחזר אותה. בכל אופן, הסיסמה ניתנת לשינוי \n"
+"מאוחר יותר כעזרת encfsctl.\n"
+"\n"
+
+#: encfs/FileUtils.cpp:1152
+msgid "Failure generating new volume key! Please report this error."
+msgstr "כישלון ביצירת מפתח ערך חדש! אנא דווח אודות שגיאה זו."
+
+#: encfs/FileUtils.cpp:1165
+msgid "Name coding interface not supported"
+msgstr "ממשק קידוד שם אינו נתמך"
+
+#: encfs/FileUtils.cpp:1166
+msgid "The filename encoding interface requested is not available"
+msgstr "ממשק קידוד שם הקובץ שביקשת אינו זמין"
+
+#: encfs/FileUtils.cpp:1204
+#, c-format
+msgid "Filesystem cipher: \"%s\", version %i:%i:%i"
+msgstr "צופן מערכת הקבצים:\"%s\", גירסא%i:%i:%i"
+
+#: encfs/FileUtils.cpp:1209 encfs/FileUtils.cpp:1235 encfs/FileUtils.cpp:1254
+msgid " (NOT supported)\n"
+msgstr " (לא נתמך)\n"
+
+#: encfs/FileUtils.cpp:1217 encfs/FileUtils.cpp:1242
+#, c-format
+msgid " (using %i:%i:%i)\n"
+msgstr " (משתמש %i:%i:%i)\n"
+
+#: encfs/FileUtils.cpp:1225
+#, c-format
+msgid "Filename encoding: \"%s\", version %i:%i:%i"
+msgstr "קידוד שם קובץ: \"%s\", גירסא %i:%i:%i"
+
+#: encfs/FileUtils.cpp:1249
+#, c-format
+msgid "Key Size: %i bits"
+msgstr "גודל מפתח: %i ביטים"
+
+#: encfs/FileUtils.cpp:1260
+#, c-format
+msgid "Using PBKDF2, with %i iterations"
+msgstr ""
+
+#: encfs/FileUtils.cpp:1262
+#, fuzzy, c-format
+msgid "Salt Size: %i bits"
+msgstr "גודל מפתח: %i ביטים"
+
+#: encfs/FileUtils.cpp:1271
+#, c-format
+msgid "Block Size: %i bytes + %i byte MAC header"
+msgstr "גודל בלוק: %i בייטים + %i בייטים ראש MAC"
+
+#: encfs/FileUtils.cpp:1279
+#, c-format
+msgid "Block Size: %i bytes, including %i byte MAC header"
+msgstr "גודל בלוק: %i בייטים, כולל + %i בייטים ראש MAC"
+
+#: encfs/FileUtils.cpp:1286
+#, c-format
+msgid "Block Size: %i bytes"
+msgstr "גודל קטע: %i בייטים"
+
+#: encfs/FileUtils.cpp:1293
+msgid "Each file contains 8 byte header with unique IV data.\n"
+msgstr "כל קובץ מכיל כותרת עליונה בגודל 8 בייטים עם מידע IV ייחודי.\n"
+
+#: encfs/FileUtils.cpp:1298
+msgid "Filenames encoded using IV chaining mode.\n"
+msgstr "שמות הקבצים קודדו בעזרת מצב שרשרת IV.\n"
+
+#: encfs/FileUtils.cpp:1303
+msgid "File data IV is chained to filename IV.\n"
+msgstr "מידע הקובץ IV משורשר לשם הקובץ IV.\n"
+
+#: encfs/FileUtils.cpp:1308
+msgid "File holes passed through to ciphertext.\n"
+msgstr ""
+
+#: encfs/FileUtils.cpp:1369
+msgid "Error creating salt\n"
+msgstr ""
+
+#: encfs/FileUtils.cpp:1398
+msgid "EncFS Password: "
+msgstr "ססמת EncFS: "
+
+#: encfs/FileUtils.cpp:1404
+msgid "Zero length password not allowed\n"
+msgstr "סיסמאות באורך אפס אסורות\n"
+
+#: encfs/FileUtils.cpp:1450
+msgid "Internal error: socketpair() failed"
+msgstr "שגיאה פנימית: socketpair() נכשל"
+
+#: encfs/FileUtils.cpp:1458
+msgid "Internal error: fork() failed"
+msgstr "שגיאה פנימית: fork() נכשל"
+
+#: encfs/FileUtils.cpp:1500
+msgid "Internal error: failed to exec program"
+msgstr "שגיאה פנימית: נכשל בביצוע תוכנה"
+
+#: encfs/FileUtils.cpp:1528
+msgid "New Encfs Password: "
+msgstr "ססמת EncFS חדשה: "
+
+#: encfs/FileUtils.cpp:1531
+msgid "Verify Encfs Password: "
+msgstr "אמת ססמת EncFS: "
+
+#: encfs/FileUtils.cpp:1540
+msgid "Passwords did not match, please try again\n"
+msgstr "הססמאות אינן תואמות. אנא נסה שוב\n"
+
+#: encfs/FileUtils.cpp:1563
+msgid "The configuration loaded is not compatible with --reverse\n"
+msgstr ""
+
+#: encfs/FileUtils.cpp:1572
+#, c-format
+msgid "Unable to find cipher %s, version %i:%i:%i"
+msgstr "נכשל במציאת צופן %s, גירסא %i:%i:%i"
+
+#: encfs/FileUtils.cpp:1578
+msgid "The requested cipher interface is not available\n"
+msgstr "ממשק הצופן המבוקש אינו זמין\n"
+
+#: encfs/FileUtils.cpp:1604
+msgid "Error decoding volume key, password incorrect\n"
+msgstr "שגיאה בפיענוח מפתח הכרך, סיסמה שגויה\n"
+
+#: encfs/FileUtils.cpp:1612
+#, c-format
+msgid "Unable to find nameio interface %s, version %i:%i:%i"
+msgstr "נכשל במציאת ממשק nameio %s, גירסא %i:%i:%i"
+
+#: encfs/FileUtils.cpp:1618
+msgid "The requested filename coding interface is not available\n"
+msgstr "ממשק קידוד שם הקובץ המבוקש לא זמין\n"
+
+#: encfs/FileUtils.cpp:1670
+msgid "Remount failed"
+msgstr ""
+
+#: encfs/BlockFileIO.cpp:419
+#, c-format
+msgid "truncate failure: read %i bytes, partial block of %i"
+msgstr "שגיאת קיצוץ: קרא %i בייטים, חסימה חלקית של %i"
+
+#: encfs/StreamNameIO.cpp:39
+msgid "Stream encoding, keeps filenames as short as possible"
+msgstr "קידוד שטף מידע, משאיר את שמות הקבצים קצרים ככל האפשר"
+
+#: encfs/SSL_Cipher.cpp:199
+msgid "8 byte block cipher"
+msgstr "צופן מקטע 8 בייט"
+
+#: encfs/BlockNameIO.cpp:50
+msgid "Block encoding, hides file name size somewhat"
+msgstr "חוסם קידוד, מחביא את שם וגודל הקובץ במקצת"
+
+#: encfs/main.cpp:127
+#, c-format
+msgid "Build: encfs version %s"
+msgstr "בניה: encfs גירסה %s"
+
+#: encfs/main.cpp:130
+#, c-format
+msgid "Usage: %s [options] rootDir mountPoint [-- [FUSE Mount Options]]"
+msgstr "שימוש: %s [אפשרויות] rootDir mountPoint [-- [אפשרויות עיגון של FUSE]]"
+
+#: encfs/main.cpp:132
+msgid ""
+"Common Options:\n"
+"  -H\t\t\tshow optional FUSE Mount Options\n"
+"  -s\t\t\tdisable multithreaded operation\n"
+"  -f\t\t\trun in foreground (don't spawn daemon).\n"
+"\t\t\tError messages will be sent to stderr\n"
+"\t\t\tinstead of syslog.\n"
+msgstr ""
+"אפשרויות נפוצות:\n"
+"  -H\t\t\t מציג אפשרויות עיגון FUSE אפשרי\n"
+"  -s\t\t\t ניטרול פעולות קריאה מרובות\n"
+"  -f\t\t\t רוץ בקדמה (אל תיצור תוכנת שרת).\n"
+"\t\t\t הודעת שגיאה תישלוח ל stderr\n"
+"\t\t\t במקום ל syslog.\n"
+
+#: encfs/main.cpp:140
+msgid ""
+"  -v, --verbose\t\tverbose: output encfs debug messages\n"
+"  -i, --idle=MINUTES\tAuto unmount after period of inactivity\n"
+"  --anykey\t\tDo not verify correct key is being used\n"
+"  --forcedecode\t\tdecode data even if an error is detected\n"
+"\t\t\t(for filesystems using MAC block headers)\n"
+msgstr ""
+"  -v, --verbose\t\tרב-מילים: פלט הודעות ניפוי encfs\n"
+"  -i, --idle=MINUTES\tהסר עיגון אוטומטית לאחר זמן מסויים של חוסר-פעילות\n"
+"  --anykey\t\tאל תוודא אם מפתח נכון נמצא בשימוש\n"
+"  --forcedecode\t\tפענח מידע גם אם נתגלתה שגיאה\n"
+"\t\t\t(עבור מערכות קבצים המשתמשות במקטעי \"ראש\" MAC )\n"
+
+#: encfs/main.cpp:145
+msgid ""
+"  --public\t\tact as a typical multi-user filesystem\n"
+"\t\t\t(encfs must be run as root)\n"
+msgstr ""
+"  --פומבי\t\tפועל כמערכת רבת משתמשים טיפוסית\n"
+"\t\t\t(encfs חייב לרוץ כמנהל)\n"
+
+#: encfs/main.cpp:147
+msgid "  --reverse\t\treverse encryption\n"
+msgstr ""
+
+#: encfs/main.cpp:150
+msgid ""
+"  --extpass=program\tUse external program for password prompt\n"
+"\n"
+"Example, to mount at ~/crypt with raw storage in ~/.crypt :\n"
+"    encfs ~/.crypt ~/crypt\n"
+"\n"
+msgstr ""
+"  --extpass=תוכנית\tמשתמשת בתוכנית חיצונית לבקשת סיסמה\n"
+"\n"
+"דוגמא, לעגן ל ~/crypt עם איחסון נא ב ~/.crypt :\n"
+"    encfs ~/.crypt ~/crypt\n"
+"\n"
+
+#: encfs/main.cpp:156
+msgid "For more information, see the man page encfs(1)"
+msgstr "בשביל עוד מידע, פנה לדף מידע encfs(1)"
+
+#: encfs/main.cpp:164
+msgid ""
+"encfs [options] rootDir mountPoint -- [FUSE Mount Options]\n"
+"valid FUSE Mount Options follow:\n"
+msgstr ""
+"encfs [אפשרויות] rootDir mountPoint -- [אפשרויות עיגון FUSE]\n"
+"אפשרויות עיגון FUSE חוקיות להלן:\n"
+
+#: encfs/main.cpp:297
+msgid "option '--public' ignored for non-root user"
+msgstr "אפשרות '--public' נתקלה בהתעלמות למשתמש שהוא אינו מנהל"
+
+#: encfs/main.cpp:309
+#, c-format
+msgid "encfs version %s"
+msgstr "encfs גירסה %s"
+
+#: encfs/main.cpp:323
+#, c-format
+msgid "getopt error: %i"
+msgstr "שגיאת getopt: %i"
+
+#: encfs/main.cpp:348
+msgid "Missing one or more arguments, aborting."
+msgstr "חסר פרמטר אחד או יותר, מבטל."
+
+#: encfs/main.cpp:373
+msgid ""
+"When specifying daemon mode, you must use absolute paths (beginning with '/')"
+msgstr "כשמצוין מצב רקע, עליך להשתמש בנתיבים מלאים (מתחילים עם '/')"
+
+#: encfs/main.cpp:389
+msgid "The raw directory may not be a subdirectory of the mount point."
+msgstr "התקייה ה\"נאה\" הזו לא יכולה להיות תת-תקייה עבור נקודת עיגון."
+
+#: encfs/main.cpp:399
+msgid "Must set password program when using mount-on-demand"
+msgstr ""
+
+#: encfs/main.cpp:408
+msgid "Unable to locate root directory, aborting."
+msgstr "נכשל באיתור תקיית המנהל, מבטל."
+
+#: encfs/main.cpp:414
+msgid "Unable to locate mount point, aborting."
+msgstr "נכשל באיתור נקודת העיגון, מבטל."
+
+#: encfs/main.cpp:584
+msgid ""
+"Note: requested single-threaded mode, but an idle\n"
+"timeout was specified.  The filesystem will operate\n"
+"single-threaded, but threads will still be used to\n"
+"implement idle checking."
+msgstr ""
+"הערה: נתבקש מצב בעל תהליך אחד, אבל פסק זמן סרק צויין.\n"
+"מערכת הקבצים תפעל במצב תהליך אחד, אבל התהליכים עדיין יהיו\n"
+"בשימוש ליישום בדיקת סרק."
+
+#: encfs/main.cpp:635
+#, c-format
+msgid ""
+"fuse failed.  Common problems:\n"
+" - fuse kernel module not installed (modprobe fuse)\n"
+" - invalid options -- see usage message\n"
+msgstr ""
+"fuse נכשל. בעיות נפוצות:\n"
+" - המודול של fuse בליבה לא פעיל (modprobe fuse)\n"
+" - פרמטרים שגויים -- ראה הודעת הסבר שימוש\n"
+
+#: encfs/main.cpp:642
+#, c-format
+msgid "Internal error: Caught exception from main loop: %s"
+msgstr "שגיאה פנימית: נתפסה חריגה בלולאה הראשית: %s"
+
+#: encfs/main.cpp:646
+msgid "Internal error: Caught unexpected exception"
+msgstr "שגיאה פנימית: נתפסה חריגה לא ידועה"
+
+#: encfs/main.cpp:736
+#, c-format
+msgid "Unmounting filesystem %s due to inactivity"
+msgstr "מסיר את עיגון מערכת הקבצים %s בשל חוסר פעילות"
+
+#: encfs/MACFileIO.cpp:217
+#, c-format
+msgid "MAC comparison failure in block %li"
+msgstr "השוואת MAC נכשלה במקטע %li"
+
+#: encfs/MACFileIO.cpp:223
+msgid "MAC comparison failure, refusing to read"
+msgstr "השוואת MAC נכשלה, מסרב לקרוא"
+
+#~ msgid "Error opening key file %s for write: %s"
+#~ msgstr "שגיאה בפתיחת קובץ מפתח %s לכתיבה: %s."
+
+#~ msgid "algorithm compatible with EncFS 0.2-0.6"
+#~ msgstr "אלגוריתם תואם EncFS 0.2-0.6"

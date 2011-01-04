@@ -59,3 +59,18 @@ IF(CYGWIN)
 	INSTALL(FILES package/fuse.pc DESTINATION /lib/pkgconfig)
 
 ENDIF(CYGWIN)
+
+IF(MINGW AND CMAKE_CROSSCOMPILING)
+	INSTALL(
+		FILES
+	include/fuse.h
+	include/fuse_common.h
+	include/fuse_opt.h
+	include/fuse_sem_fix.h
+	include/fuse_win.h
+		DESTINATION include)
+
+	INSTALL(TARGETS fuse_static ARCHIVE DESTINATION lib)
+
+ENDIF(MINGW AND CMAKE_CROSSCOMPILING)
+

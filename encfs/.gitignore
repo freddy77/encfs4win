@@ -1,0 +1,25 @@
+Makefile
+m4/libtool.m4
+m4/lt~obsolete.m4 m4/ltoptions.m4 m4/ltsugar.m4 m4/ltversion.m4
+autom4te.cache
+config.h
+config.h.in
+config.log
+config.status
+configure
+encfs/encfs.exe
+m4/ltoptions.m4
+m4/ltsugar.m4
+m4/ltversion.m4
+m4/lt~obsolete.m4
+stamp-h1
+po/POTFILES
+po/Makefile.in
+libtool
+encfs/.deps/
+encfs/.libs/
+ltmain.sh
+m4/Makefile.in
+encfs/Makefile.in
+aclocal.m4
+Makefile.in

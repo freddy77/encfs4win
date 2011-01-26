@@ -454,7 +454,8 @@ int do_fuse_loop(struct fuse *fs, bool mt)
 	wchar_t mount[MAX_PATH+1];
 	mbstowcs(mount,fs->ch->mountpoint.c_str(),MAX_PATH);
 
-	dokanOptions->DriveLetter = mount[0];	
+	dokanOptions->Version = DOKAN_VERSION;
+	dokanOptions->MountPoint = mount;
 	dokanOptions->ThreadCount = mt?FUSE_THREAD_COUNT:1;
 	
 	//Debug

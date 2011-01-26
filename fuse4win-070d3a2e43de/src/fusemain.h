@@ -74,7 +74,7 @@ public:
 		PFillFindData delegate;
 		std::vector<std::string> getdir_data; //Used only in walk_directory_getdir()
 	};
-	static int walk_directory(void *buf, const char *name, 
+	static int walk_directory(void *buf, const char *name,
 		const struct stat *stbuf, off_t off);
 	static int walk_directory_getdir(fuse_dirh_t hndl, const char *name, int type,ino_t ino);
 

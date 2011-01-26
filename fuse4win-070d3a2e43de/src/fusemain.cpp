@@ -712,11 +712,11 @@ int impl_fuse_context::get_disk_free_space(PULONGLONG free_bytes_available,
 }
 
 int impl_fuse_context::get_volume_information(LPWSTR volume_name_buffer,DWORD volume_name_size,
-						   LPWSTR file_system_name_buffer, DWORD file_system_name_size, 
+						   LPWSTR file_system_name_buffer, DWORD file_system_name_size,
 						   PDOKAN_FILE_INFO dokan_file_info)
 {
 	if(volname_)
-		utf8_to_wchar_buf(volname_,volume_name_buffer,volume_name_size);		
+		utf8_to_wchar_buf(volname_,volume_name_buffer,volume_name_size);
 	else
 		utf8_to_wchar_buf(DEFAULT_FUSE_VOLUME_NAME,volume_name_buffer,volume_name_size);
 
@@ -724,7 +724,7 @@ int impl_fuse_context::get_volume_information(LPWSTR volume_name_buffer,DWORD vo
 		utf8_to_wchar_buf(fsname_,file_system_name_buffer,file_system_name_size);
 	else
 		utf8_to_wchar_buf(DEFAULT_FUSE_FILESYSTEM_NAME,file_system_name_buffer,
-			file_system_name_size);		
+			file_system_name_size);
 
 	return 0;
 }

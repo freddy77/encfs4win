@@ -18,7 +18,7 @@ struct impl_chain_link
 #ifdef _MSC_VER
 __declspec(thread) impl_chain_link * cur_impl_chain_link=NULL;
 #else
-static impl_chain_link * cur_impl_chain_link=NULL;
+static __thread impl_chain_link * cur_impl_chain_link=NULL;
 #endif
 
 impl_chain_guard::impl_chain_guard(impl_fuse_context* ctx, int caller_pid)

@@ -694,14 +694,10 @@ int fuse_main_real(int argc, char *argv[], const struct fuse_operations *op,
 		return 1;
 
 	//MT loops are only supported on MSVC
-#ifdef _MSC_VER
 	if (multithreaded)
 		res = fuse_loop_mt(fuse);
 	else
 		res = fuse_loop(fuse);
-#else
-		res = fuse_loop(fuse);
-#endif		
 
 	fuse_teardown(fuse, mountpoint);
 	if (res == -1)

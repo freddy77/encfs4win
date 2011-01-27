@@ -101,8 +101,7 @@ int impl_fuse_context::cast_from_longlong(LONGLONG src, FUSE_OFF_T *res)
 	if (src>LONG_MAX || src<LONG_MIN)
 		return -E2BIG;
 #endif
-	*res=0;
-	*res=(long)src;
+	*res=(FUSE_OFF_T)src;
 	return 0;
 }
 
@@ -207,7 +206,7 @@ int impl_fuse_context::check_and_resolve(std::string *name)
 }
 
 int impl_fuse_context::walk_directory(void *buf, const char *name, 
-									  const struct stat *stbuf, FUSE_OFF_T off)
+									  const struct FUSE_STAT *stbuf, FUSE_OFF_T off)
 {
 	walk_data *wd=(walk_data*)buf;
 	WIN32_FIND_DATAW find_data={0};	
@@ -300,7 +299,7 @@ int impl_fuse_context::open_directory(LPCWSTR file_name,
 
 	//We don't have opendir(), so the most we can do is make sure
 	//that the target is indeed a directory
-	struct stat st={0};
+	struct FUSE_STAT st={0};
 	CHECKED(ops_.getattr(fname.c_str(),&st));
 	if (S_ISLNK(st.st_mode))
 	{
@@ -378,7 +377,7 @@ int impl_fuse_context::create_file(LPCWSTR file_name, DWORD access_mode,
 	if (!ops_.getattr)
 		return -EINVAL;
 
-	struct stat stbuf={0};
+	struct FUSE_STAT stbuf={0};
 	//Check if the target file/directory exists
 	if (ops_.getattr(fname.c_str(),&stbuf)<0)
 	{

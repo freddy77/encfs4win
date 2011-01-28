@@ -701,7 +701,7 @@ int fuse_main_real(int argc, char *argv[], const struct fuse_operations *op,
 		res = fuse_loop(fuse);
 
 	fuse_teardown(fuse, mountpoint);
-	if (res == -1)
+	if (res < 0)
 		return 1;
 	
 	return 0;

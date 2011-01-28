@@ -59,6 +59,30 @@ int main()
 	h1 = CreateFile(fn, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
 	CHECK(h1 != INVALID_HANDLE_VALUE, NULL);
 	CHECK(LockFile(h1, 0, 0, 10, 0), "lock failed");
+	CHECK(!LockFile(h1, 0, 0, 10, 0), "lock succeeded");	// double lock must fail
+	CHECK(UnlockFile(h1, 0, 0, 10, 0), "unlock failed");
+	CHECK(!UnlockFile(h1, 0, 0, 20, 0), "unlock succeeded");
+	// TODO check overlapping locks
+	CHECK(LockFile(h1, 10, 0, 10, 0), "lock failed");
+	CHECK(LockFile(h1, 20, 0, 10, 0), "lock failed");
+	CHECK(LockFile(h1, 40, 0, 10, 0), "lock failed");
+
+	// (un)lock that overlap (inside, middle, side, two contiguos)
+	CHECK(!LockFile(h1, 15, 0, 3,  0), "lock succeeded");	// inside
+	CHECK(!LockFile(h1, 10, 0, 5,  0), "lock succeeded");	// side
+	CHECK(!LockFile(h1, 15, 0, 5,  0), "lock succeeded");	// side
+	CHECK(!LockFile(h1, 10, 0, 20, 0), "lock succeeded");	// two contiguos
+	CHECK(!LockFile(h1, 30, 0, 20, 0), "lock succeeded");	// one full + free
+
+	CHECK(!UnlockFile(h1, 15, 0, 3,  0), "unlock succeeded");	// inside
+	CHECK(!UnlockFile(h1, 10, 0, 5,  0), "unlock succeeded");	// side
+	CHECK(!UnlockFile(h1, 15, 0, 5,  0), "unlock succeeded");	// side
+	CHECK(!UnlockFile(h1, 10, 0, 20, 0), "unlock succeeded");	// two contiguos
+	CHECK(!UnlockFile(h1, 30, 0, 20, 0), "unlock succeeded");	// one full + free
+
+	CHECK(UnlockFile(h1, 20, 0, 10, 0), "unlock failed");
+	CHECK(UnlockFile(h1, 10, 0, 10, 0), "unlock failed");
+	CHECK(UnlockFile(h1, 40, 0, 10, 0), "unlock failed");
 	CloseHandle(h1);
 
 	printf("deleting while open\n");

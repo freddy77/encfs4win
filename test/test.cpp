@@ -8,9 +8,10 @@ check(int line, bool test, const char *chk, const char *fmt, ...)
 {
 	if (test) return;
 
+	DWORD err = GetLastError();
 	va_list ap;
 
-	fprintf(stderr, "error at line %d: ", line);
+	fprintf(stderr, "error at line %d (last err %u): ", line, (unsigned) err);
 	va_start(ap, fmt);
 	if (fmt)
 		vfprintf(stderr, fmt, ap);
@@ -21,7 +22,7 @@ check(int line, bool test, const char *chk, const char *fmt, ...)
 	exit(1);
 }
 
-#define CHECK(test, arg...) check(__LINE__, test, #test, arg) 
+#define CHECK(test, arg...) do { SetLastError(0); check(__LINE__, test, #test, arg); } while(0)
 
 static const char fn[] = "testfile.txt";
 

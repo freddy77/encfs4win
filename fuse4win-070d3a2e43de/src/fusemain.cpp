@@ -409,7 +409,7 @@ int impl_fuse_context::create_file(LPCWSTR file_name, DWORD access_mode,
 			if (creation_disposition==CREATE_ALWAYS)
 			{
 				if (!ops_.unlink) return -EINVAL;
-				CHECKED(unlink(fname.c_str())); //Delete file
+				CHECKED(ops_.unlink(fname.c_str())); //Delete file
 				//And create it!
 				return do_create_file(file_name,creation_disposition,
 					access_mode,dokan_file_info);

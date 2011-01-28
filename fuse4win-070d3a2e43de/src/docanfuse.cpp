@@ -480,6 +480,7 @@ bool fuse_chan::init()
 
 	ResolvedDokanMain=(DokanMainType)GetProcAddress(dokanDll,"DokanMain");
 	ResolvedDokanUnmount=(DokanUnmountType)GetProcAddress(dokanDll,"DokanUnmount");
+	ResolvedDokanRemoveMountPoint=(DokanRemoveMountPointType)GetProcAddress(dokanDll,"DokanRemoveMountPoint");
 
 	if (!ResolvedDokanMain || !ResolvedDokanUnmount) return false;
 	return true;
@@ -573,6 +574,12 @@ void fuse_unmount(const char *mountpoint, struct fuse_chan *ch)
 {
 	if (ch==NULL || mountpoint==NULL || strlen(mountpoint)==0) return;
 	//Unmount attached FUSE filesystem
+	if (ch->ResolvedDokanRemoveMountPoint) {
+		wchar_t wmountpoint[MAX_PATH+1];
+		mbstowcs(wmountpoint,mountpoint,MAX_PATH);
+		ch->ResolvedDokanRemoveMountPoint(wmountpoint);
+		return;
+	}
 	ch->ResolvedDokanUnmount(mountpoint[0]); //Ugly :(
 }
 

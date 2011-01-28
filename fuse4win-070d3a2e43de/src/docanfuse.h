@@ -30,8 +30,10 @@ struct fuse_chan
 
 	typedef int (__stdcall *DokanMainType)(PDOKAN_OPTIONS,PDOKAN_OPERATIONS);
 	typedef BOOL (__stdcall *DokanUnmountType)(WCHAR DriveLetter);
+	typedef BOOL (__stdcall *DokanRemoveMountPointType)(LPCWSTR MountPoint);
 	DokanMainType ResolvedDokanMain;
 	DokanUnmountType ResolvedDokanUnmount;
+	DokanRemoveMountPointType ResolvedDokanRemoveMountPoint;
 
 	std::string mountpoint;
 private:

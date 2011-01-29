@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <map>
 
 #define CHECKED(arg) if (0);else {int __res=arg; if (__res<0) return __res;}
 #define MAX_READ_SIZE (65536)
@@ -58,9 +59,9 @@ public:
 
 	int do_open_dir(LPCWSTR FileName, PDOKAN_FILE_INFO DokanFileInfo);
 
-	int do_open_file(LPCWSTR FileName, DWORD Flags, PDOKAN_FILE_INFO DokanFileInfo);
+	int do_open_file(LPCWSTR FileName, DWORD share_mode, DWORD Flags, PDOKAN_FILE_INFO DokanFileInfo);
 
-	int do_create_file(LPCWSTR FileName, DWORD Disposition, DWORD Flags,
+	int do_create_file(LPCWSTR FileName, DWORD Disposition, DWORD share_mode, DWORD Flags,
 		PDOKAN_FILE_INFO DokanFileInfo);
 
 	int convert_flags(DWORD Flags);
@@ -147,18 +148,49 @@ public:
 	int unmount(PDOKAN_FILE_INFO DokanFileInfo);
 };
 
+class impl_file_handle;
+
+class impl_file_lock
+{
+	friend class impl_file_handle;
+	std::string name_;
+	impl_file_handle *first;
+	CRITICAL_SECTION lock;
+
+	void add_file_unlocked(impl_file_handle *file);
+	int lock_file(impl_file_handle *file, long long start, long long len);
+	int unlock_file(impl_file_handle *file, long long start, long long len);
+public:
+	impl_file_lock(const std::string& name): name_(name), first(NULL) { InitializeCriticalSection(&lock); }
+	~impl_file_lock() { DeleteCriticalSection(&lock); };
+	static int get_file(const std::string &name, bool is_dir, DWORD access_mode, DWORD shared_mode, std::auto_ptr<impl_file_handle>& out);
+	static void renamed_file(const std::string &name,const std::string &new_name);
+	void remove_file(impl_file_handle *file);
+	const std::string& get_name() const {return name_;}
+};
+
+
 class impl_file_handle
 {	
-	std::string name_;
+	friend class impl_file_lock;
 	bool is_dir_;
 	uint64_t fh_;
+	impl_file_handle *next_file;
+	impl_file_lock *file_lock;
+	DWORD shared_mode_;
+	typedef std::map<long long, long long> locks_t;
+	locks_t locks;
+	impl_file_handle(bool is_dir, DWORD shared_mode);
 public:
-	impl_file_handle(const std::string &name, bool is_dir, const fuse_file_info *finfo);
+	~impl_file_handle();
 
 	bool is_dir() const {return is_dir_;}
 	int close(const struct fuse_operations *ops);
 	fuse_file_info make_finfo();
-	const std::string& get_name() const {return name_;}
+	const std::string& get_name() const {return file_lock->get_name();}
+	void set_finfo(const fuse_file_info& finfo) { fh_ = finfo.fh; };
+	int lock(long long start, long long len) { return file_lock->lock_file(this, start, len); }
+	int unlock(long long start, long long len) { return file_lock->unlock_file(this, start, len); }
 };
 
 #endif //FUSEMAIN_H

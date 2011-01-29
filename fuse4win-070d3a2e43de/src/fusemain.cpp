@@ -1,9 +1,20 @@
 #include <windows.h>
 #include <errno.h>
 #include <sys/utime.h>
+#include <sys/stat.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <unistd.h>
+#include <map>
 
 #include "fusemain.h"
 #include "utils.h"
+
+#define S_ISLNK(mode)	 __S_ISTYPE((mode), __S_IFLNK)
+#define	__S_IFLNK	0120000	/* Symbolic link.  */
+#define	__S_ISTYPE(mode, mask)	(((mode) & __S_IFMT) == (mask))
+#define	__S_IFMT	0170000	/* These bits determine file type.  */
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ////// FUSE frames chain
@@ -109,11 +120,16 @@ int impl_fuse_context::do_open_dir(LPCWSTR FileName, PDOKAN_FILE_INFO DokanFileI
 {
 	if (ops_.opendir)
 	{
-		fuse_file_info finfo={0};
 		std::string fname=unixify(wchar_to_utf8_cstr(FileName));
+		std::auto_ptr<impl_file_handle> file;
+		// TODO access_mode
+		CHECKED(impl_file_lock::get_file(fname,true,0,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,file));
+
+		fuse_file_info finfo={0};
 		CHECKED(ops_.opendir(fname.c_str(),&finfo));
 
-		DokanFileInfo->Context=reinterpret_cast<ULONG64>(new impl_file_handle(fname,true,&finfo));
+		file->set_finfo(finfo);
+		DokanFileInfo->Context=reinterpret_cast<ULONG64>(file.release());
 		return 0;
 	}
 
@@ -121,24 +137,27 @@ int impl_fuse_context::do_open_dir(LPCWSTR FileName, PDOKAN_FILE_INFO DokanFileI
 	return 0;
 }
 
-int impl_fuse_context::do_open_file(LPCWSTR FileName, DWORD Flags,
+int impl_fuse_context::do_open_file(LPCWSTR FileName, DWORD share_mode, DWORD Flags,
 									PDOKAN_FILE_INFO DokanFileInfo)
 {
 	if (!ops_.open) return -EINVAL;
 	std::string fname=unixify(wchar_to_utf8_cstr(FileName));
 	CHECKED(check_and_resolve(&fname));
 
+	std::auto_ptr<impl_file_handle> file;
+	CHECKED(impl_file_lock::get_file(fname,false,Flags,share_mode,file));
+
 	fuse_file_info finfo={0};
-	//if ((ShareMode & FILE_SHARE_READ) || (ShareMode & FILE_SHARE_DELETE))
-	//TODO: add sharing support?	
 	finfo.flags=convert_flags(Flags);
 
 	CHECKED(ops_.open(fname.c_str(),&finfo));
-	DokanFileInfo->Context=reinterpret_cast<ULONG64>(new impl_file_handle(fname,false,&finfo));
+
+	file->set_finfo(finfo);
+	DokanFileInfo->Context=reinterpret_cast<ULONG64>(file.release());
 	return 0;
 }
 
-int impl_fuse_context::do_create_file(LPCWSTR FileName, DWORD Disposition, DWORD Flags,
+int impl_fuse_context::do_create_file(LPCWSTR FileName, DWORD Disposition, DWORD share_mode, DWORD Flags,
 									PDOKAN_FILE_INFO DokanFileInfo)
 {
 	std::string fname=unixify(wchar_to_utf8_cstr(FileName));
@@ -152,14 +171,18 @@ int impl_fuse_context::do_create_file(LPCWSTR FileName, DWORD Disposition, DWORD
 		//Use mknod+open.
 		if (!ops_.mknod || !ops_.open) return -EINVAL;
 		CHECKED(ops_.mknod(fname.c_str(),filemask_,0));
-		return do_open_file(FileName,Flags, DokanFileInfo);
+		return do_open_file(FileName, share_mode, Flags, DokanFileInfo);
 	}
+
+	std::auto_ptr<impl_file_handle> file;
+	CHECKED(impl_file_lock::get_file(fname,false,Flags,share_mode,file));
 
 	fuse_file_info finfo={0};
 	finfo.flags=O_CREAT | O_EXCL | convert_flags(Flags); //TODO: these flags should be OK for new files?	
 	
 	CHECKED(ops_.create(fname.c_str(),filemask_,&finfo));
-	DokanFileInfo->Context=reinterpret_cast<ULONG64>(new impl_file_handle(fname,false,&finfo));
+
+	DokanFileInfo->Context=reinterpret_cast<ULONG64>(file.release());
 	return 0;
 }
 
@@ -384,7 +407,7 @@ int impl_fuse_context::create_file(LPCWSTR file_name, DWORD access_mode,
 		//Nope.		
 		if (dokan_file_info->IsDirectory) 
 			return -EINVAL; //We can't create directories using CreateFile
-		return do_create_file(file_name, creation_disposition, access_mode,
+		return do_create_file(file_name, creation_disposition, share_mode, access_mode,
 			dokan_file_info);
 	} else
 	{		
@@ -411,7 +434,7 @@ int impl_fuse_context::create_file(LPCWSTR file_name, DWORD access_mode,
 				if (!ops_.unlink) return -EINVAL;
 				CHECKED(ops_.unlink(fname.c_str())); //Delete file
 				//And create it!
-				return do_create_file(file_name,creation_disposition,
+				return do_create_file(file_name,creation_disposition, share_mode,
 					access_mode,dokan_file_info);
 			} else if (creation_disposition==TRUNCATE_EXISTING)
 			{
@@ -422,7 +445,7 @@ int impl_fuse_context::create_file(LPCWSTR file_name, DWORD access_mode,
 				return -EEXIST;
 			}
 
-			return do_open_file(file_name,access_mode,dokan_file_info);
+			return do_open_file(file_name, share_mode, access_mode, dokan_file_info);
 		}
 	}
 }
@@ -592,21 +615,70 @@ int impl_fuse_context::move_file(LPCWSTR file_name, LPCWSTR new_file_name,
 		CHECKED(ops_.unlink(new_name.c_str()));
 	}
 
-	return ops_.rename(name.c_str(),new_name.c_str());
+	// this can happen cause DeleteFile in Windows can return success even if 
+	// file is still in the file system
+	if (ops_.getattr(new_name.c_str(),&stbuf)!=-ENOENT)
+	{
+		return -EEXIST;
+	}
+
+	CHECKED(ops_.rename(name.c_str(),new_name.c_str()));
+	impl_file_lock::renamed_file(name,new_name);
+	return 0;
 }
 
 int impl_fuse_context::lock_file(LPCWSTR file_name, LONGLONG byte_offset, LONGLONG length,
 			  PDOKAN_FILE_INFO dokan_file_info)
 {
-	//Not implemented yet. There's some mismatch between UNIX and Windows locking semantics.
-	return -EINVAL;
+	impl_file_handle *hndl=reinterpret_cast<impl_file_handle*>(dokan_file_info->Context);
+	if (!hndl)
+		return -EINVAL;
+	if (hndl->is_dir())
+		return -EACCES;
+
+	FUSE_OFF_T off;
+	CHECKED(cast_from_longlong(byte_offset,&off));
+
+	if (ops_.lock) {
+		fuse_file_info finfo(hndl->make_finfo());
+
+		struct flock lock;
+		lock.l_type = F_WRLCK;
+		lock.l_whence = SEEK_SET;
+		lock.l_start = off;
+		lock.l_len = length;
+
+		return ops_.lock(hndl->get_name().c_str(), &finfo, F_SETLK, &lock);
+	}
+
+	return hndl->lock(byte_offset, length);
 }
 
 int impl_fuse_context::unlock_file(LPCWSTR file_name, LONGLONG byte_offset, LONGLONG length,
 								 PDOKAN_FILE_INFO dokan_file_info)
 {
-	//Not implemented yet. There's some mismatch between UNIX and Windows locking semantics.
-	return -EINVAL;
+	impl_file_handle *hndl=reinterpret_cast<impl_file_handle*>(dokan_file_info->Context);
+	if (!hndl)
+		return -EINVAL;
+	if (hndl->is_dir())
+		return -EACCES;
+
+	FUSE_OFF_T off;
+	CHECKED(cast_from_longlong(byte_offset,&off));
+
+	if (ops_.lock) {
+		fuse_file_info finfo(hndl->make_finfo());
+
+		struct flock lock;
+		lock.l_type = F_UNLCK;
+		lock.l_whence = SEEK_SET;
+		lock.l_start = off;
+		lock.l_len = length;
+
+		return ops_.lock(hndl->get_name().c_str(), &finfo, F_SETLK, &lock);
+	}
+
+	return hndl->unlock(byte_offset, length);
 }
 
 int impl_fuse_context::set_end_of_file(LPCWSTR	file_name, LONGLONG byte_offset, 
@@ -736,12 +808,183 @@ int impl_fuse_context::unmount(PDOKAN_FILE_INFO	DokanFileInfo)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
+////// File lock
+///////////////////////////////////////////////////////////////////////////////////////
+typedef std::map<std::string, impl_file_lock *> file_locks_t;
+static file_locks_t file_locks;
+
+// get required shared mode given an access mode
+static DWORD required_share(DWORD access_mode)
+{
+	DWORD share = 0;
+	if (access_mode & (STANDARD_RIGHTS_EXECUTE|STANDARD_RIGHTS_READ|
+	  GENERIC_READ|GENERIC_EXECUTE|FILE_GENERIC_EXECUTE|FILE_GENERIC_READ|
+	  READ_CONTROL|FILE_EXECUTE|FILE_LIST_DIRECTORY|FILE_READ_DATA|
+	  FILE_READ_EA))
+		share |= FILE_SHARE_READ;
+	if (access_mode & (STANDARD_RIGHTS_WRITE|GENERIC_WRITE|FILE_GENERIC_WRITE|
+	  WRITE_DAC|WRITE_OWNER|FILE_APPEND_DATA|FILE_WRITE_ATTRIBUTES|
+	  FILE_WRITE_DATA|FILE_WRITE_EA|FILE_ADD_FILE|FILE_ADD_SUBDIRECTORY|
+	  FILE_APPEND_DATA))
+		share |= FILE_SHARE_WRITE;
+	if (access_mode & (DELETE|FILE_DELETE_CHILD))
+		share |= FILE_SHARE_DELETE;
+	return share;
+}
+
+int impl_file_lock::get_file(const std::string &name, bool is_dir, DWORD access_mode, DWORD shared_mode, std::auto_ptr<impl_file_handle>& file)
+{
+	int res = 0;
+	file.reset(new impl_file_handle(is_dir, shared_mode));
+
+	// check previous files with same names
+	impl_file_lock *lock, *old_lock = NULL;
+	EnterCriticalSection(&fuse_mutex);
+	file_locks_t::iterator i = file_locks.find(name);
+	if (i != file_locks.end()) {
+		old_lock = lock = i->second;
+		EnterCriticalSection(&lock->lock);
+	} else {
+		lock = new impl_file_lock(name);
+		file_locks[name] = lock;
+		lock->add_file_unlocked(file.get());
+	}
+	file->file_lock = lock;
+	LeaveCriticalSection(&fuse_mutex);
+
+	if (!old_lock)
+		return res;
+
+	// check previous files with same names
+	DWORD share = FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE;
+	for (impl_file_handle *i = lock->first; i; i = i->next_file)
+		share &= i->shared_mode_;
+	if ((required_share(access_mode) | share) != share) {
+		file.reset();
+		res = -EACCES;
+	} else {
+		lock->add_file_unlocked(file.get());
+	}
+	LeaveCriticalSection(&lock->lock);
+	return res;
+}
+
+void impl_file_lock::add_file_unlocked(impl_file_handle *file)
+{
+	file->next_file = first;
+	first = file;
+}
+
+void impl_file_lock::remove_file(impl_file_handle *file)
+{
+	impl_file_handle *first_locked;
+
+	EnterCriticalSection(&lock);
+	impl_file_handle **p = &first;
+	while (*p != NULL) {
+		if (*p == file) {
+			*p = file->next_file;
+			file->next_file = NULL;
+			continue;
+		}
+		p = &(*p)->next_file;
+	}
+	first_locked = first;
+	// avoid dead lock
+	LeaveCriticalSection(&lock);
+
+	// empty ??
+	if (first_locked)
+		return;
+
+	EnterCriticalSection(&fuse_mutex);
+	file_locks_t::iterator i = file_locks.find(name_);
+	if (i != file_locks.end() && !i->second->first) {
+		file_locks.erase(i);
+		delete i->second;
+	}
+	LeaveCriticalSection(&fuse_mutex);
+}
+
+void impl_file_lock::renamed_file(const std::string &name,const std::string &new_name)
+{
+	if (name == new_name)
+		return;
+
+	EnterCriticalSection(&fuse_mutex);
+	// TODO what happen if new_name exists ??
+	file_locks_t::iterator i = file_locks.find(name);
+	if (i != file_locks.end()) {
+		impl_file_lock *lock = i->second;
+		EnterCriticalSection(&lock->lock);
+		lock->name_ = new_name;
+		LeaveCriticalSection(&lock->lock);
+		file_locks[new_name] = lock;
+		file_locks.erase(i);
+	}
+	LeaveCriticalSection(&fuse_mutex);
+}
+
+int impl_file_lock::lock_file(impl_file_handle *file, long long start, long long len)
+{
+	if (start < 0 || len <= 0)
+		return -EINVAL;
+
+	bool locked = false;
+	EnterCriticalSection(&lock);
+	// multiple locks are not allowed
+	for (impl_file_handle *i = first; i; i = i->next_file) {
+		impl_file_handle::locks_t::iterator j = i->locks.lower_bound(start);
+		if (j != i->locks.end()) {
+			// we found a range which start after our start
+			if (len >= j->first - start)
+				locked = true;
+		} else {
+			// check last
+			impl_file_handle::locks_t::reverse_iterator j = i->locks.rbegin();
+			if (j != i->locks.rend() && start - j->first < j->second)
+				locked = true;
+		}
+	}
+	if (!locked)
+		file->locks[start] = len;
+	LeaveCriticalSection(&lock);
+	return locked ? -EACCES : 0;
+}
+
+int impl_file_lock::unlock_file(impl_file_handle *file, long long start, long long len)
+{
+	if (len == 0)
+		return 0;
+
+	if (start < 0 || len <= 0)
+		return -EINVAL;
+
+	EnterCriticalSection(&lock);
+	bool locked = false;
+	impl_file_handle::locks_t::iterator i = file->locks.find(start);
+	if (i != file->locks.end()) {
+		// we found a range which start as our, is our ??
+		if (i->second == len) {
+			file->locks.erase(i);
+			locked = true;
+		}
+	}
+	LeaveCriticalSection(&lock);
+	return locked ? 0 : -EACCES;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
 ////// File handle
 ///////////////////////////////////////////////////////////////////////////////////////
-impl_file_handle::impl_file_handle(const std::string &name, bool is_dir,
-				 const fuse_file_info *finfo) : name_(name), is_dir_(is_dir), 
-				 fh_(finfo->fh)
+impl_file_handle::impl_file_handle(bool is_dir, DWORD shared_mode) : is_dir_(is_dir),
+				 fh_(-1), next_file(NULL), shared_mode_(shared_mode)
 {
+}
+
+impl_file_handle::~impl_file_handle()
+{
+	file_lock->remove_file(this);
 }
 
 int impl_file_handle::close(const struct fuse_operations *ops)
@@ -752,7 +995,7 @@ int impl_file_handle::close(const struct fuse_operations *ops)
 		if (ops->releasedir)
 		{
 			fuse_file_info finfo(make_finfo());
-			ops->releasedir(name_.c_str(),&finfo);
+			ops->releasedir(get_name().c_str(),&finfo);
 		}
 	} else
 	{
@@ -760,12 +1003,12 @@ int impl_file_handle::close(const struct fuse_operations *ops)
 		{
 			fuse_file_info finfo(make_finfo());
 			finfo.flush=1;
-			flush_err=ops->flush(name_.c_str(),&finfo);
+			flush_err=ops->flush(get_name().c_str(),&finfo);
 		}
 		if (ops->release) //Ignoring result.
 		{
 			fuse_file_info finfo(make_finfo());
-			ops->release(name_.c_str(),&finfo); //Set open() flags here?
+			ops->release(get_name().c_str(),&finfo); //Set open() flags here?
 		}
 	}
 	return flush_err;

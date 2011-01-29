@@ -44,6 +44,7 @@ static const char rcsid[] = "$OpenBSD: readpassphrase.c,v 1.12 2001/12/15 05:41:
 #include <unistd.h>
 #include <cstring>
 #include <cctype>
+#include <conio.h>
 
 #include <readpassphrase.h>
 
@@ -62,7 +63,7 @@ readpassphrase(const char *prompt, char *buf, size_t bufsiz, int flags)
         printf("%s", prompt);
         fflush(stdout);
         end = buf + bufsiz - 1;
-        for (p = buf; (ch = getchar()) != EOF && ch != '\n' && ch != '\r';) {
+        for (p = buf; (ch = getch()) != EOF && ch != '\n' && ch != '\r';) {
                 if (p < end) {
                         ch &= 0xff;
                         if ((flags & RPP_SEVENBIT))

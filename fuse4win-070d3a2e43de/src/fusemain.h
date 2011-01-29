@@ -14,6 +14,8 @@
 class impl_fuse_context;
 struct impl_chain_link;
 
+extern CRITICAL_SECTION fuse_mutex;
+
 /*
 	This class pushes the impl_fuse_context frame on a thread-local stack,
 	this allows to have reentrant FUSE filesystem (if anyone really wants

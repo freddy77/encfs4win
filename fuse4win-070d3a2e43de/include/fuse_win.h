@@ -158,4 +158,9 @@ struct stat64 {
 };
 #endif
 
+
+#define F_WRLCK	1
+#define F_UNLCK	2
+#define F_SETLK	6
+
 #endif //_FUSE_WIN_H_

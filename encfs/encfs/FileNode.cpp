@@ -208,9 +208,7 @@ int FileNode::mknod(mode_t mode, dev_t rdev, uid_t uid, gid_t gid)
      * The regular file stuff could be stripped off if there
      * were a create method (advised to have)
      */
-printf("mknod %o\n", mode);
     if (S_ISREG( mode ) || !(mode & _S_IFMT)) {
-	printf("open name %s\n", _cname.c_str());
         res = ::open( _cname.c_str(), O_CREAT | O_EXCL | O_WRONLY, mode );
         if (res >= 0)
             res = ::close( res );

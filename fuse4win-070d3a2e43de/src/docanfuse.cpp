@@ -487,11 +487,17 @@ bool fuse_chan::init()
 	dokanDll=LoadLibraryW(DOKAN_DLL);
 	if (!dokanDll) return false;
 
+	// check version
+	typedef ULONG (__stdcall *DokanVersionType)();
+	DokanVersionType ResolvedDokanVersion;
+	ResolvedDokanVersion=(DokanVersionType)GetProcAddress(dokanDll,"DokanVersion");
+	if (!ResolvedDokanVersion || ResolvedDokanVersion() < DOKAN_VERSION) return false;
+
 	ResolvedDokanMain=(DokanMainType)GetProcAddress(dokanDll,"DokanMain");
 	ResolvedDokanUnmount=(DokanUnmountType)GetProcAddress(dokanDll,"DokanUnmount");
 	ResolvedDokanRemoveMountPoint=(DokanRemoveMountPointType)GetProcAddress(dokanDll,"DokanRemoveMountPoint");
 
-	if (!ResolvedDokanMain || !ResolvedDokanUnmount) return false;
+	if (!ResolvedDokanMain || !ResolvedDokanUnmount || !ResolvedDokanRemoveMountPoint) return false;
 	return true;
 }
 

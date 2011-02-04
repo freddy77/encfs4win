@@ -158,7 +158,7 @@ class impl_file_lock
 	CRITICAL_SECTION lock;
 
 	void add_file_unlocked(impl_file_handle *file);
-	int lock_file(impl_file_handle *file, long long start, long long len);
+	int lock_file(impl_file_handle *file, long long start, long long len, bool mark=true);
 	int unlock_file(impl_file_handle *file, long long start, long long len);
 public:
 	impl_file_lock(const std::string& name): name_(name), first(NULL) { InitializeCriticalSection(&lock); }
@@ -189,6 +189,7 @@ public:
 	fuse_file_info make_finfo();
 	const std::string& get_name() const {return file_lock->get_name();}
 	void set_finfo(const fuse_file_info& finfo) { fh_ = finfo.fh; };
+	int check_lock(long long start, long long len) { return file_lock->lock_file(this, start, len, false); }
 	int lock(long long start, long long len) { return file_lock->lock_file(this, start, len); }
 	int unlock(long long start, long long len) { return file_lock->unlock_file(this, start, len); }
 };

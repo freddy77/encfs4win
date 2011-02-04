@@ -481,6 +481,10 @@ int impl_fuse_context::read_file(LPCWSTR /*file_name*/, LPVOID buffer, DWORD num
 	if (hndl->is_dir())
 		return -EACCES;
 	
+	// check locking
+	if (hndl->check_lock(offset, num_bytes_to_read))
+		return -EACCES;
+
 	FUSE_OFF_T off;
 	CHECKED(cast_from_longlong(offset,&off));
 	fuse_file_info finfo(hndl->make_finfo());
@@ -524,6 +528,10 @@ int impl_fuse_context::write_file(LPCWSTR /*file_name*/, LPCVOID buffer,
 	//Clip the maximum write size
 	if (num_bytes_to_write>conn_info_.max_write)
 		num_bytes_to_write=conn_info_.max_write;
+
+	// check locking
+	if (hndl->check_lock(offset, num_bytes_to_write))
+		return -EACCES;
 
 	FUSE_OFF_T off;
 	CHECKED(cast_from_longlong(offset,&off));
@@ -925,7 +933,7 @@ void impl_file_lock::renamed_file(const std::string &name,const std::string &new
 	LeaveCriticalSection(&fuse_mutex);
 }
 
-int impl_file_lock::lock_file(impl_file_handle *file, long long start, long long len)
+int impl_file_lock::lock_file(impl_file_handle *file, long long start, long long len, bool mark)
 {
 	if (start < 0 || len <= 0)
 		return -EINVAL;
@@ -934,11 +942,19 @@ int impl_file_lock::lock_file(impl_file_handle *file, long long start, long long
 	EnterCriticalSection(&lock);
 	// multiple locks are not allowed
 	for (impl_file_handle *i = first; i; i = i->next_file) {
+		if (!mark && i == file)
+			continue;
 		impl_file_handle::locks_t::iterator j = i->locks.lower_bound(start);
 		if (j != i->locks.end()) {
 			// we found a range which start after our start
-			if (len >= j->first - start)
+			if (len > j->first - start)
 				locked = true;
+			// check previous not override
+			if (j != i->locks.begin()) {
+				--j;
+				if (j->second > start - j->first)
+					locked = true;
+			}
 		} else {
 			// check last
 			impl_file_handle::locks_t::reverse_iterator j = i->locks.rbegin();
@@ -946,7 +962,7 @@ int impl_file_lock::lock_file(impl_file_handle *file, long long start, long long
 				locked = true;
 		}
 	}
-	if (!locked)
+	if (!locked & mark)
 		file->locks[start] = len;
 	LeaveCriticalSection(&lock);
 	return locked ? -EACCES : 0;

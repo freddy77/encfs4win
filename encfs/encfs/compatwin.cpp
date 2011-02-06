@@ -101,14 +101,17 @@ ssize_t pwrite(int fd, const void *buf, size_t count, long long int offset)
 	return len;
 }
 
-int truncate(const char *path, off_t length)
+int truncate(const char *path, __int64 length)
 {
 	int fd = open(path, O_RDWR);
 
 	if (fd < 0) return -1;
-	int res = ftruncate(fd, length);
-	if (res < 0) {
-		int save_errno = errno;
+
+	LONG high = length >> 32;
+	HANDLE h = (HANDLE) _get_osfhandle(fd);
+	if (!SetFilePointer(h, length, &high, FILE_BEGIN)
+	    || !SetEndOfFile(h) ) {
+		int save_errno = win32_error_to_errno(GetLastError());
 		close(fd);
 		errno = save_errno;
 		return -1;
@@ -281,7 +284,7 @@ utimes(const char *filename, const struct timeval times[2])
 }
 
 int
-my_stat (const char* fn, struct stat* st)
+my_stat (const char* fn, struct FUSE_STAT* st)
 {
 	char buf[512];
 	_snprintf(buf, 512, "%s", fn);
@@ -295,7 +298,7 @@ my_stat (const char* fn, struct stat* st)
 	if (buf[l-1] == '\\')
 		buf[l-1] = 0;
 
-	return ::stat(buf, st);
+	return ::_stati64(buf, st);
 }
 
 int

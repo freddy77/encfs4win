@@ -136,13 +136,15 @@ struct statvfs
 
 //We have a choice between CRT-compatible 32-bit off_t definition
 //and a custom 64-bit definition
+#define WIDE_OFF_T 1
 #ifndef WIDE_OFF_T
 #define FUSE_OFF_T off_t
 #define FUSE_STAT stat
 
 #else
 #define FUSE_OFF_T __int64
-#define FUSE_STAT stat64
+#define FUSE_STAT _stati64
+#if 0
 struct stat64 {
 	dev_t st_dev;
 	ino_t st_ino;
@@ -156,6 +158,7 @@ struct stat64 {
 	time_t st_mtime;
 	time_t st_ctime;
 };
+#endif
 #endif
 
 

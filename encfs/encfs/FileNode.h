@@ -68,7 +68,7 @@ public:
     int open(int flags) const;
 
     // getAttr returns 0 on success, -errno on failure
-    int getAttr(struct stat *stbuf) const;
+    int getAttr(struct FUSE_STAT *stbuf) const;
     off_t getSize() const;
 
     ssize_t read(off_t offset, unsigned char *data, ssize_t size) const;

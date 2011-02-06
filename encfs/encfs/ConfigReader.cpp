@@ -26,6 +26,7 @@
 #include <cstring>
 
 #include <pthread.h>
+#include <fuse.h>
 
 
 using namespace std;
@@ -45,8 +46,8 @@ ConfigReader::~ConfigReader()
 bool 
 ConfigReader::load(const char *fileName)
 {
-    struct stat stbuf;
-    memset( &stbuf, 0, sizeof(struct stat));
+    struct FUSE_STAT stbuf;
+    memset( &stbuf, 0, sizeof(stbuf));
     if( lstat( fileName, &stbuf ) != 0)
 	return false;
 

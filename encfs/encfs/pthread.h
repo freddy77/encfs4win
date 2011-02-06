@@ -21,9 +21,9 @@ int fdatasync(int fd);
 ssize_t pread(int fd, void *buf, size_t count, long long int offset);
 ssize_t pwrite(int fd, const void *buf, size_t count, long long int offset);
 
-int truncate(const char *path, off_t length);
+int truncate(const char *path, __int64 length);
 int utimes(const char *filename, const struct timeval times[2]);
-int my_stat (const char* fn, struct stat* st);
+int my_stat (const char* fn, struct FUSE_STAT* st);
 #define lstat my_stat
 int my_open(const char *fn, int flags);
 namespace pthread {

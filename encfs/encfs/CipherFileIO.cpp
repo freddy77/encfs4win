@@ -149,7 +149,7 @@ bool CipherFileIO::setIV( uint64_t iv )
     return base->setIV( iv );
 }
 
-int CipherFileIO::getAttr( struct stat *stbuf ) const
+int CipherFileIO::getAttr( struct FUSE_STAT *stbuf ) const
 {
     int res = base->getAttr( stbuf );
     // adjust size if we have a file header

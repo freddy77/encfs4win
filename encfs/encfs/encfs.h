@@ -57,8 +57,9 @@ static __inline int setfsgid(gid_t gid)
 #endif
 #endif
 
-int encfs_getattr(const char *path, struct stat *stbuf);
-int encfs_fgetattr(const char *path, struct stat *stbuf, 
+#define off_t __int64
+int encfs_getattr(const char *path, struct FUSE_STAT *stbuf);
+int encfs_fgetattr(const char *path, struct FUSE_STAT *stbuf, 
 	struct fuse_file_info *fi);
 int encfs_readlink(const char *path, char *buf, size_t size);
 int encfs_getdir(const char *path, fuse_dirh_t h, fuse_dirfil_t filler);

@@ -126,7 +126,7 @@ string FileNode::plaintextParent() const
 
 static bool setIV(const shared_ptr<FileIO> &io, uint64_t iv)
 {
-    struct stat stbuf;
+    struct FUSE_STAT stbuf;
     if((io->getAttr(&stbuf) < 0) || S_ISREG(stbuf.st_mode))
 	return io->setIV( iv );
     else
@@ -249,7 +249,7 @@ int FileNode::open(int flags) const
     return res;
 }
 
-int FileNode::getAttr(struct stat *stbuf) const
+int FileNode::getAttr(struct FUSE_STAT *stbuf) const
 {
     Lock _lock( mutex );
 

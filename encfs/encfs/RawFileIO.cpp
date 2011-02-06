@@ -101,8 +101,8 @@ rel::Interface RawFileIO::interface() const
 static int open_readonly_workaround(const char *path, int flags)
 {
     int fd = -1;
-    struct stat stbuf;
-    memset(&stbuf, 0, sizeof(struct stat));
+    struct FUSE_STAT stbuf;
+    memset(&stbuf, 0, sizeof(stbuf));
     if(lstat( path, &stbuf ) != -1)
     {
 	// make sure user has read/write permission..
@@ -187,7 +187,7 @@ rDebug("opened raw %s", name.c_str());
     return result;
 }
 
-int RawFileIO::getAttr( struct stat *stbuf ) const
+int RawFileIO::getAttr( struct FUSE_STAT *stbuf ) const
 {
     int res = lstat( name.c_str(), stbuf );
     int eno = errno;
@@ -212,8 +212,8 @@ off_t RawFileIO::getSize() const
 {
     if(!knownSize)
     {
-	struct stat stbuf;
-	memset( &stbuf, 0, sizeof( struct stat ));
+	struct FUSE_STAT stbuf;
+	memset( &stbuf, 0, sizeof(stbuf));
 	int res = lstat( name.c_str(), &stbuf );
 
 	if(res == 0)

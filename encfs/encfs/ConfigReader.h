@@ -18,6 +18,8 @@
 #ifndef _ConfigReader_incl_
 #define _ConfigReader_incl_
 
+#include "encfs.h"
+
 #include <string>
 #include <map>
 

@@ -28,6 +28,29 @@ check(int line, bool test, const char *chk, const char *fmt, ...)
 static const char fn[] = "testfile.txt";
 static const char fn2[] = "testfile2.txt";
 
+static FILETIME *
+Time(FILETIME &t, int y, int m, int d, int h=12)
+{
+	SYSTEMTIME st;
+	memset(&st, 0, sizeof(st));
+	st.wYear  = y;
+	st.wMonth = m;
+	st.wDay   = d;
+	st.wHour  = h;
+	SystemTimeToFileTime(&st, &t);
+	return &t;
+}
+
+static bool
+SameTime(const FILETIME &t, int y, int m, int d)
+{
+	SYSTEMTIME st;
+	FileTimeToSystemTime(&t, &st);
+	if (st.wYear != y || st.wMonth != m || st.wDay != d)
+		return false;
+	return true;
+}
+
 int main()
 {
 	HANDLE h1, h2;
@@ -121,11 +144,28 @@ int main()
 	CloseHandle(h1);
 	DeleteFile(fn2);
 
+	printf("time check and attributes\n");
+	CHECK(SetFileAttributes(fn, FILE_ATTRIBUTE_HIDDEN), NULL);
+	h1 = CreateFile(fn, FILE_WRITE_ATTRIBUTES, FILE_SHARE_WRITE|FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+	CHECK(h1 != INVALID_HANDLE_VALUE, "create failed");
+	FILETIME c,a,m;
+	CHECK(SetFileTime(h1, Time(c,2000,1,2), Time(a,2001,3,5), Time(m,2010,12,24)), NULL);
+	CloseHandle(h1);
+
+	WIN32_FIND_DATA wfd;
+	h1 = FindFirstFile(fn, &wfd);
+	CHECK(h1 != INVALID_HANDLE_VALUE, "find failed");
+	CHECK(wfd.dwFileAttributes == FILE_ATTRIBUTE_HIDDEN, NULL);
+	CHECK(SameTime(wfd.ftCreationTime,2000,1,2), NULL);
+	CHECK(SameTime(wfd.ftLastAccessTime,2001,3,5), NULL);
+	CHECK(SameTime(wfd.ftLastWriteTime,2010,12,24), NULL);
+	FindClose(h1);
+	CHECK(SetFileAttributes(fn, FILE_ATTRIBUTE_NORMAL), NULL);
+
 	printf("deleting while open\n");
 	h1 = CreateFile(fn, FILE_READ_ATTRIBUTES, FILE_SHARE_DELETE, NULL, OPEN_EXISTING, 0, NULL);
 	CHECK(h1 != INVALID_HANDLE_VALUE, NULL);
 	CHECK(DeleteFile(fn), "failed deleting file");
-	WIN32_FIND_DATA wfd;
 	h2 = FindFirstFile(fn, &wfd);
 	CHECK(h2 != INVALID_HANDLE_VALUE, NULL);
 	FindClose(h2);

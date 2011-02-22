@@ -16,6 +16,15 @@
 #define	__S_ISTYPE(mode, mask)	(((mode) & __S_IFMT) == (mask))
 #define	__S_IFMT	0170000	/* These bits determine file type.  */
 
+#define ACCESS_READ (STANDARD_RIGHTS_EXECUTE|STANDARD_RIGHTS_READ|\
+	GENERIC_READ|GENERIC_EXECUTE|FILE_GENERIC_EXECUTE|FILE_GENERIC_READ|\
+	READ_CONTROL|FILE_EXECUTE|FILE_LIST_DIRECTORY|FILE_READ_DATA|\
+	FILE_READ_EA)
+#define ACCESS_WRITE (STANDARD_RIGHTS_WRITE|GENERIC_WRITE|FILE_GENERIC_WRITE|\
+	WRITE_DAC|WRITE_OWNER|FILE_APPEND_DATA|FILE_WRITE_ATTRIBUTES|\
+	FILE_WRITE_DATA|FILE_WRITE_EA|FILE_ADD_FILE|FILE_ADD_SUBDIRECTORY|\
+	FILE_APPEND_DATA)
+
 ///////////////////////////////////////////////////////////////////////////////////////
 ////// FUSE frames chain
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -188,8 +197,8 @@ int impl_fuse_context::do_create_file(LPCWSTR FileName, DWORD Disposition, DWORD
 
 int impl_fuse_context::convert_flags(DWORD Flags)
 {
-	bool read=(Flags & GENERIC_READ) || (Flags & GENERIC_EXECUTE);
-	bool write=(Flags & GENERIC_WRITE);
+	bool read=(Flags & ACCESS_READ);
+	bool write=(Flags & ACCESS_WRITE);
 	if (read && !write)
 		return O_RDONLY;
 	if (!read && write)

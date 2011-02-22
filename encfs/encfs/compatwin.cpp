@@ -306,8 +306,12 @@ my_open(const char *fn, int flags)
 {
 	HANDLE f = CreateFile(fn, flags == O_RDONLY ? GENERIC_WRITE : GENERIC_WRITE|GENERIC_READ, FILE_SHARE_DELETE, NULL, OPEN_EXISTING, 0, NULL);
 	if (f == INVALID_HANDLE_VALUE) {
-		errno = ENOENT;
-		return -1;
+		int save_errno = win32_error_to_errno(GetLastError());
+		f = CreateFile(fn, flags == O_RDONLY ? GENERIC_WRITE : GENERIC_WRITE|GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+		if (f == INVALID_HANDLE_VALUE) {
+			errno = save_errno;
+			return -1;
+		}
 	}
 	int fd = _open_osfhandle((intptr_t) f, flags);
 	if (fd < 0) {

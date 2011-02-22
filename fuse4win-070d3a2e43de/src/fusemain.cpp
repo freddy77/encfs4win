@@ -259,6 +259,13 @@ int impl_fuse_context::walk_directory(void *buf, const char *name,
 	}
 	
 	convertStatlikeBuf(&stat,name,&find_data);
+
+	uint32_t attrs = 0xFFFFFFFFu;
+	if (wd->ctx->ops_.win_get_attributes)
+		attrs = wd->ctx->ops_.win_get_attributes((wd->dirname+name).c_str());
+	if (attrs != 0xFFFFFFFFu)
+		find_data.dwFileAttributes = attrs;
+	
 	return wd->delegate(&find_data,wd->DokanFileInfo);
 }
 
@@ -592,6 +599,12 @@ int impl_fuse_context::get_file_information(LPCWSTR file_name,
 		dokan_file_info->IsDirectory=TRUE;
 	convertStatlikeBuf(&st,fname,handle_file_information);
 
+	uint32_t attrs = 0xFFFFFFFFu;
+	if (ops_.win_get_attributes)
+		attrs = ops_.win_get_attributes(fname.c_str());
+	if (attrs != 0xFFFFFFFFu)
+		handle_file_information->dwFileAttributes = attrs;
+
 	return 0;
 }
 
@@ -718,6 +731,12 @@ int impl_fuse_context::set_file_attributes(LPCWSTR file_name, DWORD file_attribu
 
 	//Just return 'success' since returning -EINVAL interferes with modification time 
 	//setting from FAR Manager.
+	if (ops_.win_set_attributes)
+	{
+		std::string fname=unixify(wchar_to_utf8_cstr(file_name));
+		CHECKED(check_and_resolve(&fname));
+		return ops_.win_set_attributes(fname.c_str(), file_attributes);
+	}
 	return 0;
 }
 
@@ -738,7 +757,23 @@ int impl_fuse_context::set_file_time(PCWSTR file_name, const FILETIME* creation_
 				  const FILETIME* last_access_time, const FILETIME* last_write_time,
 				  PDOKAN_FILE_INFO dokan_file_info)
 {
-	if (!ops_.utimens && !ops_.utime) return -EINVAL;
+	if (!ops_.utimens && !ops_.utime && !ops_.win_set_times) return -EINVAL;
+
+	if (ops_.win_set_times)
+	{
+		impl_file_handle *hndl=reinterpret_cast<impl_file_handle*>(dokan_file_info->Context);
+		if (!hndl)
+			return -EINVAL;
+		if (hndl->is_dir())
+			return -EACCES;
+
+		fuse_file_info finfo(hndl->make_finfo());
+
+		std::string fname=unixify(wchar_to_utf8_cstr(file_name));
+		CHECKED(check_and_resolve(&fname));
+		return ops_.win_set_times(fname.c_str(), &finfo, creation_time, last_access_time, last_write_time);
+	}
+
 	if (!ops_.getattr)
 		return -EINVAL;
 

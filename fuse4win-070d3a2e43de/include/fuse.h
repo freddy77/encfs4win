@@ -12,6 +12,7 @@
 /* Include Windows compatibility stuff early*/
 #ifdef WIN32
 #include "fuse_win.h"
+typedef struct _FILETIME FILETIME;
 #else
 #define FUSE_OFF_T off_t
 #define FUSE_STAT stat
@@ -445,6 +446,13 @@ struct fuse_operations {
 	 * Introduced in version 2.6
 	 */
 	int (*bmap) (const char *, size_t blocksize, uint64_t *idx);
+
+#ifdef WIN32
+	/* these to support extanted windows calls */
+	uint32_t (*win_get_attributes) (const char *fn);
+	int (*win_set_attributes) (const char *fn, uint32_t attr);
+	int (*win_set_times) (const char *fn, struct fuse_file_info *, const FILETIME *create, const FILETIME *access, const FILETIME *modified);
+#endif
 };
 
 /** Extra context that may be needed by some filesystems

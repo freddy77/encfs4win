@@ -106,5 +106,8 @@ int encfs_removexattr( const char *path, const char *name );
 
 int encfs_utimens( const char *path, const struct timespec ts[2] );
 
+#ifdef WIN32
+void win_encfs_oper_init(fuse_operations &encfs_oper);
+#endif
 #endif
 

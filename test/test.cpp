@@ -146,10 +146,14 @@ int main()
 
 	printf("time check and attributes\n");
 	CHECK(SetFileAttributes(fn, FILE_ATTRIBUTE_HIDDEN), NULL);
+	CHECK(GetFileAttributes(fn) == FILE_ATTRIBUTE_HIDDEN, NULL);
 	h1 = CreateFile(fn, FILE_WRITE_ATTRIBUTES, FILE_SHARE_WRITE|FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 	CHECK(h1 != INVALID_HANDLE_VALUE, "create failed");
+	CHECK(GetFileAttributes(fn) == FILE_ATTRIBUTE_HIDDEN, NULL);
 	FILETIME c,a,m;
 	CHECK(SetFileTime(h1, Time(c,2000,1,2), Time(a,2001,3,5), Time(m,2010,12,24)), NULL);
+	// this is required only for Dokan cause SetFileInformation is called with BasicInformation
+	CHECK(SetFileAttributes(fn, FILE_ATTRIBUTE_HIDDEN), NULL);
 	CloseHandle(h1);
 
 	WIN32_FIND_DATA wfd;
@@ -160,6 +164,7 @@ int main()
 	CHECK(SameTime(wfd.ftLastAccessTime,2001,3,5), NULL);
 	CHECK(SameTime(wfd.ftLastWriteTime,2010,12,24), NULL);
 	FindClose(h1);
+	CHECK(GetFileAttributes(fn) == FILE_ATTRIBUTE_HIDDEN, NULL);
 	CHECK(SetFileAttributes(fn, FILE_ATTRIBUTE_NORMAL), NULL);
 
 	printf("deleting while open\n");

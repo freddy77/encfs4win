@@ -814,3 +814,66 @@ int encfs_removexattr( const char *path, const char *name )
 
 #endif // HAVE_XATTR
 
+#ifdef WIN32
+
+static uint32_t encfs_win_get_attributes(const char *fn)
+{
+    EncFS_Context *ctx = context();
+
+    int res = -EIO;
+    shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
+    if(!FSRoot)
+	return res;
+
+   std::string path = FSRoot->cipherPath(fn);
+   // TODO error
+   return GetFileAttributes(path.c_str());
+}
+
+static int encfs_win_set_attributes(const char *fn, uint32_t attr)
+{
+    EncFS_Context *ctx = context();
+
+    int res = -EIO;
+    shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
+    if(!FSRoot)
+	return res;
+
+   std::string path = FSRoot->cipherPath(fn);
+   if (SetFileAttributes(path.c_str(), attr))
+        return 0;
+   return -win32_error_to_errno(GetLastError());
+}
+
+int _do_win_set_times(FileNode *fnode, tuple<const FILETIME *, const FILETIME *, const FILETIME *> data )
+{
+    /* Flush can be called multiple times for an open file, so it doesn't
+       close the file.  However it is important to call close() for some
+       underlying filesystems (like NFS).
+    */
+    int res = fnode->open( O_RDONLY );
+    if(res >= 0)
+    {
+	if (SetFileTime((HANDLE)_get_osfhandle(res), data.get<0>(), data.get<1>(), data.get<2>()))
+	    return 0;
+	res = -win32_error_to_errno(GetLastError());
+    }
+
+    return res;
+}
+
+static int encfs_win_set_times(const char *path, struct fuse_file_info *fi, const FILETIME *create, const FILETIME *access, const FILETIME *modified)
+{
+    return withFileNode("win_set_times", path, fi, _do_win_set_times,
+                       make_tuple(create, access, modified));
+}
+
+void win_encfs_oper_init(fuse_operations &encfs_oper)
+{
+    encfs_oper.win_set_times = encfs_win_set_times;
+    encfs_oper.win_get_attributes = encfs_win_get_attributes;
+    encfs_oper.win_set_attributes = encfs_win_set_attributes;
+}
+#endif
+
+

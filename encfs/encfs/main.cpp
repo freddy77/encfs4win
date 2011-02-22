@@ -547,6 +547,9 @@ int main(int argc, char *argv[])
     encfs_oper.fgetattr = encfs_fgetattr;
     encfs_oper.utimens = encfs_utimens;
     //encfs_oper.bmap = encfs_bmap;
+#ifdef WIN32
+    win_encfs_oper_init(encfs_oper);
+#endif
 
     openssl_init( encfsArgs->isThreaded );
 

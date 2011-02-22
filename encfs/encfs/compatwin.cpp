@@ -63,7 +63,7 @@ int fdatasync(int fd)
 	return 0;
 }
 
-ssize_t pread(int fd, void *buf, size_t count, long long int offset)
+ssize_t pread(int fd, void *buf, size_t count, __int64 offset)
 {
 	HANDLE h = (HANDLE) _get_osfhandle(fd);
 	if (h == INVALID_HANDLE_VALUE) {
@@ -82,7 +82,7 @@ ssize_t pread(int fd, void *buf, size_t count, long long int offset)
 	return len;
 }
 
-ssize_t pwrite(int fd, const void *buf, size_t count, long long int offset)
+ssize_t pwrite(int fd, const void *buf, size_t count, __int64 offset)
 {
 	HANDLE h = (HANDLE) _get_osfhandle(fd);
 	if (h == INVALID_HANDLE_VALUE) {

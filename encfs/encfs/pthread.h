@@ -18,8 +18,8 @@ void pthread_join(pthread_t thread, int);
 int fsync(int fd);
 int fdatasync(int fd);
 
-ssize_t pread(int fd, void *buf, size_t count, long long int offset);
-ssize_t pwrite(int fd, const void *buf, size_t count, long long int offset);
+ssize_t pread(int fd, void *buf, size_t count, __int64 offset);
+ssize_t pwrite(int fd, const void *buf, size_t count, __int64 offset);
 
 int truncate(const char *path, __int64 length);
 int utimes(const char *filename, const struct timeval times[2]);

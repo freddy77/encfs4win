@@ -21,7 +21,7 @@ for lib in libboost_*.lib; do
 	rm -f ${lib%.lib}.a
 	ln -s $lib ${lib%.lib}.a
 done
-cd ../..
+cd ../../boost
 rm -rf $NAME
 
 echo Boost ok

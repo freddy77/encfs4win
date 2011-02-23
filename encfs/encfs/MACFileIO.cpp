@@ -18,6 +18,7 @@
 #include "MACFileIO.h"
 
 #include "MemoryPool.h"
+#include "FileUtils.h"
 
 #include <rlog/rlog.h>
 #include <rlog/Error.h>
@@ -40,31 +41,38 @@ static RLogChannel *Info = DEF_CHANNEL("info/MACFileIO", Log_Info);
 // Version 2.0 takes [blockSize - headerSize] worth of user data and writes
 //   [blockSize] bytes.  That way the size going into the crypto engine is
 //   valid from what was selected based on the crypto module allowed ranges!
+// Version 2.1 allows per-block rand bytes to be used without enabling MAC.
 //
 // The information about MACFileIO currently does not make its way into the
 // configuration file, so there is no easy way to make this backward
 // compatible, except at a high level by checking a revision number for the
 // filesystem...
 //
-static rel::Interface MACFileIO_iface("FileIO/MAC", 2, 0, 0);
+static rel::Interface MACFileIO_iface("FileIO/MAC", 2, 1, 0);
+
+int dataBlockSize(const FSConfigPtr &cfg)
+{
+    return cfg->config->blockSize
+            - cfg->config->blockMACBytes
+            - cfg->config->blockMACRandBytes;
+}
 
 MACFileIO::MACFileIO( const shared_ptr<FileIO> &_base,
-	const shared_ptr<Cipher> &_cipher,
-	const CipherKey &_key, int fsBlockSize,
-	int _macBytes, int _randBytes,
-	bool warnOnlyMode )
-   : BlockFileIO( fsBlockSize - _macBytes - _randBytes )
+                      const FSConfigPtr &cfg )
+   : BlockFileIO( dataBlockSize( cfg ), cfg )
    , base( _base )
-   , cipher( _cipher )
-   , key( _key )
-   , macBytes( _macBytes )
-   , randBytes( _randBytes )
-   , warnOnly( warnOnlyMode )
+   , cipher( cfg->cipher )
+   , key( cfg->key )
+   , macBytes( cfg->config->blockMACBytes )
+   , randBytes( cfg->config->blockMACRandBytes )
+   , warnOnly( cfg->opts->forceDecode )
 {
-    rAssert( macBytes > 0 && macBytes <= 8 );
+    rAssert( macBytes >= 0 && macBytes <= 8 );
     rAssert( randBytes >= 0 );
     rLog(Info, "fs block size = %i, macBytes = %i, randBytes = %i",
-	    fsBlockSize, macBytes, randBytes);
+	    cfg->config->blockSize, 
+            cfg->config->blockMACBytes, 
+            cfg->config->blockMACRandBytes);
 }
 
 MACFileIO::~MACFileIO()
@@ -160,14 +168,6 @@ off_t MACFileIO::getSize() const
     return size;
 }
 
-void MACFileIO::allowHoles( bool allow )
-{
-    BlockFileIO::allowHoles( allow );
-    shared_ptr<BlockFileIO> bf = dynamic_pointer_cast<BlockFileIO>( base );
-    if(bf)
-        bf->allowHoles( allow );
-}
-
 ssize_t MACFileIO::readOneBlock( const IORequest &req ) const
 {
     int headerSize = macBytes + randBytes;
@@ -185,17 +185,16 @@ ssize_t MACFileIO::readOneBlock( const IORequest &req ) const
     ssize_t readSize = base->read( tmp );
 
     // don't store zeros if configured for zero-block pass-through
-    bool skipBlock;
+    bool skipBlock = true;
     if( _allowHoles )
     {
-        skipBlock = true;
         for(int i=0; i<readSize; ++i)
             if(tmp.data[i] != 0)
             {
                 skipBlock = false;
                 break;
             }
-    } else
+    } else if(macBytes > 0)
        skipBlock = false; 
 
     if(readSize > headerSize)
@@ -259,20 +258,23 @@ bool MACFileIO::writeOneBlock( const IORequest &req )
 
     memset( newReq.data, 0, headerSize );
     memcpy( newReq.data + headerSize, req.data, req.dataLen );
-    if(randBytes)
+    if(randBytes > 0)
     {
 	if(!cipher->randomize( newReq.data+macBytes, randBytes, false ))
             return false;
     }
 
-    // compute the mac (which includes the random data) and fill it in
-    uint64_t mac = cipher->MAC_64( newReq.data+macBytes, 
-	                           req.dataLen + randBytes, key );
-
-    for(int i=0; i<macBytes; ++i)
+    if(macBytes > 0)
     {
-	newReq.data[i] = mac & 0xff;
-	mac >>= 8;
+        // compute the mac (which includes the random data) and fill it in
+        uint64_t mac = cipher->MAC_64( newReq.data+macBytes, 
+                req.dataLen + randBytes, key );
+
+        for(int i=0; i<macBytes; ++i)
+        {
+            newReq.data[i] = mac & 0xff;
+            mac >>= 8;
+        }
     }
 
     // now, we can let the next level have it..

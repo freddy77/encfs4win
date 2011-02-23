@@ -20,8 +20,8 @@
 
 #include "encfs.h"
 #include "Interface.h"
-#include "DirNode.h"
 #include "CipherKey.h"
+#include "FSConfig.h"
 
 // true if the path points to an existing node (of any type)
 bool fileExists( const char *fileName );
@@ -38,83 +38,8 @@ std::string parentDirectory( const std::string &path );
 // do it and return true.
 bool userAllowMkdir( const char *dirPath, mode_t mode );
 
-enum ConfigType
-{
-    Config_None = 0,
-    Config_Prehistoric,
-    Config_V3,
-    Config_V4,
-    Config_V5,
-    Config_V6
-};
-
-struct EncFSConfig
-{
-    ConfigType cfgType;
-
-    std::string creator;
-    int subVersion;
-
-    // interface of cipher
-    rel::Interface cipherIface;
-    // interface used for file name coding
-    rel::Interface nameIface;
-    int keySize; // reported in bits
-    int blockSize; // reported in bytes
-
-    std::vector<unsigned char> keyData;
-
-    std::vector<unsigned char> salt;
-    int kdfIterations;
-    long desiredKDFDuration;
-
-    int blockMACBytes; // MAC headers on blocks..
-    int blockMACRandBytes; // number of random bytes in the block header
-
-    bool uniqueIV; // per-file Initialization Vector
-    bool externalIVChaining; // IV seeding by filename IV chaining
-
-    bool chainedNameIV; // filename IV chaining
-    bool allowHoles; // allow holes in files (implicit zero blocks)
-
-    EncFSConfig()
-        : keyData()
-        , salt()
-    {
-        cfgType = Config_None;
-        subVersion = 0;
-        blockMACBytes = 0;
-        blockMACRandBytes = 0;
-        uniqueIV = false;
-        externalIVChaining = false;
-        chainedNameIV = false;
-        allowHoles = false;
-
-        kdfIterations = 0;
-        desiredKDFDuration = 500;
-    }
-
-    CipherKey getUserKey(bool useStdin);
-    CipherKey getNewUserKey();
-    
-    shared_ptr<Cipher> getCipher() const;
-
-    // deprecated
-    void assignKeyData(const std::string &in);
-    void assignKeyData(unsigned char *data, int length);
-    void assignSaltData(unsigned char *data, int length);
-
-    unsigned char *getKeyData() const;
-    unsigned char *getSaltData() const;
-
-private:
-    CipherKey makeKey(const char *password, int passwdLen);
-};
-    
-std::ostream &operator << (std::ostream &os, const EncFSConfig &cfg);
-std::istream &operator >> (std::istream &os, EncFSConfig &cfg);
-
 class Cipher;
+class DirNode;
 
 struct EncFS_Root
 {
@@ -128,18 +53,12 @@ struct EncFS_Root
 
 typedef boost::shared_ptr<EncFS_Root> RootPtr;
 
-/*
-    Read existing config file.  Looks for any supported configuration version.
-*/
-ConfigType readConfig( const std::string &rootDir, EncFSConfig *config ); 
-
-/*
-    Save the configuration.  Saves back as the same configuration type as was
-    read from.
-*/
-bool saveConfig( ConfigType type, const std::string &rootdir, 
-	EncFSConfig *config );
-
+enum ConfigMode
+{
+    Config_Prompt,
+    Config_Standard,
+    Config_Paranoia
+};
 
 struct EncFS_Opts
 {
@@ -157,42 +76,61 @@ struct EncFS_Opts
     bool ownerCreate; // set owner of new files to caller
 
     bool reverseEncryption; // Reverse encryption
+
+    ConfigMode configMode;
+
     EncFS_Opts()
     {
-	createIfNotFound = true;
-	idleTracking = false;
-	mountOnDemand = false;
-	checkKey = true;
-	forceDecode = false;
-	useStdin = false;
-	ownerCreate = false;
-	reverseEncryption = false;
+        createIfNotFound = true;
+        idleTracking = false;
+        mountOnDemand = false;
+        checkKey = true;
+        forceDecode = false;
+        useStdin = false;
+        ownerCreate = false;
+        reverseEncryption = false;
+        configMode = Config_Prompt;
     }
 };
 
+/*
+    Read existing config file.  Looks for any supported configuration version.
+*/
+ConfigType readConfig( const std::string &rootDir, 
+        const boost::shared_ptr<EncFSConfig> &config ); 
+
+/*
+    Save the configuration.  Saves back as the same configuration type as was
+    read from.
+*/
+bool saveConfig( ConfigType type, const std::string &rootdir, 
+	const boost::shared_ptr<EncFSConfig> &config );
+
 class EncFS_Context;
 
-RootPtr initFS( EncFS_Context *ctx, const shared_ptr<EncFS_Opts> &opts );
+RootPtr initFS( EncFS_Context *ctx, const boost::shared_ptr<EncFS_Opts> &opts );
 
-RootPtr createV6Config( EncFS_Context *ctx, const std::string &rootDir, 
-	bool enableIdleTracking,
-	bool forceDecode,
-	const std::string &passwordProgram, bool reverseEncryption,
-        bool allowHoles );
+RootPtr createV6Config( EncFS_Context *ctx, 
+                        const boost::shared_ptr<EncFS_Opts> &opts );
 
+void showFSInfo( const boost::shared_ptr<EncFSConfig> &config );
 
-void showFSInfo( const EncFSConfig &config );
-
-bool readV4Config( const char *configFile, EncFSConfig *config,
+bool readV4Config( const char *configFile, 
+        const boost::shared_ptr<EncFSConfig> &config,
 	struct ConfigInfo *);
-bool writeV4Config( const char *configFile, EncFSConfig *config);
+bool writeV4Config( const char *configFile, 
+        const boost::shared_ptr<EncFSConfig> &config);
 
-bool readV5Config( const char *configFile, EncFSConfig *config,
+bool readV5Config( const char *configFile, 
+        const boost::shared_ptr<EncFSConfig> &config,
 	struct ConfigInfo *);
-bool writeV5Config( const char *configFile, EncFSConfig *config);
+bool writeV5Config( const char *configFile, 
+        const boost::shared_ptr<EncFSConfig> &config);
 
-bool readV6Config( const char *configFile, EncFSConfig *config,
+bool readV6Config( const char *configFile, 
+        const boost::shared_ptr<EncFSConfig> &config,
 	struct ConfigInfo *);
-bool writeV6Config( const char *configFile, EncFSConfig *config);
+bool writeV6Config( const char *configFile, 
+        const boost::shared_ptr<EncFSConfig> &config);
 
 #endif

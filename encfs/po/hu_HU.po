@@ -1,51 +1,56 @@
-# Arabic translation for encfs
-# Copyright (c) 2007 Rosetta Contributors and Canonical Ltd 2007
-# This file is distributed under the same license as the encfs package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2007.
-#
+# translation of hu.po to 
+# translation of hu_HU.po to
+# Magyar (Hungary) translation for Encrypted Filesystem for Linux
+# Copyright (c) (c) 2004 Canonical Ltd, and Rosetta Contributors 2004
+# This file is distributed under the same license as the Encrypted Filesystem for Linux package.
+# Szabolcs Gyuris <szimszon at gmail  com>, 2004, 2005.
+# , 2005.
 msgid ""
 msgstr ""
-"Project-Id-Version: encfs\n"
+"Project-Id-Version: hu\n"
 "Report-Msgid-Bugs-To: vgough@pobox.com\n"
 "POT-Creation-Date: 2010-11-18 00:12-0800\n"
-"PO-Revision-Date: 2008-02-27 11:55+0000\n"
-"Last-Translator: Anas Husseini <anas_h_34@hotmail.com>\n"
-"Language-Team: Arabic <ar@li.org>\n"
-"Language: ar\n"
+"PO-Revision-Date: 2005-04-12 11:24+0200\n"
+"Last-Translator: Hajdara Szabolcs\n"
+"Language-Team:  <hu@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n % 100 >= "
-"3 && n % 100 <= 10 ? 3 : n % 100 >= 11 && n % 100 <= 99 ? 4 : 5;\n"
-"X-Launchpad-Export-Date: 2010-06-17 04:44+0000\n"
-"X-Generator: Launchpad (build Unknown)\n"
+"X-Rosetta-Version: 0.1\n"
+"Plural-Forms: nplurals=2; plural=n != 1\n"
+"X-Generator: KBabel 1.9.1\n"
 
+# start po-group: [none]
+# start po-group: [none]
 #: encfs/BlockFileIO.cpp:414
 #, c-format
 msgid "truncate failure: read %i bytes, partial block of %i"
-msgstr "فشل تقطيع: قراءة %i بايت، كتلةجزئية من %i"
+msgstr "csonkítás hiba: %i olvasott byte, a(z) %i részblokkban"
 
+# start po-group: setup
+# start po-group: setup
 #: encfs/BlockNameIO.cpp:50
 msgid "Block encoding, hides file name size somewhat"
-msgstr "تعمية بالكتلة؛ تخفي اسم الملف و حجمه بعض الشيء"
+msgstr "Blokk titkosítés, elrejti a fájlnév hosszát, amennyire ez lehetséges"
 
 #: encfs/FileUtils.cpp:322
 #, c-format
 msgid "The directory \"%s\" does not exist. Should it be created? (y,n) "
-msgstr "الدليل \"%s\" غير موجود. هل ينبغي إنشاؤه؟ (y، n) "
+msgstr "A \"%s\" könyvtár nem létezik. Létrehozzam? (y,n) "
 
 #: encfs/FileUtils.cpp:331
 msgid "Unable to create directory: "
-msgstr "تعذّر إنشاء دليل: "
+msgstr "Nem lehet létrehozni a könyvtárat: "
 
 #: encfs/FileUtils.cpp:338
 msgid "Directory not created."
-msgstr "لم ينشأ الدليل."
+msgstr "A könyvtár nem létezik."
 
 #: encfs/FileUtils.cpp:360
 #, c-format
 msgid "Found config file %s, but failed to load"
-msgstr "وجد ملف تضبيطات %s، لكن تعذّر تحميله"
+msgstr "%s konfigurációs fájlt találtam, de nem tudom betölteni"
 
 #: encfs/FileUtils.cpp:439
 #, c-format
@@ -53,59 +58,59 @@ msgid ""
 "Config subversion %i found, but this version of encfs only supports up to "
 "version %i."
 msgstr ""
-"وجدت تضبيطات من الإصدارة الفرعية %i إلا أن هذه الإصدارة من encfs تدعم فقط "
-"الإصدارات حتى %i."
+"%i alverziójú konfigurációt találtam, de az encfs ezen verziója csak %i "
+"verzióig támogatja."
 
 #: encfs/FileUtils.cpp:446
 msgid ""
 "This version of EncFS doesn't support filesystems created before 2004-08-13"
-msgstr "هذه النسخة من EncFS لا تدعم أنظمة الملفات المنشأة قبل 13-08-2004"
+msgstr ""
 
 #: encfs/FileUtils.cpp:646
 msgid "The following cipher algorithms are available:"
-msgstr "خوارزميات التعمية التالية متاحة:"
+msgstr "A következő titkosító algoritmusok érhetők el:"
 
 #: encfs/FileUtils.cpp:658
 #, c-format
 msgid " -- key length %i bits"
-msgstr " -- طول المفتاح %i بتة"
+msgstr " -- %i bit hosszú kulcs"
 
 #: encfs/FileUtils.cpp:665
 #, c-format
 msgid " -- Supports key lengths of %i to %i bits"
-msgstr " -- يدعم أطوال مفاتيح من %i إلى %i بتة"
+msgstr " -- Támogatott kulcshosszak: %i - %i bit"
 
 #: encfs/FileUtils.cpp:674
 #, c-format
 msgid " -- block size %i bytes"
-msgstr " -- حجم الكتلة %i بايت"
+msgstr " -- %i byte hosszú blokk"
 
 #: encfs/FileUtils.cpp:681
 #, c-format
 msgid " -- Supports block sizes of %i to %i bytes"
-msgstr " -- يدعم حجوما للكتل من %i إلى %i بايت"
+msgstr " -- Támogatott blokkméretek: %i - %i byte"
 
 #: encfs/FileUtils.cpp:687 encfs/FileUtils.cpp:732
 msgid "Enter the number corresponding to your choice: "
-msgstr "أدخل الرقم المقابل لاختيارك: "
+msgstr "Adja meg az ön által választott számot: "
 
 #: encfs/FileUtils.cpp:695 encfs/FileUtils.cpp:740
 msgid "Invalid selection."
-msgstr "اختيار غير صحيح."
+msgstr "Hibás választás."
 
 #: encfs/FileUtils.cpp:706 encfs/FileUtils.cpp:749
 #, c-format
 msgid "Selected algorithm \"%s\""
-msgstr "لقد اخترت خوارزمية \"%s\""
+msgstr "Kiválasztott algoritmus \"%s\""
 
 #: encfs/FileUtils.cpp:720
 msgid "The following filename encoding algorithms are available:"
-msgstr "خوارزميات ترميز أسماء الملفات التالية متاحة:"
+msgstr "A következő fájlnév titkosító algoritmusok érhetők el:"
 
 #: encfs/FileUtils.cpp:761 encfs/FileUtils.cpp:808
 #, c-format
 msgid "Using key size of %i bits"
-msgstr "يستخدم مفتاح بطول %i بتة"
+msgstr "Használt kulcshossz %i bit"
 
 #: encfs/FileUtils.cpp:768
 #, c-format
@@ -114,18 +119,19 @@ msgid ""
 "supports sizes from %i to %i bits in increments of %i bits.\n"
 "For example: "
 msgstr ""
-"اختر طولا للمفتاح بالبتات. الخوارزمية التي اخترتها\n"
-"تدعم أطوالا من %i إلى %i بتة بمضاعفات %i بتة.\n"
-"مثلا: "
+"Kérem válasszon egy kulcshosszt bitben. A kiválasztott algoritmus \n"
+"%i - %i bit közötti kulcshosszakat enged meg\n"
+"(%i bites lépésekben lehet emelni).\n"
+"Például:"
 
 #: encfs/FileUtils.cpp:798
 msgid "Selected key size: "
-msgstr "طول المفتاح المختار: "
+msgstr "Kiválasztott kulcshossz: "
 
 #: encfs/FileUtils.cpp:820 encfs/FileUtils.cpp:847
 #, c-format
 msgid "Using filesystem block size of %i bytes"
-msgstr "يستخدم كتل لنظام الملفات حجمها %i بايت"
+msgstr "A használt fájlrendszer blokk mérete %i byte"
 
 #: encfs/FileUtils.cpp:827
 #, c-format
@@ -134,13 +140,13 @@ msgid ""
 "supports sizes from %i to %i bytes in increments of %i.\n"
 "Or just hit enter for the default (%i bytes)\n"
 msgstr ""
-"اختر حجما للكتلة بالبايتات. الخوارزمية التي اخترتها\n"
-"تدعم حجوما من %i إلى %i بايت بمضاعفات %i.\n"
-"أو اضغط enter لتستعمل المبدئي (%i بايت)\n"
+"Kérem válasszon blokkméretet byte-okban. A kiválasztott algoritmus\n"
+"%i - %i byte hosszt enged meg %i byte lépésekben.\n"
+"Az alapértelmezett %i byte-hoz üssön ENTER-t\n"
 
 #: encfs/FileUtils.cpp:834
 msgid "filesystem block size: "
-msgstr "حجم كتلة نظام الملفات: "
+msgstr "fájlrendszer blokk mérete: "
 
 #: encfs/FileUtils.cpp:857
 msgid ""
@@ -149,6 +155,7 @@ msgid ""
 msgstr ""
 
 #: encfs/FileUtils.cpp:875
+#, fuzzy
 msgid ""
 "Enable block authentication code headers\n"
 "on every block in a file?  This adds about 12 bytes per block\n"
@@ -156,6 +163,12 @@ msgid ""
 "performance but it also means [almost] any modifications or errors\n"
 "within a block will be caught and will cause a read error."
 msgstr ""
+"Legyen bekapcsolva a blokk hitelesítés minden blokkon a fájlban?\n"
+"Ez a lehetőség nagyjából 12 byte plusz tárhelyet igényel blokkonként,\n"
+"és nagyban befolyásolja a teljesítményt, de így felismerhető (majdnem)\n"
+"minden változtatás vagy hiba a blokkon belül és olvasási hibát eredményez.\n"
+"Az alapértelmezett beállítás Nem  \n"
+"Az a válasz amelyik nem 'y'-nal kezdődik Nem-et jelent:"
 
 #: encfs/FileUtils.cpp:887
 msgid ""
@@ -167,11 +180,12 @@ msgid ""
 "penalty. \n"
 "Select a number of bytes, from 0 (no random bytes) to 8: "
 msgstr ""
-"أأضيف بايتات عشوائية إلى ترويسة كل كتلة؟\n"
-"يقلل هذا من الأداء إلا أنه يضمن أن يكون لكل\n"
-"كتلة رمز توثيق مختلفة. لاحظ أنه بوسعك الحصول\n"
-"على ذات النتيجة بتفعيل متجهات البدء على كل ملف\n"
-"و هي لا تقلل الأداء بذات القدر. "
+"Legyen minden blokk fejléchez véletlenszerű byte hozzáadva?\n"
+"Így csökken a teljesítmény, de biztosítja, hogy minden blokknak\n"
+"más azonosító kódja legyen. Megjegyzendő, hogy ugyanezt elérheti\n"
+"ha engedélyezi a fájlonkénti inicializáló vektort, ami nem hat olyan\n"
+"károsan a teljesítményre. Válasszon egy számot 0 (nincs véletlen byte) és 8 "
+"között: "
 
 #: encfs/FileUtils.cpp:913
 msgid ""
@@ -180,21 +194,35 @@ msgid ""
 msgstr ""
 
 #: encfs/FileUtils.cpp:931
+#, fuzzy
 msgid ""
 "Enable per-file initialization vectors?\n"
 "This adds about 8 bytes per file to the storage requirements.\n"
 "It should not affect performance except possibly with applications\n"
 "which rely on block-aligned file io for performance."
 msgstr ""
+"Engedélyezi a fájlonkénti inicializáló vektort?\n"
+"8 byte-tal növeli a tárigényt fájlonként.\n"
+"Nincs hatással a teljesítményre, hacsak nem használ olyan alkalmazást\n"
+"amely blokk mérethez igazított fájlokkal dolgozik.\n"
+"Az alapértelmezés itt Igen.  \n"
+"Minden válasz ami nem 'n'-nel kezdődik Igen-t jelent: "
 
 #: encfs/FileUtils.cpp:942
+#, fuzzy
 msgid ""
 "Enable filename initialization vector chaining?\n"
 "This makes filename encoding dependent on the complete path, \n"
 "rather then encoding each path element individually."
 msgstr ""
+"Engedélyezi a fájlnév inicializációs vektor láncolását?\n"
+"Ez azt jelenti, hogy a fájlnév titkosítás a teljes elérési úttól függ,\n"
+"és nem titkosítja az út minden elemét külön-külön.\n"
+"Általában ez az opció kívánatos, így az alapértelmezés Igen.\n"
+"Minden válasz ami nem 'n'-nel kezdődik Igen-t jelent: "
 
 #: encfs/FileUtils.cpp:952
+#, fuzzy
 msgid ""
 "Enable filename to IV header chaining?\n"
 "This makes file data encoding dependent on the complete file path.\n"
@@ -203,6 +231,14 @@ msgid ""
 "If this option is enabled, then hard links will not be supported\n"
 "in the filesystem."
 msgstr ""
+"Engedélyezi a fájlnév IV fejlécbe láncolását?\n"
+"Ezzel a fájl tartalmának kódolása a teljes elérési úttól és fájlnévtől\n"
+"függ. Ha a fájl neve megváltozik nem lehet visszakódolni hacsak nem\n"
+"az encfs-sel és a megfelelő kulccsal lett átnevezve.\n"
+"Ha ez az opció be van kapcsolva, abban az esetben a 'hard' linkek nem\n"
+"támogatottak a fájlrendszeren\n"
+"Az alapértelmezés Nem. \n"
+"Minden válasz ami nem 'y'-nal kezdődik Nem-et jelent: "
 
 #: encfs/FileUtils.cpp:965
 msgid ""
@@ -212,7 +248,7 @@ msgstr ""
 
 #: encfs/FileUtils.cpp:985
 msgid "Creating new encrypted volume."
-msgstr "يجري إنشاء مجلد معمى جديد."
+msgstr "Új titkosított kötet létrehozása."
 
 #: encfs/FileUtils.cpp:991
 msgid ""
@@ -222,64 +258,64 @@ msgid ""
 " anything else, or an empty line will select standard mode.\n"
 "?> "
 msgstr ""
-"اختر أحد الخيارات التالية:\n"
-" أدخل \"x\" لطور التضبيطات المتقدم،\n"
-" اضغط \"p\" للتضبيطات الجاهزة بالغة الحيطة،\n"
-" أي شيء آخر أو سطر خاو سيختار الطور العادي.\n"
-"؟> "
+"Kérem válasszon az alábbi lehetőségek közül:\n"
+" \"x\" a haladó beállításokhoz,\n"
+" \"p\" a meghatározott beállításokat tartalmazó 'paranoia' konfigurációhoz,\n"
+" minden mással, vagy az üres sorral az alap konfigurációt választja.\n"
+"?> "
 
 #: encfs/FileUtils.cpp:1027
+#, fuzzy
 msgid "Paranoia configuration not supported for --reverse"
-msgstr "إعدادات المهووس الأمني غير مدعومة مع --reverse"
+msgstr "A 'paranoia' konfigurációt választotta."
 
 #: encfs/FileUtils.cpp:1032
 msgid "Paranoia configuration selected."
-msgstr "اختيرت التضبيطات بالغة الحذر."
+msgstr "A 'paranoia' konfigurációt választotta."
 
 #: encfs/FileUtils.cpp:1051
 msgid "Standard configuration selected."
-msgstr "اختيرت التضبيطات الاعتيادية"
+msgstr "Az alap konfigurációt választotta."
 
 #: encfs/FileUtils.cpp:1063 encfs/FileUtils.cpp:1094
 msgid "--reverse specified, not using unique/chained IV"
-msgstr "--reverse محدد، دون استخدام IV الفريد/المسلسل"
+msgstr ""
 
 #: encfs/FileUtils.cpp:1077
 msgid ""
 "Sorry, unable to locate cipher for predefined configuration...\n"
 "Falling through to Manual configuration mode."
 msgstr ""
-"تعذّر إيجاد خوارزمية تلبي الإعدادت المسبقة...\n"
-"يجري الرجوع إلى طور التضبيطات اليدوية."
+"Sajnálom, nem találok titkosító algoritmust a kiválasztott "
+"konfigurációhoz...\n"
+"Kézi beállításra váltok."
 
 #: encfs/FileUtils.cpp:1083
 msgid "Manual configuration mode selected."
-msgstr "اختير طور التضبيطات اليدوية."
+msgstr "A kézi beállítást választotta."
 
 #: encfs/FileUtils.cpp:1104
 msgid ""
 "External chained IV disabled, as both 'IV chaining'\n"
 "and 'unique IV' features are required for this option."
 msgstr ""
-"تم تعطيل السلسة الخارجية لمتجهات البدء حيث أن كلا من\n"
-" 'سَلسة المتجهات' و 'المتجهات الفريدة' مطلوب ليتاح هذا الخيار."
+"Külső IV kikapcsolva, mivel mind az IV láncolás, mind az egyedi IV\n"
+"szükséges ehhez az opcióhoz."
 
 #: encfs/FileUtils.cpp:1117
 #, c-format
 msgid "Unable to instanciate cipher %s, key size %i, block size %i"
-msgstr "تعذّر بدء الخوارزمية %s بفمتاح حجمه %i و كتلة حجمها %i"
+msgstr "Unable to instanciate cipher %s, key size %i, block size %i"
 
 #: encfs/FileUtils.cpp:1148
 msgid ""
 "Configuration finished.  The filesystem to be created has\n"
 "the following properties:"
-msgstr ""
-"تمت التضبيطات. نظام الملفات الذي سينشأ\n"
-"ستكون له الخصائص التالية:"
+msgstr "A konfigurálás kész. A készűlő fájlrendszer tulajdonságai:"
 
 #: encfs/FileUtils.cpp:1155
 msgid "-------------------------- WARNING --------------------------\n"
-msgstr "-------------------------- تحذير --------------------------\n"
+msgstr ""
 
 #: encfs/FileUtils.cpp:1157
 msgid ""
@@ -291,13 +327,6 @@ msgid ""
 "If you would like to choose another configuration setting,\n"
 "please press CTRL-C now to abort and start over."
 msgstr ""
-"تم تفعيل خيار السَلسلة الخاريجة لمتجهات البدء.\n"
-"يعطل هذا الخيار استعمال الروابط الصلبة في نظام الملفات.\n"
-"بعض البرمجيات قد لا تعمل في غياب الروابط الصلبة.\n"
-"مثل، برمجيتا mutt و procmail معروف عنهما هذا.\n"
-"لمزيد من المعلومات طالع قائمة encfs البريدية.\n"
-"إن كنت تريد تغيير أي من خيارات التضبيطات\n"
-"فاضغط CTRL-C الآن لتجهض هذا و تبدأ من جديد."
 
 #: encfs/FileUtils.cpp:1168
 msgid ""
@@ -307,47 +336,49 @@ msgid ""
 "later using encfsctl.\n"
 "\n"
 msgstr ""
-"ينبغي عليك الآن إدخال كلمة مرور لنظام الملفات.\n"
-"سيكون عليك تذكر كلمة المرور حيث لا توجد أي\n"
-"وسيلة لاستعادة المعمى، لكن سيكون بإمكانك تغيير\n"
-"كلمة المرور في أي وقت لاحقا باستخدام encfsctl.\n"
+"Önnek most be kell írnia a jelszót a fájlrendszerhez.\n"
+"Jegyezze meg ezt a jelszót, mert egyáltalán\n"
+"nincs semmiféle visszaállítási lehetőség.  Viszont a jelszó később\n"
+"megváltoztatható az encfsctl-lel.\n"
 "\n"
 
 #: encfs/FileUtils.cpp:1196
 msgid "Failure generating new volume key! Please report this error."
-msgstr "فشل توليد مفتاح جديد للمجلد! رجاء أبلغ عن هذا الخطأ."
+msgstr ""
+"Hiba az új kötet kulcs generálásakor! Tájékoztassa a fejlesztőt erről a "
+"hibáról."
 
 #: encfs/FileUtils.cpp:1209
 msgid "Name coding interface not supported"
-msgstr "واجهة ترميز الأسماء غير مدعومة."
+msgstr "Névkódolási interfész nem támogatott"
 
 #: encfs/FileUtils.cpp:1210
 msgid "The filename encoding interface requested is not available"
-msgstr "واجهة ترميز أسماء الملفات المطلوبة غير متاحة"
+msgstr "A kért fájlnév kódolási interfész nem érhető el"
 
 #: encfs/FileUtils.cpp:1243
 #, c-format
 msgid "Filesystem cipher: \"%s\", version %i:%i:%i"
-msgstr "خوارزمية تعمية نظام الملفات: \"%s\" الإصدارة %i:%i:%i"
+msgstr "Fájlrendszer titkosítás: \"%s\", verzió: %i:%i:%i"
 
 #: encfs/FileUtils.cpp:1248 encfs/FileUtils.cpp:1274 encfs/FileUtils.cpp:1293
 msgid " (NOT supported)\n"
-msgstr " (غير مدعوم)\n"
+msgstr " (NEM támogatott)\n"
 
 #: encfs/FileUtils.cpp:1256 encfs/FileUtils.cpp:1281
 #, c-format
 msgid " (using %i:%i:%i)\n"
-msgstr " (باستخدام %i:%i:%i)\n"
+msgstr " (%i:%i:%i -t használ)\n"
 
 #: encfs/FileUtils.cpp:1264
 #, c-format
 msgid "Filename encoding: \"%s\", version %i:%i:%i"
-msgstr "ترميز أسماء اللفات: \"%s\" الإصدارة %i:%i:%i"
+msgstr "Fájlnév titkosítás: \"%s\", verzió: %i:%i:%i"
 
 #: encfs/FileUtils.cpp:1288
 #, c-format
 msgid "Key Size: %i bits"
-msgstr "طول المفتاح: %i بتة"
+msgstr "Kucs méret: %i bit"
 
 #: encfs/FileUtils.cpp:1299
 #, c-format
@@ -357,34 +388,34 @@ msgstr ""
 #: encfs/FileUtils.cpp:1301
 #, fuzzy, c-format
 msgid "Salt Size: %i bits"
-msgstr "طول المفتاح: %i بتة"
+msgstr "Kucs méret: %i bit"
 
 #: encfs/FileUtils.cpp:1310
 #, c-format
 msgid "Block Size: %i bytes + %i byte MAC header"
-msgstr "حجم الكتلة: %i بايت + %i بايت ترويسة MAC"
+msgstr "Blokk méret: %i byte + %i byte MAC fejéc"
 
 #: encfs/FileUtils.cpp:1318
 #, c-format
 msgid "Block Size: %i bytes, including %i byte MAC header"
-msgstr "حجم الكتلة: %i بايت متضمنة %i بايت ترويسة MAC"
+msgstr "Blokk méret: %i byte, %i byte MAC fejlécet tartalmaz"
 
 #: encfs/FileUtils.cpp:1325
 #, c-format
 msgid "Block Size: %i bytes"
-msgstr "حجم الكتلة: %i بايت"
+msgstr "Blokk méret: %i byte"
 
 #: encfs/FileUtils.cpp:1332
 msgid "Each file contains 8 byte header with unique IV data.\n"
-msgstr "كل ملف يحوي ترويسة طولها 8 بايتات من بيانات متجه البدء الفريدة.\n"
+msgstr "Minden fájl 8 byte fejlécet tartalmaz egyedi IV adattal.\n"
 
 #: encfs/FileUtils.cpp:1337
 msgid "Filenames encoded using IV chaining mode.\n"
-msgstr "أيماء الملفات مرمزة في طور سَلسلة متجهات البدء.\n"
+msgstr "Fájlnév titkosítás IV láncolást használ.\n"
 
 #: encfs/FileUtils.cpp:1342
 msgid "File data IV is chained to filename IV.\n"
-msgstr "بيانات متجهات بدء الملفات مسلسلة مع متجهات بدء أسماء الملفات.\n"
+msgstr "A fájl adat IV adata a fájlnév IV adatához van láncolva.\n"
 
 #: encfs/FileUtils.cpp:1347
 msgid "File holes passed through to ciphertext.\n"
@@ -394,13 +425,15 @@ msgstr ""
 msgid "Error creating salt\n"
 msgstr ""
 
+# start po-group: common
+# start po-group: common
 #: encfs/FileUtils.cpp:1431
 msgid "EncFS Password: "
-msgstr "كلمة مرور EncFS: "
+msgstr "EncFS jelszó: "
 
 #: encfs/FileUtils.cpp:1437
 msgid "Zero length password not allowed\n"
-msgstr "كلمات المرور الخاوية غير مقبولة\n"
+msgstr "Az üres jelszó nem megengedett\n"
 
 #: encfs/FileUtils.cpp:1483
 msgid "Internal error: socketpair() failed"
@@ -416,66 +449,68 @@ msgstr "Internal error: failed to exec program"
 
 #: encfs/FileUtils.cpp:1561
 msgid "New Encfs Password: "
-msgstr "كلمة مرور EncFS الجديدة: "
+msgstr "Új Encfs jelszó: "
 
 #: encfs/FileUtils.cpp:1564
 msgid "Verify Encfs Password: "
-msgstr "أكد كلمة مرور EncFS: "
+msgstr "EncFS jelszó megerősítése: "
 
 #: encfs/FileUtils.cpp:1573
 msgid "Passwords did not match, please try again\n"
-msgstr "لم تتطابق كلمتا المرور، رجاء حاول ثانية\n"
+msgstr "A jelszavak nem egyeznek, kérem írja be újra\n"
 
 #: encfs/FileUtils.cpp:1596
 msgid "The configuration loaded is not compatible with --reverse\n"
-msgstr "الإعدادات المحملة غير متوافقة مع --reverse\n"
+msgstr ""
 
 #: encfs/FileUtils.cpp:1605
 #, c-format
 msgid "Unable to find cipher %s, version %i:%i:%i"
-msgstr "تعذّر إيجاد خوارزمية التعمية %s، الإصدارة %i: %i: %i"
+msgstr "%s titkosító algoritmus nem található, verzió %i:%i:%i"
 
 #: encfs/FileUtils.cpp:1611
 msgid "The requested cipher interface is not available\n"
-msgstr "واجهة خوارزمية التعمية المطلوبة غير متاحة\n"
+msgstr "A kért titkosító interfész nem használható\n"
 
 #: encfs/FileUtils.cpp:1637
 msgid "Error decoding volume key, password incorrect\n"
-msgstr "حدث خطأ أثناء حل ترميز مفتاح المجلد؛ كلمة المرور غير صحيحة\n"
+msgstr "Hiba a kötet kulcsának meghatározásánál, a jelszó hibás\n"
 
 #: encfs/FileUtils.cpp:1645
 #, c-format
 msgid "Unable to find nameio interface %s, version %i:%i:%i"
-msgstr "تعذّر إيجاد واجهة ترميز أسماء الملفات %s، الإصدارة  %i: %i: %i"
+msgstr "%s nameio interfész nem található, verzió %i:%i:%i"
 
 #: encfs/FileUtils.cpp:1651
 msgid "The requested filename coding interface is not available\n"
-msgstr "واجهة ترميز أسماء الملفات المطلوبة غير متاحة\n"
+msgstr "A fájlnév titkosító interfész nem használható\n"
 
 #: encfs/FileUtils.cpp:1696
 msgid "Remount failed"
-msgstr "فشلت إعادة الضم"
+msgstr ""
 
 #: encfs/MACFileIO.cpp:216
 #, c-format
 msgid "MAC comparison failure in block %li"
-msgstr "فشلت مطابقة MAC للكتلة %li"
+msgstr "MAC összehasonlítási hiba a %li blokkban"
 
 #: encfs/MACFileIO.cpp:222
 msgid "MAC comparison failure, refusing to read"
-msgstr "فشلت مطابقة MAC، ترفض القراءة"
+msgstr "A MAC összehasonlítás nem sikerült, elolvasás letiltva"
 
 #: encfs/SSL_Cipher.cpp:201
 msgid "8 byte block cipher"
-msgstr ""
+msgstr "8 byte-os blokk titkosítás"
 
 #: encfs/StreamNameIO.cpp:39
 msgid "Stream encoding, keeps filenames as short as possible"
-msgstr ""
+msgstr "Folyam kódolás a fájlnevek lehető legrövidebben tartásához"
 
+# start po-group: usage
+# start po-group: usage
 #: encfs/encfsctl.cpp:85
 msgid "  -- show information (Default command)"
-msgstr ""
+msgstr "  -- információk megjelenítése (alapértelmezett parancs)"
 
 #: encfs/encfsctl.cpp:88
 msgid "  -- show key"
@@ -483,48 +518,47 @@ msgstr ""
 
 #: encfs/encfsctl.cpp:91
 msgid "  -- change password for volume"
-msgstr ""
+msgstr "  -- kötet jelszavának megváltoztatása"
 
 #: encfs/encfsctl.cpp:94
 msgid ""
 "  -- change password for volume, taking password from standard input.\n"
 "\tNo prompts are issued."
 msgstr ""
-"  -- غيّر كلمة المرور للمجلد، آخذا كلمة المرور من الإدخال القياسي\n"
-"\tلن يظهر محث"
 
 #: encfs/encfsctl.cpp:99
 msgid "  -- show undecodable filenames in the volume"
-msgstr "  -- أظهر أسماء الملفات المتعذر حل ترميزها في مساحة التخزين"
+msgstr "  -- a visszakódolhatatlan fájlnevek megjelenítése a kötetben"
 
 #: encfs/encfsctl.cpp:102
 msgid "  -- decodes the file and cats it to standard out"
-msgstr "  -- تحل ترميز الملف وتخرجه إلى المخرج القياسي"
+msgstr ""
 
 #: encfs/encfsctl.cpp:105
 msgid "  -- decodes name and prints plaintext version"
-msgstr "  -- تحل ترميز الاسم و تطبع  نصه الصريح"
+msgstr "  -- visszafejti a nevet és olvasható formában jeleníti meg"
 
 #: encfs/encfsctl.cpp:108
+#, fuzzy
 msgid "  -- encodes a filename and print result"
-msgstr "  -- ترمز اسم ملف و تطبع النتيجة"
+msgstr "  -- visszafejti a nevet és olvasható formában jeleníti meg"
 
 #: encfs/encfsctl.cpp:111
 msgid "  -- decrypts a volume and writes results to path"
-msgstr "  -- تظهّر مساحة تخزين وتكتب النتائج إلى المسار"
+msgstr ""
 
 #: encfs/encfsctl.cpp:114
 msgid "  -- print version number and exit"
-msgstr "  -- اطبع رقم الإصدارة و اخرج"
+msgstr "  -- verziószám megjelenítiése után kilépés"
 
 #: encfs/encfsctl.cpp:123 encfs/encfsctl.cpp:167
 #, c-format
 msgid "encfsctl version %s"
-msgstr "encfsctl الإصدارة %s"
+msgstr "encfsctl verzió %s"
 
 #: encfs/encfsctl.cpp:124
 msgid "Usage:\n"
-msgstr "الاستخدام:\n"
+msgstr "Használat:\n"
 
 #: encfs/encfsctl.cpp:127
 #, c-format
@@ -532,8 +566,8 @@ msgid ""
 "%s (root dir)\n"
 "  -- displays information about the filesystem, or \n"
 msgstr ""
-"%s (دليل الجذر) \n"
-"  -- تعرض معلومات عن نظام الملفات أو \n"
+"%s (root dir)\n"
+"  -- megjeleníti a fájlrendszer információkat, vagy \n"
 
 #: encfs/encfsctl.cpp:144
 #, c-format
@@ -541,96 +575,100 @@ msgid ""
 "Example: \n"
 "%s info ~/.crypt\n"
 msgstr ""
-"مثال: \n"
+"Például: \n"
 "%s info ~/.crypt\n"
 
 #: encfs/encfsctl.cpp:152
 #, c-format
 msgid "directory %s does not exist.\n"
-msgstr "الدليل %s غير موجود.\n"
+msgstr "A(z) %s könyvtár nem létezik.\n"
 
+# start po-group: diag
+# start po-group: diag
 #: encfs/encfsctl.cpp:187 encfs/encfsctl.cpp:708
 msgid "Unable to load or parse config file\n"
-msgstr "تعذّر تحميل أو تفصيل ملف التضبيطات\n"
+msgstr "Olvashatatlan vagy értelmezhetetlen konfigurációs fájl\n"
 
 #: encfs/encfsctl.cpp:191
 msgid ""
 "A really old EncFS filesystem was found. \n"
 "It is not supported in this EncFS build.\n"
 msgstr ""
-"نظام ملفات EncFS هذا قديم جدا. \n"
-"و هو غير مدعوم في هذه الإنشاءة من EncFS.\n"
+"Egy meglehetősen régi EncFS fájlrendszert találtam.\n"
+"Nem támogatott ebben a verzióban.\n"
 
 #: encfs/encfsctl.cpp:196
 #, c-format
 msgid "Version 3 configuration; created by %s\n"
-msgstr "تضبيطات من الإصدارة 3؛ انشأها %s\n"
+msgstr "3-as verziójú configuráció; készítette: %s\n"
 
 #: encfs/encfsctl.cpp:201
 #, c-format
 msgid "Version 4 configuration; created by %s\n"
-msgstr "تضبيطات من الإصدارة 4؛ أنشأها %s\n"
+msgstr "4-es verziójú configuráció; készítette: %s\n"
 
 #: encfs/encfsctl.cpp:206
 #, c-format
 msgid "Version 5 configuration; created by %s (revision %i)\n"
-msgstr "تضبيطات من الإصدارة 5؛ أنشأها %s (المراجعة %i)\n"
+msgstr "5-ös verziójú configuráció; készítette: %s (változat: %i)\n"
 
 #: encfs/encfsctl.cpp:212
-#, c-format
+#, fuzzy, c-format
 msgid "Version 6 configuration; created by %s (revision %i)\n"
-msgstr ""
+msgstr "5-ös verziójú configuráció; készítette: %s (változat: %i)\n"
 
 #: encfs/encfsctl.cpp:250 encfs/main.cpp:331
 #, c-format
 msgid "getopt error: %i"
-msgstr "خطأ getopt: %i"
+msgstr "getopt error: %i"
 
 #: encfs/encfsctl.cpp:260
 #, fuzzy
 msgid "Incorrect number of arguments"
-msgstr "عدد المعطيات غير صحيح للأمر \"%s\""
+msgstr "Hibás paraméterszám a(z) \"%s\" parancshoz"
 
 #: encfs/encfsctl.cpp:272 encfs/encfsctl.cpp:293
 msgid "Unable to initialize encrypted filesystem - check path.\n"
-msgstr "تعذّر بدء نظام الملفات المعمّى - راجع المسار.\n"
+msgstr ""
+"A titkosított fájlrendszert nem lehet inicializálni, kérem ellenőrizze az "
+"elérési utat.\n"
 
 #: encfs/encfsctl.cpp:642
 #, c-format
 msgid "In directory %s: \n"
-msgstr "في الدليل %s: \n"
+msgstr "A(z) %s könyvtárban: \n"
 
 #: encfs/encfsctl.cpp:690
 #, c-format
 msgid "Found %i invalid file."
 msgid_plural "Found %i invalid files."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%i db hibás fájlt találtam."
+msgstr[1] "%i db hibás fájlt találtam."
 
 #: encfs/encfsctl.cpp:717
 #, c-format
 msgid "Unable to find specified cipher \"%s\"\n"
-msgstr "تعذّر إيجاد خوارزمية التعمية \"%s\"\n"
+msgstr "Nem találom a megadott titkosító algoritmust, \"%s\"\n"
 
 #: encfs/encfsctl.cpp:723
 msgid "Enter current Encfs password\n"
-msgstr "أدخل كلمة مرور EncFS الحالية\n"
+msgstr "Addja meg az aktuális Encfs jelszót\n"
 
 #: encfs/encfsctl.cpp:734
 msgid "Invalid password\n"
-msgstr "كلمة مرور غير صحيحة\n"
+msgstr "Érvénytelen jelszó\n"
 
 #: encfs/encfsctl.cpp:740
 msgid "Enter new Encfs password\n"
-msgstr "أدخل كلمة مرور EncFS الجديدة\n"
+msgstr "Addja meg az új Encfs jelszót\n"
 
 #: encfs/encfsctl.cpp:766
 msgid "Volume Key successfully updated.\n"
-msgstr "تم بنجاح تحديث مفتاح المجلد.\n"
+msgstr "Kötet kulcs sikeresen frissítve.\n"
 
 #: encfs/encfsctl.cpp:770
 msgid "Error saving modified config file.\n"
-msgstr "حدث خطأ أثناء حفظ ملف التضبيطات المعدّل.\n"
+msgstr "Hiba a módosult konfigurációs fájl mentésénél.\n"
 
 #: encfs/encfsctl.cpp:774
 msgid "Error creating key\n"
@@ -639,23 +677,24 @@ msgstr ""
 #: encfs/encfsctl.cpp:839
 #, c-format
 msgid "invalid command: \"%s\""
-msgstr "أمر غير صحيح: \"%s\""
+msgstr "Érvénytelen parancs: \"%s\""
 
 #: encfs/encfsctl.cpp:846
 #, c-format
 msgid "Incorrect number of arguments for command \"%s\""
-msgstr "عدد المعطيات غير صحيح للأمر \"%s\""
+msgstr "Hibás paraméterszám a(z) \"%s\" parancshoz"
 
 #: encfs/main.cpp:127
 #, c-format
 msgid "Build: encfs version %s"
-msgstr "الإنشاءة: encfs الإصدارة %s"
+msgstr "Build: encfs verzió %s"
 
 #: encfs/main.cpp:130
 #, c-format
 msgid "Usage: %s [options] rootDir mountPoint [-- [FUSE Mount Options]]"
 msgstr ""
-"الاستخدام:  %s  [خيارات]   مجلد الجذر   نقطة الضم   [[-- [خيارات ضم FUSE]]"
+"Használat: %s [paraméterek] gyökérkönyvtár <csatolási pont> [-- [FUSE "
+"csatolási paraméterek]]"
 
 #: encfs/main.cpp:132
 msgid ""
@@ -666,6 +705,12 @@ msgid ""
 "\t\t\tError messages will be sent to stderr\n"
 "\t\t\tinstead of syslog.\n"
 msgstr ""
+"Általános paraméterek:\n"
+"  -H\t\t\tmegmutatja a lehetséges FUSE csatolási paramétereket\n"
+"  -s\t\t\tkikapcsolja a többszálú működést\n"
+"  -f\t\t\taz előtérben fut (nem a háttérben indul).\n"
+"\t\t\tA hibaüzenetek a syslog helyett az alapértelmezett\n"
+"\t\t\thibakimenetre lesznek irányítva\n"
 
 #: encfs/main.cpp:140
 msgid ""
@@ -675,18 +720,22 @@ msgid ""
 "  --forcedecode\t\tdecode data even if an error is detected\n"
 "\t\t\t(for filesystems using MAC block headers)\n"
 msgstr ""
+"-v, --verbose\t\tbeszédes mód: az encfs futási információkat közöl\n"
+"-i, --idle=PERC\tA PERC-ben megadott inkatív idő után automatikusan "
+"lecsatolja a kötetet\n"
+"--anykey\t\tNem ellenőrzi, hogy a megadott kulcs helyes-e\n"
+"--forcedecode\t\takkor is visszafejti az adatot, ha hibát észlel\n"
+"\t\t\t(olyan fájlrendszerekhez, amik MAC blokk fejlécet használnak)\n"
 
 #: encfs/main.cpp:145
 msgid ""
 "  --public\t\tact as a typical multi-user filesystem\n"
 "\t\t\t(encfs must be run as root)\n"
 msgstr ""
-"  --public\t\tيتصرف كأنه نظام ملفات نموذجي متعدد المستخدمين\n"
-"\t\ttab](يجب تشغيل encfs كجذر)\n"
 
 #: encfs/main.cpp:147
 msgid "  --reverse\t\treverse encryption\n"
-msgstr "  --reverse\t\tتشفير عكسي\n"
+msgstr ""
 
 #: encfs/main.cpp:150
 msgid ""
@@ -696,36 +745,45 @@ msgid ""
 "    encfs ~/.crypt ~/crypt\n"
 "\n"
 msgstr ""
+"--extpass=PROGRAM\tA PROGRAM-ot használja a jelszó bekéréshez\n"
+"\n"
+"Például a ~/.cryp könyvtár titkosított tartalmát a ~/crypt könyvtárba "
+"felcsatolni:\n"
+"encfs ~/.crypt ~/crypt\n"
+"\n"
+"paranccsal lehet.\n"
+"\n"
 
 #: encfs/main.cpp:156
 msgid "For more information, see the man page encfs(1)"
-msgstr "لمزيد من المعلومات. راجع صفحة دليل encfs(1)"
+msgstr "További információk: encfs(1) man oldal"
 
 #: encfs/main.cpp:164
 msgid ""
 "encfs [options] rootDir mountPoint -- [FUSE Mount Options]\n"
 "valid FUSE Mount Options follow:\n"
 msgstr ""
-"encfs [خيارات]  مجلد الجذر  نفطة الضم  -- [خيارات ضم FUSE]\n"
-"يتبع ذلك خيارات ضم FUSE صالحة:\n"
+"encfs [paraméterek] gyökérkönyvtár <csatolási pont> -- [FUSE-paraméterek]\n"
+"Lehetséges FUSE-paraméterek:\n"
 
 #: encfs/main.cpp:305
 msgid "option '--public' ignored for non-root user"
-msgstr "تم تجاهل الخيار '--public' للمستخدم غير الجذر"
+msgstr ""
 
 #: encfs/main.cpp:317
 #, c-format
 msgid "encfs version %s"
-msgstr "encfsالإصدارة %s"
+msgstr "encfs verzió %s"
 
 #: encfs/main.cpp:356
 msgid "Missing one or more arguments, aborting."
-msgstr "ينقص معطى واحد أو أكثر، جارٍ الإجهاض."
+msgstr "Megszakítás, hiányzik egy vagy több paraméter."
 
 #: encfs/main.cpp:381
 msgid ""
 "When specifying daemon mode, you must use absolute paths (beginning with '/')"
 msgstr ""
+"Démonként mindenképpen az abszolút utat kell megadni (/ jellel kezdődően)"
 
 #: encfs/main.cpp:397
 msgid "The raw directory may not be a subdirectory of the mount point."
@@ -733,15 +791,15 @@ msgstr ""
 
 #: encfs/main.cpp:407
 msgid "Must set password program when using mount-on-demand"
-msgstr "يحب ضبط برتامج كلمة السر عند استخدام الضم-عند-الطلب"
+msgstr ""
 
 #: encfs/main.cpp:416
 msgid "Unable to locate root directory, aborting."
-msgstr "تعذر تحديد موقع مجلد الجذر، جارٍ الإجهاض."
+msgstr "Megszakítás, a gyökér könyvtár nem található."
 
 #: encfs/main.cpp:422
 msgid "Unable to locate mount point, aborting."
-msgstr ""
+msgstr "Megszakítás, a csatolási pont nem található."
 
 #: encfs/main.cpp:605
 msgid ""
@@ -750,6 +808,9 @@ msgid ""
 "single-threaded, but threads will still be used to\n"
 "implement idle checking."
 msgstr ""
+"Megjegyzés: egyszálú mód és az inkatív-idő figyelés is be van\n"
+"kapcsolva. A fájlrendszer egyszálúként fog működni, de további\n"
+"szálak kérülnek elindításra az inaktív-idő figyelésére."
 
 #: encfs/main.cpp:656
 #, c-format
@@ -758,17 +819,26 @@ msgid ""
 " - fuse kernel module not installed (modprobe fuse)\n"
 " - invalid options -- see usage message\n"
 msgstr ""
+"A fuse hibásan futott le, lehetséges gyakori problémák:\n"
+" - a fuse kernel modul nincs telepítve (modprobe fuse)\n"
+" - hibás paraméterek -- nézze meg a hibaüzeneteket\n"
 
 #: encfs/main.cpp:663
 #, c-format
 msgid "Internal error: Caught exception from main loop: %s"
-msgstr ""
+msgstr "Internal error: Caught exception from main loop: %s"
 
 #: encfs/main.cpp:667
 msgid "Internal error: Caught unexpected exception"
-msgstr ""
+msgstr "Internal error: Caught unexpected exception"
 
 #: encfs/main.cpp:757
 #, c-format
 msgid "Unmounting filesystem %s due to inactivity"
-msgstr ""
+msgstr "A(z) %s fájlrendszer inaktivitás miatt lecsatolásra került"
+
+#~ msgid "algorithm compatible with EncFS 0.2-0.6"
+#~ msgstr "EncFS 0.2-0.6 -tal kompatibilis algoritmus"
+
+#~ msgid "Error opening key file %s for write: %s"
+#~ msgstr "Hiba a %s kulcs fájl írásra való megnyitásánál: %s"

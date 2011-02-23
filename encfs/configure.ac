@@ -1,7 +1,13 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(encfs/encfs.h) dnl a source file from your sub dir
-AM_INIT_AUTOMAKE(encfs, 1.5) dnl searches for some needed programs
+AM_INIT_AUTOMAKE(encfs, 1.7.4) dnl searches for some needed programs
+
+AC_CANONICAL_HOST
+AM_CONDITIONAL([DARWIN],
+               [case $host_os in darwin*) true;; *) false;; esac])
+
+AC_CONFIG_MACRO_DIR([m4])
 
 dnl without this order in this file, automake will be confused!
 dnl
@@ -13,9 +19,6 @@ unset CDPATH
 AC_LANG_CPLUSPLUS
 AC_PROG_CXX
     
-RELEASE=2
-AC_SUBST(RELEASE)
-
 dnl almost the same like KDE_SET_PEFIX but the path is /usr/local
 dnl
 unset CDPATH
@@ -54,6 +57,11 @@ CPPFLAGS="$CPPFLAGS $USER_INCLUDES $FUSEFLAGS -D__STDC_FORMAT_MACROS"
 CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS $USER_INCLUDES"
 LDFLAGS="$LDFLAGS $PTHREAD_LIBS $USER_LDFLAGS"
 
+# default install path on Darwin of Macports, which is where rlog may be
+if test -z "${DARWIN_TRUE}"; then
+    LDFLAGS="$LDFLAGS -L/opt/local/lib"
+fi
+
 if test "$GXX" = "yes"; then
     CXXFLAGS="-W -Wall -Wpointer-arith -Wwrite-strings $CXXFLAGS"
     dnl CXXFLAGS="$CXXFLAGS -Wformat=2 -Wconversion"
@@ -64,11 +72,13 @@ AC_CHECK_HEADER(fuse.h,,
 	Can't find fuse.h - add the search path to CPPFLAGS and
 	rerun configure, eg:
 	export CPPFLAGS=-I/usr/local/include ])])
-AC_CHECK_LIB(fuse,fuse_new, [FUSE_LIBS="-lfuse"],
-    [AC_MSG_ERROR([
-	Can't find libfuse.a - add the search path to LDFLAGS
-	and rerun configure, eg:
-	export LDFLAGS=-L/usr/local/lib ])],)
+AC_CHECK_LIB(fuse_ino64,fuse_new, [FUSE_LIBS="-lfuse_ino64"],
+    [ AC_CHECK_LIB(fuse,fuse_new, [FUSE_LIBS="-lfuse"],
+        [AC_MSG_ERROR([
+	    Can't find libfuse.a - add the search path to LDFLAGS
+	    and rerun configure, eg:
+	    export LDFLAGS=-L/usr/local/lib ])],) 
+    ],)
 
 AC_SUBST(FUSE_LIBS)
 
@@ -99,7 +109,11 @@ if test x"$smb_attr_cv_xattr_add_opt" = x"yes"; then
 fi
 
 dnl Check for valgrind headers..
-AC_CHECK_HEADERS([valgrind/valgrind.h valgrind/memcheck.h])
+AC_ARG_ENABLE(valgrind,
+    AC_HELP_STRING([--enable-valgrind],
+                   [build with valgrind support.]),
+       AC_CHECK_HEADERS([valgrind/valgrind.h valgrind/memcheck.h])
+       )
 
 # allow user option of not using ssl..
 AC_ARG_ENABLE(openssl,
@@ -158,12 +172,14 @@ if test "x$with_openssl" != "xyes"; then
 fi
 
 # check for RLOG
-PKG_CHECK_MODULES(RLOG, librlog >= 1.3,
-	with_rlog="yes", 
-	[ # do old-style test instead..
-	AC_MSG_WARN([Checking for librlog the hard way])
-	AC_CHECK_LIB(rlog, RLogVersion, [RLOG_LIBS="-lrlog"],
-	    [AC_MSG_ERROR([EncFS depends on librlog, by the same author.])]) ])
+PKG_CHECK_MODULES(RLOG, librlog >= 1.3, with_rlog="yes", with_rlog="test")
+
+# manual check for rlog, unless environment variable already set
+if test "$with_rlog" = "test" && test "x$RLOG_LIBS" = "x"; then
+    AC_MSG_WARN([Checking for librlog the hard way])
+    AC_CHECK_LIB(rlog, RLogVersion, [RLOG_LIBS="-lrlog"],
+        [AC_MSG_ERROR([EncFS depends on librlog])]) 
+fi
 
 # look for pod2man program for building man pages
 AC_PATH_PROG(POD2MAN, pod2man, [no])

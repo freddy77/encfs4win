@@ -226,6 +226,9 @@ bool RenameOp::apply()
             rDebug("renaming %s -> %s",
                     last->oldCName.c_str(), last->newCName.c_str());
 
+            struct stat st;
+            bool preserve_mtime = ::stat(last->oldCName.c_str(), &st) == 0;
+
             // internal node rename..
             dn->renameNode( last->oldPName.c_str(), 
                             last->newPName.c_str() );
@@ -239,6 +242,14 @@ bool RenameOp::apply()
                 dn->renameNode( last->newPName.c_str(), 
                         last->oldPName.c_str(), false );
                 return false;
+            }
+
+            if(preserve_mtime)
+            {
+                struct utimbuf ut;
+                ut.actime = st.st_atime;
+                ut.modtime = st.st_mtime;
+                ::utime(last->newCName.c_str(), &ut);
             }
 
             ++last;
@@ -291,7 +302,8 @@ void RenameOp::undo()
 }
 
 DirNode::DirNode(EncFS_Context *_ctx,
-	const string &sourceDir, const shared_ptr<Config> &_config)
+        const string &sourceDir,
+        const FSConfigPtr &_config)
 {
     pthread_mutex_init( &mutex, 0 );
     
@@ -299,14 +311,14 @@ DirNode::DirNode(EncFS_Context *_ctx,
 
     ctx = _ctx;
     rootDir = sourceDir;
-    config = _config;
+    fsConfig = _config;
 
     // make sure rootDir ends in '/', so that we can form a path by appending
     // the rest..
     if( rootDir[ rootDir.length()-1 ] != '/' )
 	rootDir.append( 1, '/');
 
-    naming = config->nameCoding;
+    naming = fsConfig->nameCoding;
 }
 
 DirNode::~DirNode()
@@ -332,6 +344,12 @@ string
 DirNode::cipherPath( const char *plaintextPath )
 {
     return rootDir + naming->encodePath( plaintextPath );
+}
+
+string
+DirNode::cipherPathWithoutRoot( const char *plaintextPath )
+{
+    return naming->encodePath( plaintextPath );
 }
 
 string
@@ -626,6 +644,9 @@ DirNode::rename( const char *fromPlaintext, const char *toPlaintext )
     int res = 0;
     try
     {
+        struct FUSE_STAT st;
+        bool preserve_mtime = lstat(fromCName.c_str(), &st) == 0;
+
 	renameNode( fromPlaintext, toPlaintext );
 	toNode.reset();
 	res = ::rename( fromCName.c_str(), toCName.c_str() );
@@ -638,7 +659,13 @@ DirNode::rename( const char *fromPlaintext, const char *toPlaintext )
 
 	    if(renameOp)
 		renameOp->undo();
-	}
+	} else if(preserve_mtime)
+        {
+            struct utimbuf ut;
+            ut.actime = st.st_atime;
+            ut.modtime = st.st_mtime;
+            ::utime(toCName.c_str(), &ut);
+        }
     } catch( rlog::Error &err )
     {
 	// exception from renameNode, just show the error and continue..
@@ -668,7 +695,7 @@ int DirNode::link( const char *from, const char *to )
     rLog(Info, "link %s -> %s", fromCName.c_str(), toCName.c_str());
 
     int res = -EPERM;
-    if( config->externalIVChaining )
+    if( fsConfig->config->externalIVChaining )
     {
 	rLog(Info, "hard links not supported with external IV chaining!");
     } else
@@ -727,16 +754,8 @@ shared_ptr<FileNode> DirNode::directLookup( const char *path )
 {
     return shared_ptr<FileNode>( 
             new FileNode( this, 
-                config->fsSubVersion,
-                "unknown", path, 
-                config->cipher, config->key,
-                config->blockSize, config->blockMACBytes,
-                config->blockMACRandBytes, 
-                config->uniqueIV,
-                config->externalIVChaining,
-                config->forceDecode,
-                config->reverseEncryption,
-                config->allowHoles) );
+                fsConfig,
+                "unknown", path ));
 }
 
 shared_ptr<FileNode> DirNode::findOrCreate( const char *plainName)
@@ -749,20 +768,11 @@ shared_ptr<FileNode> DirNode::findOrCreate( const char *plainName)
     {
 	uint64_t iv = 0;
 	string cipherName = naming->encodePath( plainName, &iv );
-	node.reset( new FileNode( this, 
-		config->fsSubVersion,
+        node.reset( new FileNode( this, fsConfig,
 		plainName, 
-		(rootDir + cipherName).c_str(), 
-		config->cipher, config->key,
-		config->blockSize, config->blockMACBytes,
-		config->blockMACRandBytes, 
-		config->uniqueIV,
-		config->externalIVChaining,
-		config->forceDecode,
-		config->reverseEncryption,
-                config->allowHoles) );
+                (rootDir + cipherName).c_str()));
 		
-	if(config->externalIVChaining)
+	if(fsConfig->config->externalIVChaining)
 	    node->setName(0, 0, iv);
 
 	rLog(Info, "created FileNode for %s", node->cipherName());

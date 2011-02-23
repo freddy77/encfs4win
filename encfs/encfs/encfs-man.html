@@ -4,13 +4,15 @@
 <head>
 <title>encfs - mounts or creates an encrypted virtual filesystem</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@localhost" />
+<link rev="made" href="mailto:vgough@typhoon.arg0.net" />
 </head>
 
 <body style="background-color: white">
 
-<p><a name="__index__"></a></p>
+
 <!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
 
 <ul>
 
@@ -27,9 +29,11 @@
 	<li><a href="#authors">AUTHORS</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
 </ul>
+
+<hr name="index" />
+</div>
 <!-- INDEX END -->
 
-<hr />
 <p>
 </p>
 <hr />
@@ -43,7 +47,8 @@
 [<strong>-i MINUTES</strong>|<strong>--idle=MINUTES</strong>] [<strong>--extpass=program</strong>] 
 [<strong>-S</strong>|<strong>--stdinpass</strong>] [<strong>--anykey</strong>] [<strong>--forcedecode</strong>] 
 [<strong>-d</strong>|<strong>--fuse-debug</strong>] [<strong>--public</strong>] [<strong>--no-default-flags</strong>]
-[<strong>--ondemand</strong>] [<strong>--reverse</strong>] [<strong>-o FUSE_OPTION</strong>]
+[<strong>--ondemand</strong>] [<strong>--reverse</strong>] [<strong>--standard</strong>] 
+[<strong>-o FUSE_OPTION</strong>]
 <em>rootdir</em> <em>mountPoint</em> 
 [<strong>--</strong> [<em>Fuse Mount Options</em>]]</p>
 <p>
@@ -64,7 +69,7 @@ may be an increasing number of choices.</p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="item__2di_2c__2d_2didle_3dminutes"><strong>-i</strong>, <strong>--idle=MINUTES</strong></a></strong></dt>
+<dt><strong><a name="i_idle_minutes" class="item"><strong>-i</strong>, <strong>--idle=MINUTES</strong></a></strong></dt>
 
 <dd>
 <p>Enable automatic unmount of the filesystem after a period of inactivity.  The
@@ -73,7 +78,7 @@ requested is one minute.  <strong>EncFS</strong> will not automatically unmount 
 files open within the filesystem, even if they are open in read-only mode.
 However simply having files open does not count as activity.</p>
 </dd>
-<dt><strong><a name="item__2df"><strong>-f</strong></a></strong></dt>
+<dt><strong><a name="f" class="item"><strong>-f</strong></a></strong></dt>
 
 <dd>
 <p>The <strong>-f</strong> (<em>foreground</em>) option causes <strong>EncFS</strong> to run in the foreground.
@@ -83,7 +88,7 @@ foreground and any warning/debug log messages will be displayed on standard
 error.  In the default (background) mode, all log messages are logged via
 syslog.</p>
 </dd>
-<dt><strong><a name="item__2dv_2c__2d_2dverbose"><strong>-v</strong>, <strong>--verbose</strong></a></strong></dt>
+<dt><strong><a name="v_verbose" class="item"><strong>-v</strong>, <strong>--verbose</strong></a></strong></dt>
 
 <dd>
 <p>Causes <strong>EncFS</strong> to enable logging of various debug channels within <strong>EncFS</strong>.
@@ -91,7 +96,7 @@ Normally these logging messages are disabled and have no effect.  It is
 recommended that you run in foreground (<strong>-f</strong>) mode when running with verbose
 enabled.</p>
 </dd>
-<dt><strong><a name="item__2ds"><strong>-s</strong></a></strong></dt>
+<dt><strong><a name="s" class="item"><strong>-s</strong></a></strong></dt>
 
 <dd>
 <p>The <strong>-s</strong> (<em>single threaded</em>) option causes <strong>EncFS</strong> to run in single threaded
@@ -99,7 +104,7 @@ mode.  By default, <strong>EncFS</strong> runs in multi-threaded mode.  This opt
 during <strong>EncFS</strong> development in order to simplify debugging and allow it to run
 under memory checking tools..</p>
 </dd>
-<dt><strong><a name="item__2dd_2c__2d_2dfuse_2ddebug"><strong>-d</strong>, <strong>--fuse-debug</strong></a></strong></dt>
+<dt><strong><a name="d_fuse_debug" class="item"><strong>-d</strong>, <strong>--fuse-debug</strong></a></strong></dt>
 
 <dd>
 <p>Enables debugging within the <strong>FUSE</strong> library.  This should only be used if you
@@ -108,7 +113,7 @@ of low-level data and is not likely to be very helpful in general problem
 tracking.  Try <em>verbose</em> mode (<strong>-v</strong>) first, which gives a higher level view
 of what is happening within <strong>EncFS</strong>.</p>
 </dd>
-<dt><strong><a name="item__2d_2dforcedecode"><strong>--forcedecode</strong></a></strong></dt>
+<dt><strong><a name="forcedecode" class="item"><strong>--forcedecode</strong></a></strong></dt>
 
 <dd>
 <p>This option only has an effect on filesystems which use MAC block headers.  By
@@ -118,14 +123,14 @@ not returned.  However, by specifying <strong>--forcedecode</strong>, only an er
 logged and the data will still be returned to the application.  This may be
 useful for attempting to read corrupted files.</p>
 </dd>
-<dt><strong><a name="item__2d_2dpublic"><strong>--public</strong></a></strong></dt>
+<dt><strong><a name="public" class="item"><strong>--public</strong></a></strong></dt>
 
 <dd>
 <p>Attempt to make encfs behave as a typical multi-user filesystem.  By default,
 all FUSE based filesystems are visible only to the user who mounted them.  No
 other users (including root) can view the filesystem contents.  The <strong>--public</strong>
-option does two things.  It adds the FUSE flags ``allow_other'' and
-``default_permission'' when mounting the filesystem, which tells FUSE to allow
+option does two things.  It adds the FUSE flags &quot;allow_other&quot; and
+&quot;default_permission&quot; when mounting the filesystem, which tells FUSE to allow
 other users to access the filesystem, and to use the ownership permissions
 provided by the filesystem.  Secondly, the <strong>--public</strong> flag changes how encfs's
 node creation functions work - as they will try and set ownership of new nodes
@@ -135,7 +140,7 @@ it will not have the ability to change ownership of files.  I recommend that
 you instead investigate if the fuse allow_other option can be used to do what
 you want before considering the use of <strong>--public</strong>.</p>
 </dd>
-<dt><strong><a name="item__2d_2dondemand"><strong>--ondemand</strong></a></strong></dt>
+<dt><strong><a name="ondemand" class="item"><strong>--ondemand</strong></a></strong></dt>
 
 <dd>
 <p>Mount the filesystem on-demand.  This currently only makes sense in combination
@@ -145,7 +150,7 @@ internally dropping it's reference to it.  If someone attempts to access the
 filesystem again, the extpass program is used to prompt the user for the
 password.  If this succeeds, then the filesystem becomes available again.</p>
 </dd>
-<dt><strong><a name="item__2d_2dreverse"><strong>--reverse</strong></a></strong></dt>
+<dt><strong><a name="reverse" class="item"><strong>--reverse</strong></a></strong></dt>
 
 <dd>
 <p>Normally <strong>EncFS</strong> provides a plaintext view of data on demand.  Normally it
@@ -166,7 +171,16 @@ reproduce the unencrypted data:</p>
 <p>Note that <strong>--reverse</strong> mode only works with limited configuration options, so
 many settings may be disabled when used.</p>
 </dd>
-<dt><strong><a name="item__2do_fuse_arg"><strong>-o FUSE_ARG</strong></a></strong></dt>
+<dt><strong><a name="standard" class="item"><strong>--standard</strong></a></strong></dt>
+
+<dd>
+<p>If creating a new filesystem, this automatically selects standard configuration
+options, to help with automatic filesystem creation.  This is the set of
+options that should be used unless you know what you're doing and have read the
+documentation.</p>
+<p>When not creating a filesystem, this flag does nothing.</p>
+</dd>
+<dt><strong><a name="o_fuse_arg" class="item"><strong>-o FUSE_ARG</strong></a></strong></dt>
 
 <dd>
 <p>Pass through <strong>FUSE</strong> args to the underlying library.  This makes it easy to
@@ -182,17 +196,17 @@ arguments, create a wrapper, such as  encfs-reverse;</p>
 <pre>
     mount encfs-reverse#/home/me /home/me-crypt -t fuse</pre>
 </dd>
-<dt><strong><a name="item__2d_2d"><strong>--</strong></a></strong></dt>
+<dt><strong><a name="__" class="item"><strong>--</strong></a></strong></dt>
 
 <dd>
 <p>The <strong>--</strong> option tells <strong>EncFS</strong> to send any remaining arguments directly to
 <strong>FUSE</strong>.  In turn, <strong>FUSE</strong> passes the arguments to <strong>fusermount</strong>.  See
 the <strong>fusermount</strong> help page for information on available commands.</p>
 </dd>
-<dt><strong><a name="item__2d_2dno_2ddefault_2dflags"><strong>--no-default-flags</strong></a></strong></dt>
+<dt><strong><a name="no_default_flags" class="item"><strong>--no-default-flags</strong></a></strong></dt>
 
 <dd>
-<p><strong>Encfs</strong> adds the FUSE flags ``use_ino'' and ``default_permissions'' by default, as
+<p><strong>Encfs</strong> adds the FUSE flags &quot;use_ino&quot; and &quot;default_permissions&quot; by default, as
 of version 1.2.2, because that improves compatibility with some programs..  If
 for some reason you need to disable one or both of these flags, use the option
 <strong>--no-default-flags</strong>.</p>
@@ -201,11 +215,11 @@ for some reason you need to disable one or both of these flags, use the option
     encfs raw crypt
     encfs --no-default-flags raw crypt -- -o use_ino,default_permissions</pre>
 </dd>
-<dt><strong><a name="item__2d_2dextpass_3dprogram"><strong>--extpass=program</strong></a></strong></dt>
+<dt><strong><a name="extpass_program" class="item"><strong>--extpass=program</strong></a></strong></dt>
 
 <dd>
 <p>Specify an external program to use for getting the user password.  When the
-external program is spawned, the environment variable ``RootDir'' will be set to
+external program is spawned, the environment variable &quot;RootDir&quot; will be set to
 contain the path to the root directory.  The program should print the password
 to standard output.</p>
 <p><strong>EncFS</strong> takes everything returned from the program to be the password, except
@@ -216,7 +230,7 @@ for a trailing newline (\n) which will be removed.</p>
 removes any trailing newline.  Versions before 1.4.x accepted only 64 bytes of
 text.</p>
 </dd>
-<dt><strong><a name="item__2ds_2c__2d_2dstdinpass"><strong>-S</strong>, <strong>--stdinpass</strong></a></strong></dt>
+<dt><strong><a name="s_stdinpass" class="item"><strong>-S</strong>, <strong>--stdinpass</strong></a></strong></dt>
 
 <dd>
 <p>Read password from standard input, without prompting.  This may be useful for
@@ -225,7 +239,7 @@ scripting encfs mounts.</p>
 Otherwise encfs will prompt for the filesystem creation options, which may
 interfere with your script.</p>
 </dd>
-<dt><strong><a name="item__2d_2danykey"><strong>--anykey</strong></a></strong></dt>
+<dt><strong><a name="anykey" class="item"><strong>--anykey</strong></a></strong></dt>
 
 <dd>
 <p>Turn off key validation checking.  This allows <strong>EncFS</strong> to be used with
@@ -245,7 +259,7 @@ which will not remain the same if the primary password is changed.</p>
 <hr />
 <h1><a name="examples">EXAMPLES</a></h1>
 <p>Create a new encrypted filesystem.  Store the raw (encrypted) data in
-``~/.crypt'' , and make the unencrypted data visible in ``~/crypt''.  Both
+&quot;~/.crypt&quot; , and make the unencrypted data visible in &quot;~/crypt&quot;.  Both
 directories are in the home directory in this example.  This example shows the
 full output of encfs as it asks the user if they wish to create the filesystem:</p>
 <pre>
@@ -349,7 +363,7 @@ filesystem.</p>
 function will be used and the filesystem will no longer be readable by older
 versions.</p>
 <dl>
-<dt><strong><a name="item_cipher"><em>Cipher</em></a></strong></dt>
+<dt><strong><a name="cipher" class="item"><em>Cipher</em></a></strong></dt>
 
 <dd>
 <p>Which encryption algorithm to use.  The list is generated automatically based
@@ -359,14 +373,14 @@ options.</p>
 <p>Blowfish is an 8 byte cipher - encoding 8 bytes at a time.  AES is a 16 byte
 cipher.</p>
 </dd>
-<dt><strong><a name="item_cipher_key_size"><em>Cipher Key Size</em></a></strong></dt>
+<dt><strong><a name="cipher_key_size" class="item"><em>Cipher Key Size</em></a></strong></dt>
 
 <dd>
 <p>Many, if not all, of the supported ciphers support multiple key lengths.  There
 is not really much need to have enormous key lengths.  Even 160 bits (the
 default) is probably overkill.</p>
 </dd>
-<dt><strong><a name="item_filesystem_block_size"><em>Filesystem Block Size</em></a></strong></dt>
+<dt><strong><a name="filesystem_block_size" class="item"><em>Filesystem Block Size</em></a></strong></dt>
 
 <dd>
 <p>This is the size (in bytes) that <strong>EncFS</strong> deals with at one time.  Each block
@@ -383,7 +397,7 @@ applied and the block encoded and written back out.</p>
 version 0.x, which was not as efficient as the current setting for general
 usage.</p>
 </dd>
-<dt><strong><a name="item_filename_encoding"><em>Filename Encoding</em></a></strong></dt>
+<dt><strong><a name="filename_encoding" class="item"><em>Filename Encoding</em></a></strong></dt>
 
 <dd>
 <p><strong>New in 1.1</strong>. A choice is given between stream encoding of filename and block
@@ -400,18 +414,18 @@ However stream cipher mode may be useful if you want shorter encrypted
 filenames for some reason.</p>
 <p>Prior to version 1.1, only stream encoding was supported.</p>
 </dd>
-<dt><strong><a name="item_filename_initialization_vector_chaining"><em>Filename Initialization Vector Chaining</em></a></strong></dt>
+<dt><strong><a name="filename_initialization_vector_chaining" class="item"><em>Filename Initialization Vector Chaining</em></a></strong></dt>
 
 <dd>
 <p><strong>New in 1.1</strong>.  In previous versions of <strong>EncFS</strong>, each filename element in
-a path was encoded separately.  So if ``foo'' encoded to ``XXX'', then it would
+a path was encoded separately.  So if &quot;foo&quot; encoded to &quot;XXX&quot;, then it would
 always encode that way (given the same encryption key), no matter if the path
-was ``a/b/foo'', or ``aa/foo/cc'', etc.  That meant it was possible for someone
+was &quot;a/b/foo&quot;, or &quot;aa/foo/cc&quot;, etc.  That meant it was possible for someone
 looking at the encrypted data to see if two files in different directories had
 the same name, even though they wouldn't know what that name decoded to.</p>
 <p>With initialization vector chaining, each directory gets its own initialization
-vector.  So ``a/foo'' and ``b/foo'' will have completely different encoded names
-for ``foo''.  This features has almost no performance impact (for most
+vector.  So &quot;a/foo&quot; and &quot;b/foo&quot; will have completely different encoded names
+for &quot;foo&quot;.  This features has almost no performance impact (for most
 operations), and so is the default in all modes.</p>
 <p><strong>Note:</strong> One significant performance exception is directory renames.  Since the
 initialization vector for filename encoding depends on the directory path, any
@@ -422,7 +436,7 @@ can't decode or doesn't have permission to move during the rename operation, in
 which case it will attempt to undo any changes it made up to that point and the
 rename will fail.</p>
 </dd>
-<dt><strong><a name="item_per_2dfile_initialization_vectors"><em>Per-File Initialization Vectors</em></a></strong></dt>
+<dt><strong><a name="per_file_initialization_vectors" class="item"><em>Per-File Initialization Vectors</em></a></strong></dt>
 
 <dd>
 <p><strong>New in 1.1</strong>.  In previous versions of <strong>EncFS</strong>, each file was encoded in the
@@ -435,7 +449,7 @@ encoded data.</p>
 initialization vector, so that each file is encrypted in a different way.</p>
 <p>This option is enabled by default.</p>
 </dd>
-<dt><strong><a name="item_external_iv_chaining"><em>External IV Chaining</em></a></strong></dt>
+<dt><strong><a name="external_iv_chaining" class="item"><em>External IV Chaining</em></a></strong></dt>
 
 <dd>
 <p><strong>New in 1.1.3</strong>.  This option is closely related to Per-File Initialization
@@ -457,7 +471,7 @@ be allowed when the user has write access to the file.</p>
 <p>Because of these limits, this option is disabled by default for standard mode
 (and enabled by default for paranoia mode).</p>
 </dd>
-<dt><strong><a name="item_block_mac_headers"><em>Block MAC headers</em></a></strong></dt>
+<dt><strong><a name="block_mac_headers" class="item"><em>Block MAC headers</em></a></strong></dt>
 
 <dd>
 <p><strong>New to 1.1</strong>.  If this is enabled, every block in every file is stored along
@@ -491,7 +505,7 @@ scope of this documentation.</p>
 <p>That said, here are some example attacks and data gathering techniques on the
 filesystem contents along with the algorithms <strong>EncFS</strong> supports to thwart them:</p>
 <dl>
-<dt><strong><a name="item_file"><strong>Attack</strong>: modifying a few bytes of an encrypted file (without knowing
+<dt><strong><a name="file" class="item"><strong>Attack</strong>: modifying a few bytes of an encrypted file (without knowing
 what they will decode to).</a></strong></dt>
 
 <dd>
@@ -500,30 +514,30 @@ single bytes to be modified without affecting others.  Most modifications
 would affect dozens or more bytes.  Additionally, MAC Block headers can be
 used to identify any changes to files.</p>
 </dd>
-<dt><strong><a name="item_attack_3a_copying_a_random_block_of_one_file_to_a_"><strong>Attack</strong>: copying a random block of one file to a random block of another file.</a></strong></dt>
+<dt><strong><a name="attack_copying_a_random_block_of_one_file_to_a_random_block_of_another_file" class="item"><strong>Attack</strong>: copying a random block of one file to a random block of another file.</a></strong></dt>
 
 <dd>
 <p>Each block has its own [deterministic] initialization vector.</p>
 </dd>
-<dt><strong><a name="item_attack_3a_copying_block_n_to_block_n_of_another_fi"><strong>Attack</strong>: copying block N to block N of another file.</a></strong></dt>
+<dt><strong><a name="attack_copying_block_n_to_block_n_of_another_file" class="item"><strong>Attack</strong>: copying block N to block N of another file.</a></strong></dt>
 
 <dd>
 <p>When the Per-File Initialization Vector support is enabled (default
 in 1.1.x filesystems), a copied block will not decode properly when copied to
 another file.</p>
 </dd>
-<dt><strong><a name="item_attack_3a_copying_an_entire_file_to_another_file_2"><strong>Attack</strong>: copying an entire file to another file.</a></strong></dt>
+<dt><strong><a name="attack_copying_an_entire_file_to_another_file" class="item"><strong>Attack</strong>: copying an entire file to another file.</a></strong></dt>
 
 <dd>
 <p>Can be prevented by enabling External IV Chaining mode.</p>
 </dd>
-<dt><strong><a name="item_attack_3a_determine_if_two_filenames_are_the_same_"><strong>Attack</strong>: determine if two filenames are the same by looking at encrypted names.</a></strong></dt>
+<dt><strong><a name="attack_determine_if_two_filenames_are_the_same_by_looking_at_encrypted_names" class="item"><strong>Attack</strong>: determine if two filenames are the same by looking at encrypted names.</a></strong></dt>
 
 <dd>
 <p>Filename Initialization Vector chaining prevents this by giving each file a
 64-bit initialization vector derived from its full path name.</p>
 </dd>
-<dt><strong><a name="item_attack_3a_compare_if_two_files_contain_the_same_da"><strong>Attack</strong>: compare if two files contain the same data.</a></strong></dt>
+<dt><strong><a name="attack_compare_if_two_files_contain_the_same_data" class="item"><strong>Attack</strong>: compare if two files contain the same data.</a></strong></dt>
 
 <dd>
 <p>Per-File Initialization Vector support prevents this.</p>
@@ -535,7 +549,7 @@ another file.</p>
 <h1><a name="disclaimer">DISCLAIMER</a></h1>
 <p>This library is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE.  Please refer to the ``COPYING'' file distributed with
+PARTICULAR PURPOSE.  Please refer to the &quot;COPYING&quot; file distributed with
 <strong>EncFS</strong> for complete details.</p>
 <p>
 </p>

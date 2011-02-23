@@ -25,6 +25,8 @@
 #include "Cipher.h"
 
 #include "Context.h"
+#include "FileNode.h"
+#include "DirNode.h"
 
 #include <rlog/rlog.h>
 #include <rlog/StdioNode.h>
@@ -33,6 +35,7 @@
 #include <iostream>
 #include <string>
 
+#include <getopt.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -97,10 +100,10 @@ struct CommandOpts
     {"cat", 2, 2, cmd_cat, "(root dir) path",
 	// xgroup(usage)
         gettext_noop("  -- decodes the file and cats it to standard out")}, 
-    {"decode", 1, 2, cmd_decode, "(root dir) encoded-name",
+    {"decode", 1, 100, cmd_decode, "[--extpass=prog] (root dir) [encoded-name ...]",
 	// xgroup(usage)
         gettext_noop("  -- decodes name and prints plaintext version")}, 
-    {"encode", 1, 2, cmd_encode, "(root dir) [plaintext-name]",
+    {"encode", 1, 100, cmd_encode, "[--extpass=prog] (root dir) [plaintext-name ...]",
 	// xgroup(usage)
         gettext_noop("  -- encodes a filename and print result")}, 
     {"export", 2, 2, cmd_export, "(root dir) path",
@@ -173,8 +176,8 @@ static int showInfo( int argc, char **argv )
     if( !checkDir( rootDir ))
 	return EXIT_FAILURE;
 
-    EncFSConfig config;
-    ConfigType type = readConfig( rootDir, &config );
+    boost::shared_ptr<EncFSConfig> config(new EncFSConfig);
+    ConfigType type = readConfig( rootDir, config );
 
     // show information stored in config..
     switch(type)
@@ -191,30 +194,85 @@ static int showInfo( int argc, char **argv )
     case Config_V3:
 	// xgroup(diag)
 	cout << "\n" << autosprintf(_("Version 3 configuration; "
-	    "created by %s\n"), config.creator.c_str());
+            "created by %s\n"), config->creator.c_str());
 	break;
     case Config_V4:
 	// xgroup(diag)
 	cout << "\n" << autosprintf(_("Version 4 configuration; "
-	    "created by %s\n"), config.creator.c_str());
+            "created by %s\n"), config->creator.c_str());
 	break;
     case Config_V5:
 	// xgroup(diag)
 	cout << "\n" << autosprintf(_("Version 5 configuration; "
-	    "created by %s (revision %i)\n"), config.creator.c_str(),
-		config.subVersion);
+            "created by %s (revision %i)\n"), config->creator.c_str(),
+                config->subVersion);
 	break;
     case Config_V6:
 	// xgroup(diag)
 	cout << "\n" << autosprintf(_("Version 6 configuration; "
-	    "created by %s (revision %i)\n"), config.creator.c_str(),
-		config.subVersion);
+            "created by %s (revision %i)\n"), config->creator.c_str(),
+                config->subVersion);
 	break;
     }
 
     showFSInfo( config );
 
     return EXIT_SUCCESS;
+}
+
+static RootPtr initRootInfo(int &argc, char ** &argv)
+{
+    RootPtr result;
+    shared_ptr<EncFS_Opts> opts( new EncFS_Opts() );
+    opts->createIfNotFound = false;
+    opts->checkKey = false;
+
+    static struct option long_options[] = {
+        {"extpass", 1, 0, 'p'},
+        {0,0,0,0}
+    };
+
+    for(;;)
+    {
+        int option_index = 0;
+
+        int res = getopt_long( argc, argv, "",
+                long_options, &option_index);
+        if(res == -1)
+            break;
+
+        switch(res)
+        {
+        case 'p':
+            opts->passwordProgram.assign(optarg);
+            break;
+        default:
+            rWarning(_("getopt error: %i"), res);
+            break;
+        }
+    }
+
+    argc -= optind;
+    argv += optind;
+
+    if(argc == 0)
+    {
+        cerr << _("Incorrect number of arguments") << "\n";
+    } else
+    {
+        opts->rootDir = string( argv[0] );
+
+        --argc;
+        ++argv;
+
+        if(checkDir( opts->rootDir ))
+            result = initFS( NULL, opts );
+
+        if(!result)
+            cerr << _("Unable to initialize encrypted filesystem - check path.\n");
+    }
+
+    return result;
 }
 
 static RootPtr initRootInfo(const char* crootDir)
@@ -257,54 +315,48 @@ static int cmd_showKey( int argc, char **argv )
 
 static int cmd_decode( int argc, char **argv )
 {
-    RootPtr rootInfo = initRootInfo(argv[1]);
-
+    RootPtr rootInfo = initRootInfo(argc, argv);
     if(!rootInfo)
 	return EXIT_FAILURE;
 
-    if( argc > 2 )
+    if(argc > 0)
     {
-	string name = rootInfo->root->plainPath( argv[2] );
-	cout << name << "\n";
+        for(int i=0; i<argc; ++i)
+        {
+            string name = rootInfo->root->plainPath( argv[i] );
+            cout << name << "\n";
+        }
     } else
     {
-	do
+        char buf[PATH_MAX+1];
+        while(cin.getline(buf,PATH_MAX))
 	{
-	    string name;
-	    cin >> name;
-	    if(name.empty())
-		break;
-
-	    name = rootInfo->root->plainPath( name.c_str() );
-	    cout << name << "\n";
-	} while(1);
+            cout << rootInfo->root->plainPath( buf ) << "\n";
+        }
     }
     return EXIT_SUCCESS;
 }
 
 static int cmd_encode( int argc, char **argv )
 {
-    RootPtr rootInfo = initRootInfo(argv[1]);
-
+    RootPtr rootInfo = initRootInfo(argc, argv);
     if(!rootInfo)
 	return EXIT_FAILURE;
 
-    if( argc > 2 )
+    if(argc > 0)
     {
-	string name = rootInfo->root->cipherPath( argv[2] );
-	cout << name << "\n";
+        for(int i=0; i<argc; ++i)
+        {
+            string name = rootInfo->root->cipherPathWithoutRoot(argv[i]);
+            cout << name << "\n";
+        }
     } else
     {
-	do
+        char buf[PATH_MAX+1];
+        while(cin.getline(buf,PATH_MAX))
 	{
-	    string name;
-	    cin >> name;
-	    if(name.empty())
-		break;
-
-	    name = rootInfo->root->cipherPath( name.c_str() );
-	    cout << name << "\n";
-	} while(1);
+            cout << rootInfo->root->cipherPathWithoutRoot( buf ) << "\n";
+        }
     }
     return EXIT_SUCCESS;
 }
@@ -648,8 +700,8 @@ static int do_chpasswd( bool useStdin, int argc, char **argv )
     if( !checkDir( rootDir ))
 	return EXIT_FAILURE;
 
-    EncFSConfig config;
-    ConfigType cfgType = readConfig( rootDir, &config );
+    boost::shared_ptr<EncFSConfig> config(new EncFSConfig);
+    ConfigType cfgType = readConfig( rootDir, config );
 
     if(cfgType == Config_None)
     {
@@ -659,23 +711,23 @@ static int do_chpasswd( bool useStdin, int argc, char **argv )
 
     // instanciate proper cipher
     shared_ptr<Cipher> cipher = Cipher::New( 
-	    config.cipherIface, config.keySize );
+            config->cipherIface, config->keySize );
     if(!cipher)
     {
 	cout << autosprintf(_("Unable to find specified cipher \"%s\"\n"),
-		config.cipherIface.name().c_str());
+                config->cipherIface.name().c_str());
 	return EXIT_FAILURE;
     }
 
     // ask for existing password
     cout << _("Enter current Encfs password\n");
-    CipherKey userKey = config.getUserKey( useStdin );
+    CipherKey userKey = config->getUserKey( useStdin );
     if(!userKey)
 	return EXIT_FAILURE;
 
     // decode volume key using user key -- at this point we detect an incorrect
     // password if the key checksum does not match (causing readKey to fail).
-    CipherKey volumeKey = cipher->readKey( config.getKeyData(), userKey );
+    CipherKey volumeKey = cipher->readKey( config->getKeyData(), userKey );
 
     if(!volumeKey)
     {
@@ -687,12 +739,12 @@ static int do_chpasswd( bool useStdin, int argc, char **argv )
     userKey.reset();
     cout << _("Enter new Encfs password\n");
     // reinitialize salt and iteration count
-    config.kdfIterations = 0; // generate new
+    config->kdfIterations = 0; // generate new
 
     if( useStdin )
-	userKey = config.getUserKey( true );
+        userKey = config->getUserKey( true );
     else
-	userKey = config.getNewUserKey();
+        userKey = config->getNewUserKey();
 
     // re-encode the volume key using the new user key and write it out..
     int result = EXIT_FAILURE;
@@ -705,10 +757,10 @@ static int do_chpasswd( bool useStdin, int argc, char **argv )
 	cipher->writeKey( volumeKey, keyBuf, userKey );
 	userKey.reset();
 
-        config.assignKeyData( keyBuf, encodedKeySize );
+        config->assignKeyData( keyBuf, encodedKeySize );
         delete[] keyBuf;
 
-	if(saveConfig( cfgType, rootDir, &config ))
+        if(saveConfig( cfgType, rootDir, config ))
 	{
 	    // password modified -- changes volume key of filesystem..
 	    cout << _("Volume Key successfully updated.\n");
@@ -800,5 +852,3 @@ int main(int argc, char **argv)
 
     return EXIT_FAILURE;
 }
-
-

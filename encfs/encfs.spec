@@ -1,7 +1,7 @@
 Name: encfs
 Summary: Encrypted pass-thru filesystem for Linux
-Version: 1.5
-Release: 2
+Version: 1.7.4
+Release: @RELEASE@
 License: GPL
 Group: System/Filesystems
 Source: %{name}-%{version}-%{release}.tgz

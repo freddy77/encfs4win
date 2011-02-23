@@ -82,7 +82,6 @@ RawFileIO::~RawFileIO()
     
     if( _fd != -1 )
 	close( _fd );
-rDebug("closed raw %s", name.c_str());
 }
 
 #undef interface
@@ -151,7 +150,6 @@ int RawFileIO::open(int flags)
 #endif
 
 	int newFd = ::my_open( name.c_str(), finalFlags );
-rDebug("opened raw %s", name.c_str());
 	
 	rDebug("open file with flags %i, result = %i", finalFlags, newFd);
 

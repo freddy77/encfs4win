@@ -1,10 +1,9 @@
 #!/bin/bash
 set -e
-NAME=openssl-0.9.8l
+NAME=openssl-1.0.0d
 OUT=$PWD/../out
 rm -rf $NAME
 tar zxvf $NAME.tar.gz
-patch -p0 < $NAME.diff
 cd $NAME
 CC=i586-mingw32msvc-gcc ./Configure --prefix=$OUT mingw
 make CC=i586-mingw32msvc-gcc RANLIB=i585-mingw32msvc-ranlib || true

@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <fuse.h>
+#include <winioctl.h>
 
 void pthread_mutex_init(pthread_mutex_t *mtx, int )
 {
@@ -301,6 +302,13 @@ my_stat (const char* fn, struct FUSE_STAT* st)
 	return ::_stati64(buf, st);
 }
 
+static int
+set_sparse(HANDLE fd)
+{
+	DWORD returned;
+	return (int) DeviceIoControl(fd, FSCTL_SET_SPARSE, NULL, 0, NULL, 0, &returned, NULL);
+}
+
 int
 my_open(const char *fn, int flags)
 {
@@ -313,6 +321,8 @@ my_open(const char *fn, int flags)
 			return -1;
 		}
 	}
+	set_sparse(f);
+
 	int fd = _open_osfhandle((intptr_t) f, flags);
 	if (fd < 0) {
 		errno = ENOENT;

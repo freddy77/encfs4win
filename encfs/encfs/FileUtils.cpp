@@ -1632,6 +1632,7 @@ RootPtr initFS( EncFS_Context *ctx, const shared_ptr<EncFS_Opts> &opts )
 	dirNodeConfig->externalIVChaining = config.externalIVChaining;
 	dirNodeConfig->forceDecode = opts->forceDecode;
 	dirNodeConfig->reverseEncryption = opts->reverseEncryption;
+	dirNodeConfig->allowHoles = config.allowHoles;
 
 	rootInfo = RootPtr( new EncFS_Root );
 	rootInfo->cipher = cipher;

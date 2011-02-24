@@ -1441,6 +1441,7 @@ CipherKey EncFSConfig::getUserKey(bool useStdin)
     return userKey;
 }
 
+#if 0
 std::string readPassword( int FD )
 {
     char buffer[1024];
@@ -1467,7 +1468,6 @@ std::string readPassword( int FD )
     return result;
 }
 
-#if 0
 CipherKey EncFSConfig::getUserKey( const std::string &passProg,
         const std::string &rootDir )
 {

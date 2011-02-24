@@ -46,7 +46,7 @@ public:
 
     virtual int open( int flags );
 
-    virtual int getAttr( struct FUSE_STAT *stbuf ) const;
+    virtual int getAttr( struct stat *stbuf ) const;
     virtual off_t getSize() const;
 
     virtual int truncate( off_t size );

@@ -155,7 +155,7 @@ static int withFileNode( const char *opName,
     can be done here.
 */
 
-int _do_getattr(FileNode *fnode, struct FUSE_STAT *stbuf)
+int _do_getattr(FileNode *fnode, struct stat *stbuf)
 {
     int res = fnode->getAttr(stbuf);
 #if 0
@@ -187,12 +187,12 @@ int _do_getattr(FileNode *fnode, struct FUSE_STAT *stbuf)
     return res;
 }
 
-int encfs_getattr(const char *path, struct FUSE_STAT *stbuf)
+int encfs_getattr(const char *path, struct stat *stbuf)
 {
     return withFileNode( "getattr", path, NULL, _do_getattr, stbuf );
 }
 
-int encfs_fgetattr(const char *path, struct FUSE_STAT *stbuf,
+int encfs_fgetattr(const char *path, struct stat *stbuf,
 	struct fuse_file_info *fi)
 {
     return withFileNode( "fgetattr", path, fi, _do_getattr, stbuf );
@@ -277,7 +277,7 @@ int encfs_mknod(const char *path, mode_t mode, dev_t rdev)
 	    shared_ptr<FileNode> dnode = 
 		FSRoot->lookupNode( parent.c_str(), "mknod" );
 
-	    struct FUSE_STAT st;
+	    struct stat st;
 	    if(dnode->getAttr( &st ) == 0)
 		res = fnode->mknod( mode, rdev, uid, st.st_gid );
 	}
@@ -317,7 +317,7 @@ int encfs_mkdir(const char *path, mode_t mode)
 	    shared_ptr<FileNode> dnode = 
 		FSRoot->lookupNode( parent.c_str(), "mkdir" );
 
-	    struct FUSE_STAT st;
+	    struct stat st;
 	    if(dnode->getAttr( &st ) == 0)
 		res = FSRoot->mkdir( path, mode, uid, st.st_gid );
 	}

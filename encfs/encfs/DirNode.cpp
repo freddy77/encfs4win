@@ -644,7 +644,7 @@ DirNode::rename( const char *fromPlaintext, const char *toPlaintext )
     int res = 0;
     try
     {
-        struct FUSE_STAT st;
+        struct stat st;
         bool preserve_mtime = lstat(fromCName.c_str(), &st) == 0;
 
 	renameNode( fromPlaintext, toPlaintext );
@@ -844,4 +844,3 @@ int DirNode::unlink( const char *plaintextName )
 	
     return res;
 }
-

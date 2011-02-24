@@ -46,7 +46,7 @@ ConfigReader::~ConfigReader()
 bool 
 ConfigReader::load(const char *fileName)
 {
-    struct FUSE_STAT stbuf;
+    struct stat stbuf;
     memset( &stbuf, 0, sizeof(stbuf));
     if( lstat( fileName, &stbuf ) != 0)
 	return false;

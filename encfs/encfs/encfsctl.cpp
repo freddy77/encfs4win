@@ -52,6 +52,24 @@
 #include <openssl/ssl.h>
 #endif
 
+#if defined(WIN32) && !defined(PATH_MAX)
+#define PATH_MAX MAX_PATH
+#define ngettext(a,b,n) (((n) == 1) ? (a): (b))
+static inline ssize_t readlink(const char *s, char *d, size_t n) { return -1; }
+static inline int symlink(const char *oldpath, const char *newpath) { return -1; }
+#define S_IFLNK 0
+#define S_ISLNK(mode) 0
+static inline struct tm *localtime_r(const time_t *timep, struct tm *result)
+{
+	struct tm *res = localtime(timep);
+	if (res) {
+		*result = *res;
+		return result;
+	}
+	return NULL;
+}
+#endif
+
 using namespace rlog;
 using namespace std;
 using namespace gnu;
@@ -789,9 +807,12 @@ static int chpasswdAutomaticly( int argc, char **argv )
     return do_chpasswd( true, argc, argv );
 }
 
+void init_mpool_mutex();
 
 int main(int argc, char **argv)
 {
+    init_mpool_mutex();
+
     RLogInit( argc, argv );
 
 #ifdef LOCALEDIR

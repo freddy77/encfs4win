@@ -5,13 +5,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif
 #include <map>
 
 #include "fusemain.h"
 #include "utils.h"
 
+#ifndef S_ISLNK
 #define S_ISLNK(mode)	 __S_ISTYPE((mode), __S_IFLNK)
+#endif
 #define	__S_IFLNK	0120000	/* Symbolic link.  */
 #define	__S_ISTYPE(mode, mask)	(((mode) & __S_IFMT) == (mask))
 #define	__S_IFMT	0170000	/* These bits determine file type.  */

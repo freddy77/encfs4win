@@ -38,7 +38,7 @@ template<class T> void convertStatlikeBuf(const struct FUSE_STAT *stbuf, const s
 	find_data->nFileSizeLow=stbuf->st_size;
 #else
 	//Support 64 sizes
-	find_data->nFileSizeLow=stbuf->st_size;
+	find_data->nFileSizeLow=(DWORD) stbuf->st_size;
 	find_data->nFileSizeHigh=stbuf->st_size>>32;
 #endif
 	if (stbuf->st_ctime!=0)

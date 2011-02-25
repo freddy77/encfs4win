@@ -104,6 +104,7 @@ typedef unsigned int mode_t;
 typedef unsigned int pid_t;
 typedef unsigned int gid_t;
 typedef unsigned int uid_t;
+typedef unsigned int uint32_t;
 typedef unsigned __int64 uint64_t;
 typedef __int64 int64_t;
 
@@ -132,6 +133,15 @@ struct statvfs
 	unsigned long int f_flag;
 	unsigned long int f_namemax;
 };
+
+struct flock {
+	short l_type;
+	short l_whence;
+	__int64 l_start;
+	__int64 l_len;
+	pid_t l_pid;
+};
+
 #endif
 
 //We have a choice between CRT-compatible 32-bit off_t definition

@@ -11,6 +11,8 @@ int dummy_fwprintf(FILE*, const wchar_t*, ...)
 {
 	return 0;
 }
+#elif defined(__GNUC__)
+#define FWPRINTF(f, args...) do { fwprintf(f, args); fflush(f); } while(0)
 #else
 #define FWPRINTF fwprintf
 #endif

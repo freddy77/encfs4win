@@ -686,7 +686,6 @@ int encfs_statfs(const char *path, struct statvfs *st)
 {
     EncFS_Context *ctx = context();
 
-#if 0
     int res = -EIO;
     try
     {
@@ -709,8 +708,6 @@ int encfs_statfs(const char *path, struct statvfs *st)
 	err.log( _RLWarningChannel );
     }
     return res;
-#endif
-	return -EIO;
 }
 
 #ifdef HAVE_XATTR

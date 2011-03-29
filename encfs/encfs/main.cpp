@@ -399,6 +399,7 @@ bool processArgs(int argc, char *argv[], const shared_ptr<EncFS_Args> &out)
 	rWarning(_("Unable to locate root directory, aborting."));
 	return false;
     }
+    if(out->mountPoint.length() > 2)
     if(!isDirectory( out->mountPoint.c_str() ) && 
 	    !userAllowMkdir( out->mountPoint.c_str(),0700))
     {

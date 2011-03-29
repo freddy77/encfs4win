@@ -840,8 +840,11 @@ int impl_fuse_context::get_disk_free_space(PULONGLONG free_bytes_available,
 
 int impl_fuse_context::get_volume_information(LPWSTR volume_name_buffer,DWORD volume_name_size,
 						   LPWSTR file_system_name_buffer, DWORD file_system_name_size,
-						   PDOKAN_FILE_INFO dokan_file_info)
+						   PDOKAN_FILE_INFO dokan_file_info, LPDWORD volume_flags)
 {
+	// case sensitive
+	*volume_flags = 3;
+
 	if(volname_)
 		utf8_to_wchar_buf(volname_,volume_name_buffer,volume_name_size);
 	else

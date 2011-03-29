@@ -143,7 +143,7 @@ public:
 
 	int get_volume_information(LPWSTR volume_name_buffer,DWORD volume_name_size,
 		LPWSTR file_system_name_buffer, DWORD file_system_name_size, 
-		PDOKAN_FILE_INFO dokan_file_info);
+		PDOKAN_FILE_INFO dokan_file_info, LPDWORD volume_flags);
 
 	int unmount(PDOKAN_FILE_INFO DokanFileInfo);
 };

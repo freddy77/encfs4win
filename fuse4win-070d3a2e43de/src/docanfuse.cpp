@@ -397,7 +397,7 @@ static int DOKAN_CALLBACK GetVolumeInformation(
 
 	impl_chain_guard guard(impl,DokanFileInfo->ProcessId);
 	return -errno_to_win32_error(impl->get_volume_information(VolumeNameBuffer,VolumeNameSize,
-		FileSystemNameBuffer,FileSystemNameSize, DokanFileInfo));
+		FileSystemNameBuffer,FileSystemNameSize, DokanFileInfo, FileSystemFlags));
 }
 
 static int DOKAN_CALLBACK FuseUnmount(PDOKAN_FILE_INFO	DokanFileInfo)

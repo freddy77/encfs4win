@@ -248,7 +248,7 @@ int impl_fuse_context::walk_directory(void *buf, const char *name,
 	WIN32_FIND_DATAW find_data={0};	
 
 	utf8_to_wchar_buf(name,find_data.cFileName,MAX_PATH);
-	GetShortPathNameW(find_data.cFileName,find_data.cAlternateFileName,MAX_PATH);
+	memset(find_data.cAlternateFileName, 0, sizeof(find_data.cAlternateFileName));
 
 	struct FUSE_STAT stat={0};
 

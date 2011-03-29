@@ -302,6 +302,32 @@ my_stat (const char* fn, struct FUSE_STAT* st)
 	return ::_stati64(buf, st);
 }
 
+int
+statvfs(const char *path, struct statvfs *fs)
+{
+	fs->f_bsize = 4096;
+	fs->f_frsize = 4096;
+	fs->f_fsid = 0;
+	fs->f_flag = 0;
+	fs->f_namemax = 255;
+	fs->f_files = -1;
+	fs->f_ffree = -1;
+	fs->f_favail = -1;
+
+	ULARGE_INTEGER avail, free_bytes, bytes;
+	if (!GetDiskFreeSpaceEx(path, &avail, &bytes, &free_bytes)) {
+		errno = win32_error_to_errno(GetLastError());
+		return -1;
+	}
+
+	fs->f_bavail = avail.QuadPart / fs->f_bsize;
+	fs->f_bfree  = free_bytes.QuadPart / fs->f_bsize;
+	fs->f_blocks = bytes.QuadPart / fs->f_bsize;
+
+	errno = 0;
+	return 0;
+}
+
 static int
 set_sparse(HANDLE fd)
 {

@@ -22,6 +22,7 @@ ssize_t pread(int fd, void *buf, size_t count, __int64 offset);
 ssize_t pwrite(int fd, const void *buf, size_t count, __int64 offset);
 
 int truncate(const char *path, __int64 length);
+int statvfs(const char *path, struct statvfs *buf);
 int utimes(const char *filename, const struct timeval times[2]);
 int my_stat (const char* fn, struct FUSE_STAT* st);
 #define lstat my_stat

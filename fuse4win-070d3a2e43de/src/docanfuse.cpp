@@ -396,6 +396,8 @@ static int DOKAN_CALLBACK GetVolumeInformation(
 	if (impl->debug()) FWPRINTF(stderr, L"GetVolumeInformation\n");
 
 	impl_chain_guard guard(impl,DokanFileInfo->ProcessId);
+	*VolumeSerialNumber = 0;
+	*MaximumComponentLength = 255;
 	return -errno_to_win32_error(impl->get_volume_information(VolumeNameBuffer,VolumeNameSize,
 		FileSystemNameBuffer,FileSystemNameSize, DokanFileInfo, FileSystemFlags));
 }

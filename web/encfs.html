@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+  <title>encfs port</title>
+  <style>
+body  { font-family: Verdana, Arial, sans-serif; color: black; background-color: white }
+.mono { font-family: Courier New,Courier,monospace }
+  </style>
+</head>
+<body>
+<h1>encfs4win</h1>
+<p>This is an experimental project of porting <a
+ href="http://www.arg0.net/encfs">encfs</a> to the Windows world.
+</p>
+<p><a href="http://gitorious.org/encfs4win">Here</a> you can find the
+Gitorious project.
+</p>
+<p>Currently based on</p>
+<ul>
+  <li>encfs 1.7.4</li>
+  <li><a href="http://www.openssl.org">openssl</a> 1.0.0d</li>
+  <li>Boost library 1.40.0</li>
+  <li>RLog 1.4</li>
+  <li><a href="http://hg.sharesource.org/fuse4win">fuse4win</a></li>
+  <li><a href="http://dokan-dev.net/en/">Dokan library</a> 0.6. USE
+ONLY 0.6 version! </li>
+</ul>
+<p>The project is cross compiled with MingW.
+</p>
+<p>I use it mostly with <a href="http://www.dropbox.com/">Dropbox</a>.
+</p>
+
+<h2>Download</h2>
+<a href="count.php">encfs.zip</a> (md5 9c01b4235c03bae4e2db964d9cc53efc). File is quite large as
+it's a static binary (all libraries are included in the executable).
+I'm quite sure executable has no virus (I use Linux :) ) but please check md5!
+
+<h2>Use</h2>
+First time<br>
+<ul>
+  <li>install required Dokan library;</li>
+  <li>Extract executable (or compile by your own).</li>
+</ul>
+Every use<br>
+<ul>
+  <li>open a windows command</li>
+  <li>launch "<span class="mono">encfs
+&lt;crypt_dir&gt; &lt;plain_dir&gt;</span>" where <span class="mono">crypt_dir</span>
+is crypted directory while <span class="mono">plain_dir</span>
+is the directory where you can access not crypted files.<br>
+<span style="color: red">NOTE:</span> Windows 7 users should use a drive (like "X:") as
+<span class="mono">plain_dir</span> to avoid case sensitive problems which results in file/folder
+not found problems.
+  </li>
+</ul>
+You can also use Ronal Moegel batch included.
+
+<h2>News</h2>
+<ul>
+  <li>2011-04-16 Added batch from Ronald Moegel to help mount/unmount your drive</li>
+  <li>2011-04-16 Minor fixes for volume informations</li>
+  <li>2011-03-29 Fixes for Windows 7</li>
+  <li>2011-02-25 Added encfsctl</li>
+  <li>2011-02-23 Update encfs to 1.7.4 and OpenSSL to 1.0.0d</li>
+  <li>2011-02-23 Fixed huge files timeout using sparse files and holes</li>
+  <li>2011-02-22 Support for file greater than 2GB</li>
+  <li>2011-02-22 Windows attributes</li>
+  <li>2011-02-22 Fix setting time</li>
+</ul>
+
+<h2>Limits and TODO</h2>
+<ul>
+  <li>symbolic links are not supported</li>
+  <li>use DLLs for OpenSSL</li>
+</ul>
+
+<h2>Thanks</h2>
+<p>Ronald Moegel for testing and hints.</p>
+
+<h2>Donations</h2>
+<p>Somebody request me this button and here you are</p>
+
+<p><form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+<input type="hidden" name="cmd" value="_s-xclick">
+<input type="hidden" name="hosted_button_id" value="M8U9QMP6Q9F4E">
+<input type="image" src="https://www.paypalobjects.com/WEBSCR-640-20110306-1/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+<img alt="" border="0" src="https://www.paypalobjects.com/WEBSCR-640-20110306-1/en_US/i/scr/pixel.gif" width="1" height="1">
+</form></p>
+
+</body>
+</html>
+

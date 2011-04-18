@@ -147,10 +147,9 @@ void usage(const char *name)
 	<< _("  --reverse\t\t"  "reverse encryption\n")
 
 	// xgroup(usage)
-	<< _("  --extpass=program\tUse external program for password prompt\n"
-	"\n"
-	"Example, to mount at ~/crypt with raw storage in ~/.crypt :\n"
-	"    encfs ~/.crypt ~/crypt\n"
+	<< _("\n"
+	"Example, to mount at c:\\plain with raw storage in c:\\crypt :\n"
+	"    encfs c:\\crypt c:\\plain\n"
 	"\n")
 	// xgroup(usage)
 	<< _("For more information, see the man page encfs(1)") << "\n"

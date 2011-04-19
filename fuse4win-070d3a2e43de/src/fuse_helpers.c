@@ -26,7 +26,6 @@ struct helper_opts {
 	char *mountpoint;
 };
 
-static struct fuse_session *fuse_instance=NULL;
 int fuse_session_exit(struct fuse_session *se);
 
 #ifdef _MSC_VER
@@ -201,6 +200,8 @@ int fuse_version(void)
 }
 
 #ifdef __CYGWIN__
+static struct fuse_session *fuse_instance=NULL;
+
 static void exit_handler(int sig)
 {
 	(void) sig;

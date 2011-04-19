@@ -105,7 +105,7 @@ struct errentry
 	int errnocode;  /* System V error code */
 };
 
-static struct errentry errtable[] = {
+static const struct errentry errtable[] = {
 	{  ERROR_INVALID_FUNCTION,       EINVAL    },  /* 1 */
 	{  ERROR_FILE_NOT_FOUND,         ENOENT    },  /* 2 */
 	{  ERROR_PATH_NOT_FOUND,         ENOENT    },  /* 3 */

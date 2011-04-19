@@ -467,7 +467,7 @@ void encfs_destroy( void *_ctx )
 
 void init_mpool_mutex();
 
-int main(int argc, char *argv[])
+extern "C" int main_encfs(int argc, char *argv[])
 {
     init_mpool_mutex();
 

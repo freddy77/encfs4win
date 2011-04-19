@@ -809,7 +809,7 @@ static int chpasswdAutomaticly( int argc, char **argv )
 
 void init_mpool_mutex();
 
-int main(int argc, char **argv)
+extern "C" int main_encfsctl(int argc, char **argv)
 {
     init_mpool_mutex();
 

@@ -22,15 +22,16 @@ AM_CXXFLAGS += -DLOCALEDIR=\"$(localedir)\"
 ALL_LDFLAGS += @LIBINTL@
 endif
 
-lib_LTLIBRARIES = libencfs.la
-bin_PROGRAMS = encfs encfsctl
+lib_LTLIBRARIES = libencfs.la libencfsall.la
+bin_PROGRAMS = encfs encfsctl encfsw
 dist_bin_SCRIPTS = encfssh
 noinst_PROGRAMS = test makeKey
 
 all-local: encfs-man.html
 
-encfs_LDADD   = libencfs.la $(ALL_LDFLAGS)
-encfsctl_LDADD = libencfs.la $(ALL_LDFLAGS)
+encfs_LDADD   = libencfsall.la
+encfsw_LDADD   = libencfsall.la
+encfsctl_LDADD = libencfsall.la
 test_LDADD   = libencfs.la $(ALL_LDFLAGS)
 makeKey_LDADD   = libencfs.la $(ALL_LDFLAGS)
 
@@ -87,9 +88,7 @@ libencfs_la_SOURCES = \
     ${EXTRASRC}
 
 
-encfs_SOURCES = \
-    encfs.cpp \
-    main.cpp
+encfs_SOURCES = win/main1.cpp
 
 test_SOURCES = \
     test.cpp
@@ -97,8 +96,18 @@ test_SOURCES = \
 makeKey_SOURCES = \
     makeKey.cpp
 
-encfsctl_SOURCES = \
-    encfsctl.cpp
+encfsctl_SOURCES = win/main2.cpp
+
+encfsw_SOURCES = win/main3.cpp
+encfsw_LDFLAGS = -Wl,--subsystem,windows
+
+libencfsall_la_SOURCES = ${libencfs_la_SOURCES} encfs.cpp main.cpp encfsctl.cpp win/maingui.cpp
+libencfsall_la_LDFLAGS = -version-info 1:0:0 -no-undefined -Wl,encfs.def
+libencfsall_la_LIBADD = @RLOG_LIBS@ \
+	@OPENSSL_LIBS@ \
+	@FUSE_LIBS@ \
+	@BOOST_SERIALIZATION_LIB@ @BOOST_FILESYSTEM_LIB@ @BOOST_SYSTEM_LIB@ \
+	-luser32 -lgdi32 -lws2_32
 
 noinst_HEADERS = \
     base64.h \

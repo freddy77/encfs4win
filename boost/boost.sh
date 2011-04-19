@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-NAME=boost_1_40_0
+NAME=boost_1_46_0
 OUT=$PWD/../out
 
 rm -rf $NAME
@@ -13,14 +13,10 @@ echo "using gcc : 4.4.4 : i586-mingw32msvc-g++ ;" >> tools/build/v2/user-config.
 ./bjam --layout=system variant=release threading=multi link=static runtime-link=static toolset=gcc target-os=windows threadapi=win32 install || true
 
 cd $OUT/lib
-test -r libboost_filesystem.lib
-test -r libboost_system.lib
-test -r libboost_serialization.lib
-for lib in libboost_*.lib; do
-	i586-mingw32msvc-ranlib $lib
-	rm -f ${lib%.lib}.a
-	ln -s $lib ${lib%.lib}.a
-done
+test -r libboost_filesystem.a
+test -r libboost_system.a
+test -r libboost_serialization.a
+i586-mingw32msvc-ranlib libboost_*.a
 cd ../../boost
 rm -rf $NAME
 

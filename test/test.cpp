@@ -27,6 +27,7 @@ check(int line, bool test, const char *chk, const char *fmt, ...)
 
 static const char fn[] = "testfile.txt";
 static const char fn2[] = "testfile2.txt";
+static const char long_fn[] = "Test very long File Name.Txt";
 
 static FILETIME *
 Time(FILETIME &t, int y, int m, int d, int h=12)
@@ -146,10 +147,10 @@ int main()
 
 	printf("time check and attributes\n");
 	CHECK(SetFileAttributes(fn, FILE_ATTRIBUTE_HIDDEN), NULL);
-	CHECK(GetFileAttributes(fn) == FILE_ATTRIBUTE_HIDDEN, NULL);
+	CHECK((GetFileAttributes(fn) & (~FILE_ATTRIBUTE_SPARSE_FILE)) == FILE_ATTRIBUTE_HIDDEN, NULL);
 	h1 = CreateFile(fn, FILE_WRITE_ATTRIBUTES, FILE_SHARE_WRITE|FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 	CHECK(h1 != INVALID_HANDLE_VALUE, "create failed");
-	CHECK(GetFileAttributes(fn) == FILE_ATTRIBUTE_HIDDEN, NULL);
+	CHECK((GetFileAttributes(fn) & (~FILE_ATTRIBUTE_SPARSE_FILE)) == FILE_ATTRIBUTE_HIDDEN, NULL);
 	FILETIME c,a,m;
 	CHECK(SetFileTime(h1, Time(c,2000,1,2), Time(a,2001,3,5), Time(m,2010,12,24)), NULL);
 	// this is required only for Dokan cause SetFileInformation is called with BasicInformation
@@ -159,12 +160,12 @@ int main()
 	WIN32_FIND_DATA wfd;
 	h1 = FindFirstFile(fn, &wfd);
 	CHECK(h1 != INVALID_HANDLE_VALUE, "find failed");
-	CHECK(wfd.dwFileAttributes == FILE_ATTRIBUTE_HIDDEN, NULL);
+	CHECK((GetFileAttributes(fn) & (~FILE_ATTRIBUTE_SPARSE_FILE)) == FILE_ATTRIBUTE_HIDDEN, NULL);
 	CHECK(SameTime(wfd.ftCreationTime,2000,1,2), NULL);
 	CHECK(SameTime(wfd.ftLastAccessTime,2001,3,5), NULL);
 	CHECK(SameTime(wfd.ftLastWriteTime,2010,12,24), NULL);
 	FindClose(h1);
-	CHECK(GetFileAttributes(fn) == FILE_ATTRIBUTE_HIDDEN, NULL);
+	CHECK((GetFileAttributes(fn) & (~FILE_ATTRIBUTE_SPARSE_FILE)) == FILE_ATTRIBUTE_HIDDEN, NULL);
 	CHECK(SetFileAttributes(fn, FILE_ATTRIBUTE_NORMAL), NULL);
 
 	printf("deleting while open\n");
@@ -176,6 +177,16 @@ int main()
 	FindClose(h2);
 	CloseHandle(h1);
 	CHECK(FindFirstFile(fn, &wfd) == INVALID_HANDLE_VALUE, NULL);
+
+	f = fopen(long_fn, "w");
+	CHECK(f != NULL, "error creating test file");
+	fputs("long test\n", f);
+	fclose(f);
+
+	h1 = FindFirstFile(long_fn, &wfd);
+	CHECK(h1 != INVALID_HANDLE_VALUE, NULL);
+	CHECK(strcmp(wfd.cFileName, long_fn) == 0, NULL);
+	FindClose(h1);
 
 	printf("all done!\n");
 

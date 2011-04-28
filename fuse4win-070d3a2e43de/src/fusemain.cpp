@@ -774,16 +774,18 @@ int impl_fuse_context::set_file_time(PCWSTR file_name, const FILETIME* creation_
 
 	if (ops_.win_set_times)
 	{
+		std::string fname=unixify(wchar_to_utf8_cstr(file_name));
+		CHECKED(check_and_resolve(&fname));
+
 		impl_file_handle *hndl=reinterpret_cast<impl_file_handle*>(dokan_file_info->Context);
 		if (!hndl)
-			return -EINVAL;
+			return ops_.win_set_times(fname.c_str(), NULL, creation_time, last_access_time, last_write_time);
+
 		if (hndl->is_dir())
 			return -EACCES;
 
 		fuse_file_info finfo(hndl->make_finfo());
 
-		std::string fname=unixify(wchar_to_utf8_cstr(file_name));
-		CHECKED(check_and_resolve(&fname));
 		return ops_.win_set_times(fname.c_str(), &finfo, creation_time, last_access_time, last_write_time);
 	}
 

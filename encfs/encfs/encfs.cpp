@@ -861,6 +861,28 @@ int _do_win_set_times(FileNode *fnode, tuple<const FILETIME *, const FILETIME *,
 
 static int encfs_win_set_times(const char *path, struct fuse_file_info *fi, const FILETIME *create, const FILETIME *access, const FILETIME *modified)
 {
+    if (!fi || !fi->fh)
+    {
+	int res = -EIO;
+	shared_ptr<DirNode> FSRoot = context()->getRoot(&res);
+	if(!FSRoot)
+	    return res;
+
+	std::string fn = FSRoot->cipherPath(path);
+
+	HANDLE f = CreateFile(fn.c_str(), FILE_WRITE_ATTRIBUTES, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	if (f == INVALID_HANDLE_VALUE)
+	    return -win32_error_to_errno(GetLastError());
+
+ 	if (SetFileTime(f, create, access, modified))
+	{
+	    CloseHandle(f);
+	    return 0;
+	}
+	res = -win32_error_to_errno(GetLastError());
+	CloseHandle(f);
+	return res;
+    }
     return withFileNode("win_set_times", path, fi, _do_win_set_times,
                        make_tuple(create, access, modified));
 }

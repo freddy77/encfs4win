@@ -181,6 +181,16 @@ string slashTerminate( const string &src )
     return result;
 }
 
+static
+char *unslashTerminate(char *src )
+{
+    size_t l = strlen(src);
+    if (l > 1 && (src[l-1] == '\\' || src[l-1] == '/'))
+	src[l-1] = 0;
+    return src;
+}
+
+
 static 
 bool processArgs(int argc, char *argv[], const shared_ptr<EncFS_Args> &out)
 {
@@ -330,8 +340,8 @@ bool processArgs(int argc, char *argv[], const shared_ptr<EncFS_Args> &out)
     // the mount point.
     if(optind+2 <= argc)
     {
-	out->opts->rootDir = slashTerminate( argv[optind++] );
-	out->mountPoint = argv[optind++];
+	out->opts->rootDir = slashTerminate( unslashTerminate(argv[optind++]) );
+	out->mountPoint = unslashTerminate(argv[optind++]);
     } else
     {
 	// no mount point specified

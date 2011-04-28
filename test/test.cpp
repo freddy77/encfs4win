@@ -28,6 +28,7 @@ check(int line, bool test, const char *chk, const char *fmt, ...)
 static const char fn[] = "testfile.txt";
 static const char fn2[] = "testfile2.txt";
 static const char long_fn[] = "Test very long File Name.Txt";
+static const char test_dir[] = "test_DIR";
 
 static FILETIME *
 Time(FILETIME &t, int y, int m, int d, int h=12)
@@ -187,6 +188,23 @@ int main()
 	CHECK(h1 != INVALID_HANDLE_VALUE, NULL);
 	CHECK(strcmp(wfd.cFileName, long_fn) == 0, NULL);
 	FindClose(h1);
+
+	// check directory
+	RemoveDirectory(test_dir);
+	CHECK(CreateDirectory(test_dir, NULL), NULL);
+	h1 = CreateFile(test_dir, FILE_WRITE_ATTRIBUTES, FILE_SHARE_WRITE|FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	CHECK(h1 != INVALID_HANDLE_VALUE, "create failed");
+	CHECK(SetFileTime(h1, Time(c,2000,1,2), Time(a,2001,3,5), Time(m,2010,12,24)), NULL);
+	CloseHandle(h1);
+
+	h1 = FindFirstFile(test_dir, &wfd);
+	CHECK(h1 != INVALID_HANDLE_VALUE, "find failed");
+	CHECK(SameTime(wfd.ftCreationTime,2000,1,2), NULL);
+	CHECK(SameTime(wfd.ftLastAccessTime,2001,3,5), NULL);
+	CHECK(SameTime(wfd.ftLastWriteTime,2010,12,24), NULL);
+	FindClose(h1);
+
+	RemoveDirectory(test_dir);
 
 	printf("all done!\n");
 

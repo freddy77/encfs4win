@@ -842,7 +842,7 @@ static int encfs_win_set_attributes(const char *fn, uint32_t attr)
    return -win32_error_to_errno(GetLastError());
 }
 
-int _do_win_set_times(FileNode *fnode, tuple<const FILETIME *, const FILETIME *, const FILETIME *> data )
+static int _do_win_set_times(FileNode *fnode, tuple<const FILETIME *, const FILETIME *, const FILETIME *> data )
 {
     /* Flush can be called multiple times for an open file, so it doesn't
        close the file.  However it is important to call close() for some

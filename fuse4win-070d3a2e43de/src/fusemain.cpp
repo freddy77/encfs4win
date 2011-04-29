@@ -136,7 +136,7 @@ int impl_fuse_context::do_open_dir(LPCWSTR FileName, PDOKAN_FILE_INFO DokanFileI
 		std::string fname=unixify(wchar_to_utf8_cstr(FileName));
 		std::auto_ptr<impl_file_handle> file;
 		// TODO access_mode
-		CHECKED(impl_file_lock::get_file(fname,true,0,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,file));
+		CHECKED(file_locks.get_file(fname,true,0,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,file));
 
 		fuse_file_info finfo={0};
 		CHECKED(ops_.opendir(fname.c_str(),&finfo));
@@ -158,7 +158,7 @@ int impl_fuse_context::do_open_file(LPCWSTR FileName, DWORD share_mode, DWORD Fl
 	CHECKED(check_and_resolve(&fname));
 
 	std::auto_ptr<impl_file_handle> file;
-	CHECKED(impl_file_lock::get_file(fname,false,Flags,share_mode,file));
+	CHECKED(file_locks.get_file(fname,false,Flags,share_mode,file));
 
 	fuse_file_info finfo={0};
 	finfo.flags=convert_flags(Flags);
@@ -188,7 +188,7 @@ int impl_fuse_context::do_create_file(LPCWSTR FileName, DWORD Disposition, DWORD
 	}
 
 	std::auto_ptr<impl_file_handle> file;
-	CHECKED(impl_file_lock::get_file(fname,false,Flags,share_mode,file));
+	CHECKED(file_locks.get_file(fname,false,Flags,share_mode,file));
 
 	fuse_file_info finfo={0};
 	finfo.flags=O_CREAT | O_EXCL | convert_flags(Flags); //TODO: these flags should be OK for new files?	
@@ -657,7 +657,7 @@ int impl_fuse_context::move_file(LPCWSTR file_name, LPCWSTR new_file_name,
 	}
 
 	CHECKED(ops_.rename(name.c_str(),new_name.c_str()));
-	impl_file_lock::renamed_file(name,new_name);
+	file_locks.renamed_file(name,new_name);
 	return 0;
 }
 
@@ -871,8 +871,6 @@ int impl_fuse_context::unmount(PDOKAN_FILE_INFO	DokanFileInfo)
 ///////////////////////////////////////////////////////////////////////////////////////
 ////// File lock
 ///////////////////////////////////////////////////////////////////////////////////////
-typedef std::map<std::string, impl_file_lock *> file_locks_t;
-static file_locks_t file_locks;
 
 // get required shared mode given an access mode
 static DWORD required_share(DWORD access_mode)
@@ -893,25 +891,25 @@ static DWORD required_share(DWORD access_mode)
 	return share;
 }
 
-int impl_file_lock::get_file(const std::string &name, bool is_dir, DWORD access_mode, DWORD shared_mode, std::auto_ptr<impl_file_handle>& file)
+int impl_file_locks::get_file(const std::string &name, bool is_dir, DWORD access_mode, DWORD shared_mode, std::auto_ptr<impl_file_handle>& file)
 {
 	int res = 0;
 	file.reset(new impl_file_handle(is_dir, shared_mode));
 
 	// check previous files with same names
 	impl_file_lock *lock, *old_lock = NULL;
-	EnterCriticalSection(&fuse_mutex);
+	EnterCriticalSection(&this->lock);
 	file_locks_t::iterator i = file_locks.find(name);
 	if (i != file_locks.end()) {
 		old_lock = lock = i->second;
 		EnterCriticalSection(&lock->lock);
 	} else {
-		lock = new impl_file_lock(name);
+		lock = new impl_file_lock(this, name);
 		file_locks[name] = lock;
 		lock->add_file_unlocked(file.get());
 	}
 	file->file_lock = lock;
-	LeaveCriticalSection(&fuse_mutex);
+	LeaveCriticalSection(&this->lock);
 
 	if (!old_lock)
 		return res;
@@ -958,21 +956,26 @@ void impl_file_lock::remove_file(impl_file_handle *file)
 	if (first_locked)
 		return;
 
-	EnterCriticalSection(&fuse_mutex);
-	file_locks_t::iterator i = file_locks.find(name_);
+	locks->remove_file(name_);
+}
+
+void impl_file_locks::remove_file(const std::string& name)
+{
+	EnterCriticalSection(&lock);
+	file_locks_t::iterator i = file_locks.find(name);
 	if (i != file_locks.end() && !i->second->first) {
 		file_locks.erase(i);
 		delete i->second;
 	}
-	LeaveCriticalSection(&fuse_mutex);
+	LeaveCriticalSection(&lock);
 }
 
-void impl_file_lock::renamed_file(const std::string &name,const std::string &new_name)
+void impl_file_locks::renamed_file(const std::string &name,const std::string &new_name)
 {
 	if (name == new_name)
 		return;
 
-	EnterCriticalSection(&fuse_mutex);
+	EnterCriticalSection(&lock);
 	// TODO what happen if new_name exists ??
 	file_locks_t::iterator i = file_locks.find(name);
 	if (i != file_locks.end()) {
@@ -983,7 +986,7 @@ void impl_file_lock::renamed_file(const std::string &name,const std::string &new
 		file_locks[new_name] = lock;
 		file_locks.erase(i);
 	}
-	LeaveCriticalSection(&fuse_mutex);
+	LeaveCriticalSection(&lock);
 }
 
 int impl_file_lock::lock_file(impl_file_handle *file, long long start, long long len, bool mark)

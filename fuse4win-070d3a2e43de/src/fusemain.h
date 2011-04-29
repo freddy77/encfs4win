@@ -15,7 +15,22 @@
 class impl_fuse_context;
 struct impl_chain_link;
 
-extern CRITICAL_SECTION fuse_mutex;
+class impl_file_handle;
+class impl_file_lock;
+
+class impl_file_locks
+{
+private:
+	typedef std::map<std::string, impl_file_lock *> file_locks_t;
+	file_locks_t file_locks;
+	CRITICAL_SECTION lock;
+public:
+	impl_file_locks() { InitializeCriticalSection(&lock); }
+	~impl_file_locks() { DeleteCriticalSection(&lock); };
+	int get_file(const std::string &name, bool is_dir, DWORD access_mode, DWORD shared_mode, std::auto_ptr<impl_file_handle>& out);
+	void renamed_file(const std::string &name,const std::string &new_name);
+	void remove_file(const std::string& name);
+};
 
 /*
 	This class pushes the impl_fuse_context frame on a thread-local stack,
@@ -47,6 +62,8 @@ class impl_fuse_context
 	unsigned int filemask_;
 	unsigned int dirmask_;
 	const char *fsname_, *volname_;
+
+	impl_file_locks file_locks;
 public:
 	impl_fuse_context(const struct fuse_operations *ops, void *user_data, 
 		bool debug, unsigned int filemask, unsigned int dirmask,
@@ -148,12 +165,13 @@ public:
 	int unmount(PDOKAN_FILE_INFO DokanFileInfo);
 };
 
-class impl_file_handle;
 
 class impl_file_lock
 {
 	friend class impl_file_handle;
+	friend class impl_file_locks;
 	std::string name_;
+	impl_file_locks* locks;
 	impl_file_handle *first;
 	CRITICAL_SECTION lock;
 
@@ -161,10 +179,8 @@ class impl_file_lock
 	int lock_file(impl_file_handle *file, long long start, long long len, bool mark=true);
 	int unlock_file(impl_file_handle *file, long long start, long long len);
 public:
-	impl_file_lock(const std::string& name): name_(name), first(NULL) { InitializeCriticalSection(&lock); }
+	impl_file_lock(impl_file_locks* _locks, const std::string& name): locks(_locks), name_(name), first(NULL) { InitializeCriticalSection(&lock); }
 	~impl_file_lock() { DeleteCriticalSection(&lock); };
-	static int get_file(const std::string &name, bool is_dir, DWORD access_mode, DWORD shared_mode, std::auto_ptr<impl_file_handle>& out);
-	static void renamed_file(const std::string &name,const std::string &new_name);
 	void remove_file(impl_file_handle *file);
 	const std::string& get_name() const {return name_;}
 };
@@ -173,6 +189,7 @@ public:
 class impl_file_handle
 {	
 	friend class impl_file_lock;
+	friend class impl_file_locks;
 	bool is_dir_;
 	uint64_t fh_;
 	impl_file_handle *next_file;

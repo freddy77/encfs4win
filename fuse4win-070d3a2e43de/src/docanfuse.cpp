@@ -19,16 +19,10 @@ int dummy_fwprintf(FILE*, const wchar_t*, ...)
 
 #define the_impl reinterpret_cast<impl_fuse_context*>(DokanFileInfo->DokanOptions->GlobalContext)
 
-static bool fuse_mutex_initialized = false;
-CRITICAL_SECTION fuse_mutex;
-
 extern "C" BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 {
 	if (dwReason == DLL_PROCESS_ATTACH) {
 		DisableThreadLibraryCalls(hInstance);
-		if (!fuse_mutex_initialized)
-			InitializeCriticalSection(&fuse_mutex);
-		fuse_mutex_initialized = true;
 	}
 	return TRUE;
 }
@@ -714,10 +708,6 @@ int fuse_main_real(int argc, char *argv[], const struct fuse_operations *op,
 	char *mountpoint;
 	int multithreaded;
 	int res;
-
-	if (!fuse_mutex_initialized)
-		InitializeCriticalSection(&fuse_mutex);
-	fuse_mutex_initialized = true;
 
 	fuse = fuse_setup(argc, argv, op, op_size, &mountpoint,
 		&multithreaded, user_data);

@@ -42,6 +42,7 @@ if test "x$enable_static" = "xyes"; then
 fi
 
 AC_PROG_LIBTOOL
+LT_AC_PROG_RC
 
 ACX_PTHREAD
 

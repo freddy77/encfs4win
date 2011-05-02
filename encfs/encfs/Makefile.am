@@ -102,12 +102,15 @@ encfsw_SOURCES = win/main3.cpp
 encfsw_LDFLAGS = -Wl,--subsystem,windows
 
 libencfsall_la_SOURCES = ${libencfs_la_SOURCES} encfs.cpp main.cpp encfsctl.cpp win/maingui.cpp
-libencfsall_la_LDFLAGS = -version-info 1:0:0 -no-undefined -Wl,encfs.def
+libencfsall_la_LDFLAGS = -version-info 1:0:0 -no-undefined -Wl,encfs.def -Wl,win/resource.res
 libencfsall_la_LIBADD = @RLOG_LIBS@ \
 	@OPENSSL_LIBS@ \
 	@FUSE_LIBS@ \
 	@BOOST_SERIALIZATION_LIB@ @BOOST_FILESYSTEM_LIB@ @BOOST_SYSTEM_LIB@ \
-	-luser32 -lgdi32 -lws2_32
+	-luser32 -lgdi32 -lws2_32 -lcomctl32 win/resource.res
+
+.rc.res:
+	$(RC) -i $< --input-format=rc -o $@ -O coff
 
 noinst_HEADERS = \
     base64.h \

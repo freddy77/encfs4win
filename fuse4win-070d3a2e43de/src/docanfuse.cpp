@@ -193,6 +193,7 @@ static int DOKAN_CALLBACK FuseCreateFile(
 		DebugConstantBit("\tAccessMode", AccessMode,  cAccessMode);
 		DebugConstantBit("\tShareMode",  ShareMode,   cShareMode);
 		DebugConstant("\tDisposition",   CreationDisposition, cDisposition);
+		FWPRINTF(stderr, L"\tFlags: %u (0x%x)\n", FlagsAndAttributes, FlagsAndAttributes);
 		fflush(stderr);
 	}
 	

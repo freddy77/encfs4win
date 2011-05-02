@@ -11,10 +11,10 @@ if true; then
 fi
 cd encfs
 rm -f encfs.exe encfsctl.exe libencfsall.la
-make encfs.exe encfsctl.exe
+make encfs.exe encfsw.exe encfsctl.exe
 test -r .libs/libencfsall-1.dll
 DLL=$(i586-mingw32msvc-objdump -p .libs/libencfsall-1.dll | grep '^Name ' | sed 's/.*encfs/encfs/')
-cp .libs/encfs.exe .libs/encfsctl.exe $OUT/bin
+cp .libs/encfs.exe .libs/encfsw.exe .libs/encfsctl.exe $OUT/bin
 cp .libs/libencfsall-1.dll $OUT/bin/$DLL
 cd ../..
 echo encfs ok

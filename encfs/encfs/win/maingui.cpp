@@ -3,6 +3,8 @@
 #include <tchar.h>
 #include <shellapi.h>
 #include <shlwapi.h>
+#include "guiutils.h"
+#include "drives.h"
 #include "resource.h"
 
 extern HINSTANCE hFuseDllInstance;
@@ -17,12 +19,6 @@ static LRESULT CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPA
 
 #define TRAYICONID	1
 #define SWM_TRAYMSG	WM_APP+100
-enum {
-	IDM_EXIT = 101,
-	IDM_ABOUT,
-	IDM_OPEN
-};
-
 
 extern "C" int main_gui(HINSTANCE /* hInstance */, HINSTANCE /* hPrevInstance */ , LPSTR /* lpCmdLine */ ,int nCmdShow)
 {
@@ -110,6 +106,8 @@ GetDllVersion(LPCTSTR lpszDllName)
 static BOOL
 OnInitDialog(HWND hWnd)
 {
+	Drives::Load();
+
 	HICON hIcon;
 
 	hIcon = (HICON) LoadImage(hInst, MAKEINTRESOURCE(IDI_MAIN), IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
@@ -135,8 +133,7 @@ ShowContextMenu(HWND hWnd)
 
 	AppendMenu(hMenu, 0, IDM_OPEN, _T("Open/Create"));
 	AppendMenu(hMenu, MF_MENUBREAK, -1, NULL);
-	// TODO add mounted directories
-	// TODO add possible directories
+	Drives::AddMenus(hMenu);
 	AppendMenu(hMenu, 0, IDM_ABOUT, _T("About"));
 	AppendMenu(hMenu, 0, IDM_EXIT, _T("Exit"));
 	SetMenuDefaultItem(hMenu, IDM_OPEN, FALSE);
@@ -147,17 +144,25 @@ ShowContextMenu(HWND hWnd)
 	DestroyMenu(hMenu);
 }
 
+static void
+OpenOrCreate(HWND hwnd)
+{
+	std::string dir = GetExistingDirectory(hwnd);
+	MessageBox(hwnd, dir.c_str(), NULL, MB_OK);
+	ShowWindow(hwnd, SW_RESTORE);
+}
+
 // Message handler for the app
 static INT_PTR CALLBACK
 DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	int wmId, wmEvent;
+	int id;
 
 	switch (message) {
 	case SWM_TRAYMSG:
 		switch (lParam) {
 		case WM_LBUTTONDBLCLK:
-			ShowWindow(hWnd, SW_RESTORE);
+			OpenOrCreate(hWnd);
 			break;
 		case WM_LBUTTONDOWN:
 		case WM_RBUTTONDOWN:
@@ -172,17 +177,35 @@ DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_COMMAND:
-		wmId = LOWORD(wParam);
-		wmEvent = HIWORD(wParam);
-		switch (wmId) {
+		id = LOWORD(wParam);
+		switch (id) {
 		case IDM_OPEN:
-			ShowWindow(hWnd, SW_RESTORE);
+			OpenOrCreate(hWnd);
 			break;
 		case IDM_EXIT:
 			DestroyWindow(hWnd);
 			break;
 		case IDM_ABOUT:
 			DialogBox(hInst, (LPCTSTR) IDD_ABOUTBOX, hWnd, (DLGPROC) AboutDlgProc);
+			break;
+		default:
+			if (id >= IDM_MOUNT_START && id < IDM_MOUNT_END) {
+				boost::shared_ptr<Drive> drive = Drives::GetDrive(IDM_MOUNT_N(id));
+				if (!drive)
+					return 1;
+
+				switch (IDM_MOUNT_TYPE(id)) {
+				case IDM_TYPE_MOUNT:
+					drive->Mount(hWnd);
+					break;
+				case IDM_TYPE_UMOUNT:
+					drive->Umount(hWnd);
+					break;
+				case IDM_TYPE_SHOW:
+					drive->Show(hWnd);
+					break;
+				}
+			}
 			break;
 		}
 		return 1;

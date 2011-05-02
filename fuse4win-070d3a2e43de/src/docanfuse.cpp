@@ -19,9 +19,12 @@ int dummy_fwprintf(FILE*, const wchar_t*, ...)
 
 #define the_impl reinterpret_cast<impl_fuse_context*>(DokanFileInfo->DokanOptions->GlobalContext)
 
+HINSTANCE hFuseDllInstance;
+
 extern "C" BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 {
 	if (dwReason == DLL_PROCESS_ATTACH) {
+		hFuseDllInstance = hInstance;
 		DisableThreadLibraryCalls(hInstance);
 	}
 	return TRUE;

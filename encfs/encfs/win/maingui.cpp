@@ -7,9 +7,6 @@
 #include "drives.h"
 #include "resource.h"
 
-extern HINSTANCE hFuseDllInstance;
-#define hInst hFuseDllInstance
-
 NOTIFYICONDATA niData;
 
 static ULONGLONG GetDllVersion(LPCTSTR lpszDllName);

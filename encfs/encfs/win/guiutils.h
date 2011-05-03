@@ -1,6 +1,8 @@
 
 #include <string>
 
-std::string GetExistingDirectory(HWND hwnd);
+extern HINSTANCE hFuseDllInstance;
+#define hInst hFuseDllInstance
 
+std::string GetExistingDirectory(HWND hwnd);
 char SelectFreeDrive(HWND hwnd);

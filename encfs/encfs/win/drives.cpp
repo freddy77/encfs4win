@@ -130,6 +130,6 @@ void Drives::AddMenus(HMENU menu)
 	}
 
 	AddMenus(menu, true, numMounted, "Open %s (%c)", "Open", IDM_TYPE_SHOW);
-	AddMenus(menu, false, numUnmounted, "Mount %s (%c)", "Mount", IDM_TYPE_UMOUNT);
-	AddMenus(menu, true, numMounted, "Unmount %s (%c)", "Unmount", IDM_TYPE_MOUNT);
+	AddMenus(menu, false, numUnmounted, "Mount %s (%c)", "Mount", IDM_TYPE_MOUNT);
+	AddMenus(menu, true, numMounted, "Unmount %s (%c)", "Unmount", IDM_TYPE_UMOUNT);
 }

@@ -9,6 +9,8 @@
 #include "drives.h"
 #include "resource.h"
 
+// TODO preference, start at login
+
 NOTIFYICONDATA niData;
 
 static ULONGLONG GetDllVersion(LPCTSTR lpszDllName);
@@ -23,6 +25,8 @@ static INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPA
 extern "C" int main_gui(HINSTANCE /* hInstance */, HINSTANCE /* hPrevInstance */ , LPSTR /* lpCmdLine */ ,int nCmdShow)
 {
 	MSG msg;
+
+	// TODO check Dokan version
 
 	if (!InitInstance(hInst, nCmdShow))
 		return FALSE;
@@ -180,7 +184,8 @@ OpenOrCreate(HWND hwnd)
 			break;
 		}
 
-		// TODO check directory is empty
+		// TODO check directory is empty, warning if continue
+		// "You are initializing a crypted directory with a no-empty directory. Is this expected?"
 
 		if (DialogBoxParam(hInst, (LPCTSTR) IDD_OPTIONS, hwnd, (DLGPROC) OptionsDlgProc, (LPARAM) dir.c_str()) != IDOK)
 			break;

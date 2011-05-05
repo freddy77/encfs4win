@@ -1,6 +1,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
+#include "config.hpp"
 
 enum {
 	IDM_MOUNT_MAX = 256,
@@ -31,12 +32,15 @@ public:
 	void Show(HWND hwnd);
 	void Mount(HWND hwnd);
 	void Umount(HWND hwnd);
+	bool Mounted() const { return mounted; }
 private:
+	std::string configName;
 	std::string dir;
 	char mnt[4];
 	bool mounted;
-	Drive(const std::string& _dir, char drive);
+	Drive(const std::string& configName, const std::string& _dir, char drive);
 	void Save();
+	static boost::shared_ptr<Drive> Load(const std::string& name);
 };
 
 class Drives
@@ -45,11 +49,11 @@ friend class Drive;
 public:
 	typedef boost::shared_ptr<Drive> drive_t;
 	static drive_t GetDrive(int n);
-	static void Save();
 	static void Load();
 	static void AddMenus(HMENU menu);
 	static drive_t Add(const std::string& dir, char drive);
 private:
+	static void NewDrive(const std::string& name, void* param);
 	static void AddMenus(HMENU menu, bool mounted, unsigned count, const char *fmt, const char *title, int type);
 	static void Delete(drive_t);
 };

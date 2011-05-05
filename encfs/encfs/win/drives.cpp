@@ -14,8 +14,8 @@ void fatal(HWND hwnd, const char *msg)
 
 #define FATAL(msg) do { fatal(hwnd, msg); return; } while(0)
 
-Drive::Drive(const std::string& _dir, char drive):
-	dir(_dir), mounted(false)
+Drive::Drive(const std::string& _configName, const std::string& _dir, char drive):
+	configName(_configName), dir(_dir), mounted(false)
 {
 	sprintf(mnt, "%c:\\", drive);
 }
@@ -50,9 +50,10 @@ void Drive::Mount(HWND hwnd)
 	if (!GetPassword(hwnd, pass, sizeof(pass)))
 		return;
 
-	// TODO mount
-	FATAL("not implemented");
+	// TODO mount, use a sort of popen, send password, check if drive presents
+	// _snprintf(cmd, sizeof(cmd), "\"%s\"" -S \"%s\" %c:", executable, dir, mnt[0]);
 	memset(pass, 0, sizeof(pass));
+	FATAL("not implemented");
 }
 
 void Drive::Umount(HWND hwnd)
@@ -69,7 +70,23 @@ void Drive::Umount(HWND hwnd)
 
 void Drive::Save()
 {
-	// TODO
+	SaveConfig(configName, "Directory", dir);
+	SaveConfig(configName, "Drive", mnt);
+}
+
+boost::shared_ptr<Drive> Drive::Load(const std::string& name)
+{
+	boost::shared_ptr<Drive> ret;
+	std::string dir = LoadConfig(name, "Directory");
+	std::string drive = LoadConfig(name, "Drive");
+	char c = 0;
+	if (!drive.empty()) c = toupper(drive[0]);
+	if (c < 'C' || c > 'Z') {
+		DeleteConfig(name);
+		return ret;
+	}
+	ret = boost::shared_ptr<Drive>(new Drive(name, dir, c));
+	return ret;
 }
 
 // DRIVES
@@ -85,14 +102,16 @@ Drives::drive_t Drives::GetDrive(int n)
 	return drives[n];
 }
 
-void Drives::Load()
+void
+Drives::NewDrive(const std::string& name, void *)
 {
-	// TODO
+	drives.push_back(Drive::Load(name));
 }
 
-void Drives::Save()
+void Drives::Load()
 {
-	// TODO
+	drives.resize(0);
+	EnumConfig(NewDrive, NULL);
 }
 
 void Drives::AddMenus(HMENU menu, bool mounted, unsigned count, const char *fmt, const char *title, int type)
@@ -141,15 +160,31 @@ void Drives::AddMenus(HMENU menu)
 void Drives::Delete(drive_t drive)
 {
 	drives.erase(std::remove(drives.begin(), drives.end(), drive), drives.end());
-	// TODO delete from configuration!
+	// delete from configuration!
+	DeleteConfig(drive->configName);
 }
 
 Drives::drive_t Drives::Add(const std::string& dir, char drive)
 {
-	// TODO remove old drive with same directory (or update drive ?? or give error ??)
-	Drives::drive_t ret(new Drive(dir, drive));
-	drives.push_back(ret);
-	ret->Save();
+	Drives::drive_t ret;
+	// we do not wants duplicate!
+	for (drives_t::iterator i = drives.begin(); ; ++i) {
+		if (i == drives.end()) {
+			ret = Drives::drive_t(new Drive(ConfigNewName(), dir, drive));
+			drives.push_back(ret);
+			break;
+		}
+		if ((*i)->dir == dir) {
+			// replace if same not mounted
+			if (!(*i)->Mounted()) {
+				ret = Drives::drive_t(new Drive((*i)->configName, dir, drive));
+				*i = ret;
+			}
+			break;
+		}
+	}
+	if (ret)
+		ret->Save();
 	return ret;
 }
 

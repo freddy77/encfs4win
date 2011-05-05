@@ -103,7 +103,7 @@ struct EncFSConfig
     unsigned char *getKeyData() const;
     unsigned char *getSaltData() const;
 
-private:
+//private:
     CipherKey makeKey(const char *password, int passwdLen);
 };
    

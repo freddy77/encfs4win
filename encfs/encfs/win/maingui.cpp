@@ -1,13 +1,16 @@
 #include <windows.h>
 #include <commctrl.h>
 #include <tchar.h>
+#include <stdio.h>
 #include <shellapi.h>
 #include <shlwapi.h>
-#include "FileUtils.h"
-#include "FSConfig.h"
+#include <stdexcept>
 #include "guiutils.h"
 #include "drives.h"
 #include "resource.h"
+#include "FileUtils.h"
+#include "Cipher.h"
+#include "BlockNameIO.h"
 
 // TODO preference, start at login
 
@@ -105,6 +108,142 @@ GetDllVersion(LPCTSTR lpszDllName)
 		return MAKEDLLVERULL(dvi.dwMajorVersion, dvi.dwMinorVersion, 0, 0);
 
 	return 0;
+}
+
+static const int NormalKDFDuration = 500;
+static const int DefaultBlockSize = 1024;
+static const int ParanoiaKDFDuration = 3000; // 3 seconds
+const int V6SubVersion = 20100713; // add version field for boost 1.42+
+
+static
+Cipher::CipherAlgorithm findCipherAlgorithm(const char *name,
+	int keySize )
+{
+	Cipher::AlgorithmList algorithms = Cipher::GetAlgorithmList();
+	Cipher::AlgorithmList::const_iterator it;
+	for(it = algorithms.begin(); it != algorithms.end(); ++it)
+	{
+		if (!strcmp( name, it->name.c_str() )
+		    && it->keyLength.allowed( keySize ))
+			return *it;
+	}
+
+	Cipher::CipherAlgorithm result;
+	return result;
+}
+
+
+static void createConfig(const std::string& rootDir, bool paranoid, const char* password)
+{
+	bool reverseEncryption = false;
+	ConfigMode configMode = paranoid ? Config_Paranoia : Config_Standard;
+    
+	int keySize = 0;
+	int blockSize = 0;
+	Cipher::CipherAlgorithm alg;
+	rel::Interface nameIOIface;
+	int blockMACBytes = 0;
+	int blockMACRandBytes = 0;
+	bool uniqueIV = false;
+	bool chainedIV = false;
+	bool externalIV = false;
+	bool allowHoles = true;
+	long desiredKDFDuration = NormalKDFDuration;
+    
+	if (reverseEncryption)
+	{
+		uniqueIV = false;
+		chainedIV = false;
+		externalIV = false;
+		blockMACBytes = 0;
+		blockMACRandBytes = 0;
+	}
+
+	if(configMode == Config_Paranoia)
+	{
+		// look for AES with 256 bit key..
+		// Use block filename encryption mode.
+		// Enable per-block HMAC headers at substantial performance penalty..
+		// Enable per-file initialization vector headers.
+		// Enable filename initialization vector chaning
+		keySize = 256;
+		blockSize = DefaultBlockSize;
+		alg = findCipherAlgorithm("AES", keySize);
+		nameIOIface = BlockNameIO::CurrentInterface();
+		blockMACBytes = 8;
+		blockMACRandBytes = 0; // using uniqueIV, so this isn't necessary
+		uniqueIV = true;
+		chainedIV = true;
+		externalIV = true;
+		desiredKDFDuration = ParanoiaKDFDuration;
+	} else {
+		// xgroup(setup)
+		// AES w/ 192 bit key, block name encoding, per-file initialization
+		// vectors are all standard.
+		keySize = 192;
+		blockSize = DefaultBlockSize;
+		alg = findCipherAlgorithm("AES", keySize);
+		blockMACBytes = 0;
+		externalIV = false;
+		nameIOIface = BlockNameIO::CurrentInterface();
+
+		if (!reverseEncryption)
+		{
+			uniqueIV = true;
+			chainedIV = true;
+		}
+	}
+
+	shared_ptr<Cipher> cipher = Cipher::New( alg.name, keySize );
+	if(!cipher)
+	{
+		char buf[256];
+		_snprintf(buf, sizeof(buf), "Unable to instanciate cipher %s, key size %i, block size %i",
+			alg.name.c_str(), keySize, blockSize);
+		throw std::runtime_error(buf);
+	}
+    
+	shared_ptr<EncFSConfig> config( new EncFSConfig );
+
+	config->cfgType = Config_V6;
+	config->cipherIface = cipher->interface();
+	config->keySize = keySize;
+	config->blockSize = blockSize;
+	config->nameIface = nameIOIface;
+	config->creator = "EncFS " VERSION;
+	config->subVersion = V6SubVersion;
+	config->blockMACBytes = blockMACBytes;
+	config->blockMACRandBytes = blockMACRandBytes;
+	config->uniqueIV = uniqueIV;
+	config->chainedNameIV = chainedIV;
+	config->externalIVChaining = externalIV;
+	config->allowHoles = allowHoles;
+
+	config->salt.clear();
+	config->kdfIterations = 0; // filled in by keying function
+	config->desiredKDFDuration = desiredKDFDuration;
+
+	int encodedKeySize = cipher->encodedKeySize();
+	unsigned char *encodedKey = new unsigned char[ encodedKeySize ];
+
+	CipherKey volumeKey = cipher->newRandomKey();
+
+	// get user key and use it to encode volume key
+	CipherKey userKey;
+	userKey = config->makeKey(password, strlen(password));
+
+	cipher->writeKey( volumeKey, encodedKey, userKey );
+	userKey.reset();
+
+	config->assignKeyData(encodedKey, encodedKeySize);
+	delete[] encodedKey;
+
+	if(!volumeKey)
+		throw std::runtime_error("Failure generating new volume key! "
+		                         "Please report this error.");
+
+	if (!saveConfig( Config_V6, rootDir, config ))
+		throw std::runtime_error("Error saving configuration file");
 }
 
 struct OptionsData
@@ -210,9 +349,7 @@ OpenOrCreate(HWND hwnd)
 		return;
 
 	// add configuration and add new drive
-	// TODO give feedback to user if failure
-	if (!createConfig(slashTerminate(dir), data.paranoia, data.password))
-		return;
+	createConfig(slashTerminate(dir), data.paranoia, data.password);
 
 	Drives::drive_t dr(Drives::Add(dir, data.drive));
 	if (dr)
@@ -277,6 +414,8 @@ MainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int id;
 
+	try {
+
 	switch (message) {
 	case WM_INITDIALOG:
 		Drives::Load();
@@ -332,6 +471,11 @@ MainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 	return 0;
+	}
+	catch (const std::runtime_error &err) {
+		MessageBox(hWnd, err.what(), "EncFS", MB_ICONERROR);
+		return 1;
+	}
 }
 
 static INT_PTR CALLBACK

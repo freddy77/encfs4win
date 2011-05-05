@@ -3,6 +3,8 @@
 #include <vector>
 #include <stdio.h>
 #include "drives.h"
+#include "guiutils.h"
+#include "FileUtils.h"
 #include "fuse.h"
 
 #if 0
@@ -49,9 +51,20 @@ void Drive::Show(HWND hwnd)
 void Drive::Mount(HWND hwnd)
 {
 	// check drive empty or require a new drive
-	if (GetDriveType(mnt) != DRIVE_NO_ROOT_DIR)
-		// TODO select another drive
-		FATAL("Drive is currently mounted");
+	while (GetDriveType(mnt) != DRIVE_NO_ROOT_DIR) {
+		char drive = SelectFreeDrive(hwnd);
+		if (!drive)
+			return;
+		sprintf(mnt, "%c:\\", drive);
+		Save();
+	}
+
+	// check directory existence
+	if (!isDirectory(dir.c_str())) {
+		if (YesNo(hwnd, "Directory does not exists. Remove from list?"))
+			Drives::Delete(shared_from_this());
+		return;
+	}
 
 	// TODO mount
 	FATAL("not implemented");
@@ -69,15 +82,20 @@ void Drive::Umount(HWND hwnd)
 	fuse_unmount(mnt, NULL);
 }
 
+void Drive::Save()
+{
+	// TODO
+}
+
 // DRIVES
 
-typedef std::vector<boost::shared_ptr<Drive> > drives_t;
+typedef std::vector<Drives::drive_t> drives_t;
 
 static drives_t drives;
 
 boost::shared_ptr<Drive> Drives::GetDrive(int n)
 {
-	if (n < 0 || n >= drives.size())
+	if (n < 0 || (unsigned) n >= drives.size())
 		return boost::shared_ptr<Drive>();
 	return drives[n];
 }
@@ -133,3 +151,9 @@ void Drives::AddMenus(HMENU menu)
 	AddMenus(menu, false, numUnmounted, "Mount %s (%c)", "Mount", IDM_TYPE_MOUNT);
 	AddMenus(menu, true, numMounted, "Unmount %s (%c)", "Unmount", IDM_TYPE_UMOUNT);
 }
+
+void Drives::Delete(drive_t drive)
+{
+	drives.erase(std::remove(drives.begin(), drives.end(), drive), drives.end());
+}
+

@@ -109,9 +109,11 @@ GetDllVersion(LPCTSTR lpszDllName)
 
 struct OptionsData
 {
-	OptionsData():paranoia(false) { password[0] = 0; }
+	OptionsData():paranoia(false),drive(0) { password[0] = 0; }
+	~OptionsData() { memset(password, 0, sizeof(password)); }
 	std::string rootDir;
 	bool paranoia;
+	char drive;
 	char password[128];
 };
 
@@ -177,36 +179,44 @@ OpenOrCreate(HWND hwnd)
 
 	if (openAlreadyOpened)
 		return;
-	openAlreadyOpened = true;
-	for (;;) {
-		std::string dir = GetExistingDirectory(hwnd, "Select a folder which contains or will contain encrypted data.", "Select Crypt Folder");
-		if (dir.empty())
-			break;
 
-		// if directory is already configured add and try to mount
-		boost::shared_ptr<EncFSConfig> config(new EncFSConfig);
-		if (readConfig(slashTerminate(dir), config) != Config_None) {
-			char drive = SelectFreeDrive(hwnd);
-			if (drive) {
-				Drives::drive_t dr(Drives::Add(dir, drive));
-				if (dr)
-					dr->Mount(hwnd);
-			}
-			break;
+	class Unique {
+	public:
+		Unique() { openAlreadyOpened = true; }
+		~Unique() { openAlreadyOpened = false; }
+	} unique;
+
+	std::string dir = GetExistingDirectory(hwnd, "Select a folder which contains or will contain encrypted data.", "Select Crypt Folder");
+	if (dir.empty())
+		return;
+
+	// if directory is already configured add and try to mount
+	boost::shared_ptr<EncFSConfig> config(new EncFSConfig);
+	if (readConfig(slashTerminate(dir), config) != Config_None) {
+		char drive = SelectFreeDrive(hwnd);
+		if (drive) {
+			Drives::drive_t dr(Drives::Add(dir, drive));
+			if (dr)
+				dr->Mount(hwnd);
 		}
-
-		// TODO check directory is empty, warning if continue
-		// "You are initializing a crypted directory with a no-empty directory. Is this expected?"
-		OptionsData data;
-		data.rootDir = dir;
-		if (DialogBoxParam(hInst, (LPCTSTR) IDD_OPTIONS, hwnd, (DLGPROC) OptionsDlgProc, (LPARAM) &data) != IDOK)
-			break;
-
-		memset(data.password, 0, sizeof(data.password));
-		// TODO add configuration and add new drive
-		break;
+		return;
 	}
-	openAlreadyOpened = false;
+
+	// TODO check directory is empty, warning if continue
+	// "You are initializing a crypted directory with a no-empty directory. Is this expected?"
+	OptionsData data;
+	data.rootDir = dir;
+	if (DialogBoxParam(hInst, (LPCTSTR) IDD_OPTIONS, hwnd, (DLGPROC) OptionsDlgProc, (LPARAM) &data) != IDOK)
+		return;
+
+	// add configuration and add new drive
+	// TODO give feedback to user if failure
+	if (!createConfig(slashTerminate(dir), data.paranoia, data.password))
+		return;
+
+	Drives::drive_t dr(Drives::Add(dir, data.drive));
+	if (dr)
+		dr->Mount(hwnd);
 }
 
 // Message handler for the app
@@ -217,6 +227,7 @@ OptionsDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	char buf1[sizeof(pData->password)];
 	char buf2[sizeof(pData->password)];
 	bool diff;
+	int i;
 
 	switch (message) {
 	case WM_INITDIALOG:
@@ -239,11 +250,16 @@ OptionsDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				MessageBox(hWnd, "Passwords don't match", "EncFS", MB_ICONERROR);
 				return TRUE;
 			}
+			i = SendDlgItemMessage(hWnd, IDC_CMBDRIVE, CB_GETCURSEL, 0, 0);
+			if (i != CB_ERR) {
+				buf1[0] = 0;
+				SendDlgItemMessage(hWnd, IDC_CMBDRIVE, CB_GETLBTEXT, i, (LPARAM) (LPTSTR) buf1);
+				pData->drive = buf1[0];
+			}
 			GetDlgItemText(hWnd, IDC_PWD1, pData->password, sizeof(pData->password));
 			EndDialog(hWnd, LOWORD(wParam));
 			return TRUE;
 		}
-		// TODO add support for options
 		break;
 	case WM_SYSCOMMAND:
 		if ((wParam & 0xFFF0) == SC_MINIMIZE)

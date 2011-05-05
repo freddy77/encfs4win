@@ -107,12 +107,23 @@ GetDllVersion(LPCTSTR lpszDllName)
 	return 0;
 }
 
+struct OptionsData
+{
+	OptionsData():paranoia(false) { password[0] = 0; }
+	std::string rootDir;
+	bool paranoia;
+	char password[128];
+};
+
 static BOOL
-OnInitDialog(HWND hWnd, const char *dir)
+OnInitDialog(HWND hWnd, OptionsData& data)
 {
 	FillFreeDrive(GetDlgItem(hWnd, IDC_CMBDRIVE));
 
-	SetDlgItemText(hWnd, IDC_DIR, dir);
+	SetDlgItemText(hWnd, IDC_DIR, data.rootDir.c_str());
+
+	if (data.paranoia)
+		SendDlgItemMessage(hWnd, IDC_CHKPARANOIA, BM_SETCHECK, BST_CHECKED, 0);
 
 	HICON hIcon;
 
@@ -186,10 +197,12 @@ OpenOrCreate(HWND hwnd)
 
 		// TODO check directory is empty, warning if continue
 		// "You are initializing a crypted directory with a no-empty directory. Is this expected?"
-
-		if (DialogBoxParam(hInst, (LPCTSTR) IDD_OPTIONS, hwnd, (DLGPROC) OptionsDlgProc, (LPARAM) dir.c_str()) != IDOK)
+		OptionsData data;
+		data.rootDir = dir;
+		if (DialogBoxParam(hInst, (LPCTSTR) IDD_OPTIONS, hwnd, (DLGPROC) OptionsDlgProc, (LPARAM) &data) != IDOK)
 			break;
 
+		memset(data.password, 0, sizeof(data.password));
 		// TODO add configuration and add new drive
 		break;
 	}
@@ -200,11 +213,33 @@ OpenOrCreate(HWND hwnd)
 static INT_PTR CALLBACK
 OptionsDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	OptionsData *pData = (OptionsData*) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+	char buf1[sizeof(pData->password)];
+	char buf2[sizeof(pData->password)];
+	bool diff;
+
 	switch (message) {
 	case WM_INITDIALOG:
-		return OnInitDialog(hWnd, (const char *) lParam);
+		pData = (OptionsData*) lParam;
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, lParam);
+		return OnInitDialog(hWnd, *pData);
 	case WM_COMMAND:
-		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
+		switch (LOWORD(wParam)) {
+		case IDCANCEL:
+			EndDialog(hWnd, LOWORD(wParam));
+			return TRUE;
+		case IDOK:
+			pData->paranoia = (IsDlgButtonChecked(hWnd, IDC_CHKPARANOIA) == BST_CHECKED);
+			GetDlgItemText(hWnd, IDC_PWD1, buf1, sizeof(buf1));
+			GetDlgItemText(hWnd, IDC_PWD2, buf2, sizeof(buf2));
+			diff = (strcmp(buf1, buf2) != 0);
+			memset(buf1, 0, sizeof(buf1));
+			memset(buf2, 0, sizeof(buf2));
+			if (diff) {
+				MessageBox(hWnd, "Passwords don't match", "EncFS", MB_ICONERROR);
+				return TRUE;
+			}
+			GetDlgItemText(hWnd, IDC_PWD1, pData->password, sizeof(pData->password));
 			EndDialog(hWnd, LOWORD(wParam));
 			return TRUE;
 		}

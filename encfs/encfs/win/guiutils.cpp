@@ -59,8 +59,11 @@ DriveDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM /* lParam*/)
 		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
 			driveSelected = 0;
 			i = SendDlgItemMessage(hDlg, IDC_CMBDRIVE, CB_GETCURSEL, 0, 0);
-			if (i != CB_ERR)
+			if (i != CB_ERR) {
+				buf[0] = 0;
 				SendDlgItemMessage(hDlg, IDC_CMBDRIVE, CB_GETLBTEXT, i, (LPARAM) (LPTSTR) buf);
+				driveSelected = buf[0];
+			}
 			EndDialog(hDlg, LOWORD(wParam));
 			return TRUE;
 		}
@@ -75,7 +78,7 @@ char SelectFreeDrive(HWND hwnd)
 	if (!drives)
 		return 0;
 
-	if (!DialogBox(hInst, (LPCTSTR) IDD_DRIVE, hwnd, (DLGPROC) DriveDlgProc) != IDOK)
+	if (DialogBox(hInst, (LPCTSTR) IDD_DRIVE, hwnd, (DLGPROC) DriveDlgProc) != IDOK)
 		return 0;
 
 	return driveSelected;

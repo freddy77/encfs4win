@@ -48,6 +48,7 @@ public:
 	static void Save();
 	static void Load();
 	static void AddMenus(HMENU menu);
+	static drive_t Add(const std::string& dir, char drive);
 private:
 	static void AddMenus(HMENU menu, bool mounted, unsigned count, const char *fmt, const char *title, int type);
 	static void Delete(drive_t);

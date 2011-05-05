@@ -7,29 +7,6 @@
 #include "FileUtils.h"
 #include "fuse.h"
 
-#if 0
-
-
-class Drive
-{
-public:
-	void Show(HWND hwnd);
-	void Mount(HWND hwnd);
-	void Umount(HWND hwnd);
-private:
-	std::string dir;
-	char drive;
-};
-
-class Drives
-{
-public:
-	static Drive* GetDrive(int n);
-	static void Save();
-	static void Load();
-};
-#endif
-
 void fatal(HWND hwnd, const char *msg)
 {
 	MessageBox(hwnd, msg, "EncFS", MB_ICONERROR);
@@ -66,8 +43,16 @@ void Drive::Mount(HWND hwnd)
 		return;
 	}
 
+	// TODO check configuration still exists ?? ... no can cause recursion problem
+
+	// ask a password to mount
+	char pass[128];
+	if (!GetPassword(hwnd, pass, sizeof(pass)))
+		return;
+
 	// TODO mount
 	FATAL("not implemented");
+	memset(pass, 0, sizeof(pass));
 }
 
 void Drive::Umount(HWND hwnd)
@@ -93,7 +78,7 @@ typedef std::vector<Drives::drive_t> drives_t;
 
 static drives_t drives;
 
-boost::shared_ptr<Drive> Drives::GetDrive(int n)
+Drives::drive_t Drives::GetDrive(int n)
 {
 	if (n < 0 || (unsigned) n >= drives.size())
 		return boost::shared_ptr<Drive>();
@@ -103,7 +88,6 @@ boost::shared_ptr<Drive> Drives::GetDrive(int n)
 void Drives::Load()
 {
 	// TODO
-	drives.push_back(boost::shared_ptr<Drive>(new Drive("c:\\test", 'x')));
 }
 
 void Drives::Save()
@@ -138,6 +122,8 @@ void Drives::AddMenus(HMENU menu, bool mounted, unsigned count, const char *fmt,
 
 void Drives::AddMenus(HMENU menu)
 {
+	// TODO check all drives, delete closed processed and so on
+
 	// counts
 	unsigned numMounted = 0, numUnmounted = 0;
 	for (drives_t::const_iterator i = drives.begin(); i != drives.end(); ++i) {
@@ -155,5 +141,15 @@ void Drives::AddMenus(HMENU menu)
 void Drives::Delete(drive_t drive)
 {
 	drives.erase(std::remove(drives.begin(), drives.end(), drive), drives.end());
+	// TODO delete from configuration!
+}
+
+Drives::drive_t Drives::Add(const std::string& dir, char drive)
+{
+	// TODO remove old drive with same directory (or update drive ?? or give error ??)
+	Drives::drive_t ret(new Drive(dir, drive));
+	drives.push_back(ret);
+	ret->Save();
+	return ret;
 }
 

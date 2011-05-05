@@ -3,6 +3,8 @@
 #include <tchar.h>
 #include <shellapi.h>
 #include <shlwapi.h>
+#include "FileUtils.h"
+#include "FSConfig.h"
 #include "guiutils.h"
 #include "drives.h"
 #include "resource.h"
@@ -11,8 +13,9 @@ NOTIFYICONDATA niData;
 
 static ULONGLONG GetDllVersion(LPCTSTR lpszDllName);
 static BOOL InitInstance(HINSTANCE hInstance, int nCmdShow);
-static INT_PTR CALLBACK DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-static LRESULT CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+static INT_PTR CALLBACK MainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+static INT_PTR CALLBACK OptionsDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+static INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 #define TRAYICONID	1
 #define SWM_TRAYMSG	WM_APP+100
@@ -40,7 +43,7 @@ InitInstance(HINSTANCE hInstance, int /* nCmdShow */)
 	// prepare for XP style controls
 	InitCommonControls();
 
-	HWND hWnd = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_DLG_DIALOG), NULL, (DLGPROC) DlgProc);
+	HWND hWnd = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_MAIN), NULL, (DLGPROC) MainDlgProc);
 	if (!hWnd)
 		return FALSE;
 
@@ -101,9 +104,11 @@ GetDllVersion(LPCTSTR lpszDllName)
 }
 
 static BOOL
-OnInitDialog(HWND hWnd)
+OnInitDialog(HWND hWnd, const char *dir)
 {
-	Drives::Load();
+	FillFreeDrive(GetDlgItem(hWnd, IDC_CMBDRIVE));
+
+	SetDlgItemText(hWnd, IDC_DIR, dir);
 
 	HICON hIcon;
 
@@ -141,21 +146,85 @@ ShowContextMenu(HWND hWnd)
 	DestroyMenu(hMenu);
 }
 
+static
+std::string slashTerminate(const std::string &src)
+{
+	std::string result = src;
+	if (result[ result.length()-1 ] != '/')
+		result.append( "/" );
+	return result;
+}
+
 static void
 OpenOrCreate(HWND hwnd)
 {
-	std::string dir = GetExistingDirectory(hwnd);
-	MessageBox(hwnd, dir.c_str(), NULL, MB_OK);
-	ShowWindow(hwnd, SW_RESTORE);
+	static bool openAlreadyOpened = false;
+
+	if (openAlreadyOpened)
+		return;
+	openAlreadyOpened = true;
+	for (;;) {
+		std::string dir = GetExistingDirectory(hwnd, "Select a folder which contains or will contain encrypted data.", "Select Crypt Folder");
+		if (dir.empty())
+			break;
+
+		// if directory is already configured add and try to mount
+		boost::shared_ptr<EncFSConfig> config(new EncFSConfig);
+		if (readConfig(slashTerminate(dir), config) != Config_None) {
+			char drive = SelectFreeDrive(hwnd);
+			if (drive) {
+				Drives::drive_t dr(Drives::Add(dir, drive));
+				if (dr)
+					dr->Mount(hwnd);
+			}
+			break;
+		}
+
+		// TODO check directory is empty
+
+		if (DialogBoxParam(hInst, (LPCTSTR) IDD_OPTIONS, hwnd, (DLGPROC) OptionsDlgProc, (LPARAM) dir.c_str()) != IDOK)
+			break;
+
+		// TODO add configuration and add new drive
+		break;
+	}
+	openAlreadyOpened = false;
 }
 
 // Message handler for the app
 static INT_PTR CALLBACK
-DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+OptionsDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message) {
+	case WM_INITDIALOG:
+		return OnInitDialog(hWnd, (const char *) lParam);
+	case WM_COMMAND:
+		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
+			EndDialog(hWnd, LOWORD(wParam));
+			return TRUE;
+		}
+		// TODO add support for options
+		break;
+	case WM_SYSCOMMAND:
+		if ((wParam & 0xFFF0) == SC_MINIMIZE)
+			return 1;
+		break;
+	case WM_CLOSE:
+		EndDialog(hWnd, IDCANCEL);
+		return TRUE;
+	}
+	return 0;
+}
+
+static INT_PTR CALLBACK
+MainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int id;
 
 	switch (message) {
+	case WM_INITDIALOG:
+		Drives::Load();
+		return TRUE;
 	case SWM_TRAYMSG:
 		switch (lParam) {
 		case WM_LBUTTONDBLCLK:
@@ -165,12 +234,6 @@ DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_RBUTTONDOWN:
 		case WM_CONTEXTMENU:
 			ShowContextMenu(hWnd);
-		}
-		break;
-	case WM_SYSCOMMAND:
-		if ((wParam & 0xFFF0) == SC_MINIMIZE) {
-			ShowWindow(hWnd, SW_HIDE);
-			return 1;
 		}
 		break;
 	case WM_COMMAND:
@@ -206,11 +269,6 @@ DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		return 1;
-	case WM_INITDIALOG:
-		return OnInitDialog(hWnd);
-	case WM_CLOSE:
-		ShowWindow(hWnd, SW_HIDE);
-		break;
 	case WM_DESTROY:
 		niData.uFlags = 0;
 		Shell_NotifyIcon(NIM_DELETE, &niData);
@@ -220,7 +278,7 @@ DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-static LRESULT CALLBACK
+static INT_PTR CALLBACK
 AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM /* lParam*/)
 {
 	switch (message) {

@@ -6,8 +6,11 @@
 #include "guiutils.h"
 #include "resource.h"
 
-static int CALLBACK BrowseProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM /* lpData */)
+static int CALLBACK BrowseProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
 {
+	if (uMsg == BFFM_INITIALIZED && lpData)
+		SetWindowText(hwnd, (LPCTSTR) lpData);
+
 	if (uMsg == BFFM_VALIDATEFAILED)
 		return 1;
 
@@ -19,7 +22,7 @@ static int CALLBACK BrowseProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM /* lp
 	return 0;
 }
 
-std::string GetExistingDirectory(HWND hwnd)
+std::string GetExistingDirectory(HWND hwnd, LPCTSTR title, LPCTSTR caption)
 {
 	BROWSEINFO bi;
 	ZeroMemory(&bi, sizeof(bi));
@@ -27,6 +30,8 @@ std::string GetExistingDirectory(HWND hwnd)
 	bi.hwndOwner = hwnd;
 	bi.ulFlags = BIF_RETURNONLYFSDIRS|BIF_USENEWUI;
 	bi.lpfn = BrowseProc;
+	bi.lpszTitle = title;
+	bi.lParam = (LPARAM) caption;
 
 	LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
 	TCHAR path[MAX_PATH];
@@ -35,34 +40,47 @@ std::string GetExistingDirectory(HWND hwnd)
 	return path;
 }
 
-static char driveSelected;
+bool FillFreeDrive(HWND combo)
+{
+	bool res = false;
+	DWORD drives = GetLogicalDrives();
+	int i;
 
-static LRESULT CALLBACK
-DriveDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM /* lParam*/)
+	for (i = 2; i < 26; ++i) {
+		char buf[16];
+
+		if (drives & (1 << i))
+			continue;
+		sprintf(buf, "%c:", 'A' + i);
+		SendMessage(combo, CB_ADDSTRING, 0, (LPARAM) (LPCTSTR) buf);
+		res = true;
+	}
+	SendMessage(combo, CB_SETCURSEL, 0, 0);
+	return res;
+}
+
+static INT_PTR CALLBACK
+DriveDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int i;
-	DWORD drives;
 	char buf[16];
+	char *pSelectedDrive = (char*) GetWindowLongPtr(hDlg, GWLP_USERDATA);
 
 	switch (message) {
 	case WM_INITDIALOG:
-		drives = GetLogicalDrives();
-		for (i = 2; i < 26; ++i) {
-			if (drives & (1 << i))
-				continue;
-			sprintf(buf, "%c:", 'A' + i);
-			SendDlgItemMessage(hDlg, IDC_CMBDRIVE, CB_ADDSTRING, 0, (LPARAM) (LPCTSTR) buf);
-		}
-		SendDlgItemMessage(hDlg, IDC_CMBDRIVE, CB_SETCURSEL, 0, 0);
+		pSelectedDrive = (char*) lParam;
+		SetWindowLongPtr(hDlg, GWLP_USERDATA, lParam);
+		*pSelectedDrive = 0;
+		FillFreeDrive(GetDlgItem(hDlg, IDC_CMBDRIVE));
 		return TRUE;
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
-			driveSelected = 0;
+			*pSelectedDrive = 0;
 			i = SendDlgItemMessage(hDlg, IDC_CMBDRIVE, CB_GETCURSEL, 0, 0);
 			if (i != CB_ERR) {
 				buf[0] = 0;
 				SendDlgItemMessage(hDlg, IDC_CMBDRIVE, CB_GETLBTEXT, i, (LPARAM) (LPTSTR) buf);
-				driveSelected = buf[0];
+				*pSelectedDrive = buf[0];
 			}
 			EndDialog(hDlg, LOWORD(wParam));
 			return TRUE;
@@ -78,8 +96,47 @@ char SelectFreeDrive(HWND hwnd)
 	if (!drives)
 		return 0;
 
-	if (DialogBox(hInst, (LPCTSTR) IDD_DRIVE, hwnd, (DLGPROC) DriveDlgProc) != IDOK)
+	char selectedDrive;
+	if (DialogBoxParam(hInst, (LPCTSTR) IDD_DRIVE, hwnd, (DLGPROC) DriveDlgProc, (LPARAM) &selectedDrive) != IDOK)
 		return 0;
 
-	return driveSelected;
+	return selectedDrive;
+}
+
+struct PasswordData {
+	char *buf;
+	size_t len;
+};
+
+static INT_PTR CALLBACK
+PasswordDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	PasswordData *pData = (PasswordData*) GetWindowLongPtr(hDlg, GWLP_USERDATA);
+
+	switch (message) {
+	case WM_INITDIALOG:
+		pData = (PasswordData*) lParam;
+		SetWindowLongPtr(hDlg, GWLP_USERDATA, lParam);
+		pData->buf[0] = 0;
+		return TRUE;
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDCANCEL:
+			EndDialog(hDlg, LOWORD(wParam));
+			return TRUE;
+		case IDOK:
+			GetDlgItemText(hDlg, IDC_PASSWORD, pData->buf, pData->len);
+			EndDialog(hDlg, LOWORD(wParam));
+			return TRUE;
+		}
+		break;
+	}
+	return FALSE;
+}
+
+bool GetPassword(HWND hwnd, char *pass, size_t len)
+{
+	PasswordData data = { pass, len };
+	
+	return DialogBoxParam(hInst, (LPCTSTR) IDD_PASSWORD, hwnd, (DLGPROC) PasswordDlgProc, (LPARAM) &data) == IDOK;
 }

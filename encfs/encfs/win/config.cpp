@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string>
 #include <stdexcept>
+#include "config.hpp"
 
 using namespace std;
 
@@ -29,7 +30,7 @@ private:
 	HKEY key;
 };
 
-void SaveConfig(const std::string& name, const std::string& entry, const std::string& value)
+void Config::Save(const std::string& name, const std::string& entry, const std::string& value)
 {
 	HKEY hkey;
 	if (RegCreateKeyEx(RootKey(), name.c_str(), 0, NULL, 0, KEY_SET_VALUE, NULL, &hkey, NULL) != ERROR_SUCCESS)
@@ -39,7 +40,7 @@ void SaveConfig(const std::string& name, const std::string& entry, const std::st
 		throw runtime_error("writing configuration");
 }
 
-std::string LoadConfig(const std::string& name, const std::string& entry)
+std::string Config::Load(const std::string& name, const std::string& entry)
 {
 	HKEY hkey;
 	if (RegOpenKeyEx(RootKey(), name.c_str(), 0, KEY_QUERY_VALUE, &hkey) != ERROR_SUCCESS)
@@ -52,7 +53,7 @@ std::string LoadConfig(const std::string& name, const std::string& entry)
 	return buf;
 }
 
-void EnumConfig(void (*proc)(const std::string& name, void* param), void *param)
+void Config::Enum(void (*proc)(const std::string& name, void* param), void *param)
 {
 	DWORD i;
 	for (i = 0; ; ++i) {
@@ -64,12 +65,12 @@ void EnumConfig(void (*proc)(const std::string& name, void* param), void *param)
 	}
 }
 
-void DeleteConfig(const std::string& name)
+void Config::Delete(const std::string& name)
 {
 	RegDeleteKey(RootKey(), name.c_str());
 }
 
-std::string ConfigNewName()
+std::string Config::NewName()
 {
 	for (unsigned n = 1; n < 100; ++n) {
 		char name[20];

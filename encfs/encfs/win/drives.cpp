@@ -70,19 +70,19 @@ void Drive::Umount(HWND hwnd)
 
 void Drive::Save()
 {
-	SaveConfig(configName, "Directory", dir);
-	SaveConfig(configName, "Drive", mnt);
+	Config::Save(configName, "Directory", dir);
+	Config::Save(configName, "Drive", mnt);
 }
 
 boost::shared_ptr<Drive> Drive::Load(const std::string& name)
 {
 	boost::shared_ptr<Drive> ret;
-	std::string dir = LoadConfig(name, "Directory");
-	std::string drive = LoadConfig(name, "Drive");
+	std::string dir = Config::Load(name, "Directory");
+	std::string drive = Config::Load(name, "Drive");
 	char c = 0;
 	if (!drive.empty()) c = toupper(drive[0]);
 	if (c < 'C' || c > 'Z') {
-		DeleteConfig(name);
+		Config::Delete(name);
 		return ret;
 	}
 	ret = boost::shared_ptr<Drive>(new Drive(name, dir, c));
@@ -111,7 +111,7 @@ Drives::NewDrive(const std::string& name, void *)
 void Drives::Load()
 {
 	drives.resize(0);
-	EnumConfig(NewDrive, NULL);
+	Config::Enum(NewDrive, NULL);
 }
 
 void Drives::AddMenus(HMENU menu, bool mounted, unsigned count, const char *fmt, const char *title, int type)
@@ -161,7 +161,7 @@ void Drives::Delete(drive_t drive)
 {
 	drives.erase(std::remove(drives.begin(), drives.end(), drive), drives.end());
 	// delete from configuration!
-	DeleteConfig(drive->configName);
+	Config::Delete(drive->configName);
 }
 
 Drives::drive_t Drives::Add(const std::string& dir, char drive)
@@ -170,7 +170,7 @@ Drives::drive_t Drives::Add(const std::string& dir, char drive)
 	// we do not wants duplicate!
 	for (drives_t::iterator i = drives.begin(); ; ++i) {
 		if (i == drives.end()) {
-			ret = Drives::drive_t(new Drive(ConfigNewName(), dir, drive));
+			ret = Drives::drive_t(new Drive(Config::NewName(), dir, drive));
 			drives.push_back(ret);
 			break;
 		}

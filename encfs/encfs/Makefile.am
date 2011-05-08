@@ -102,7 +102,7 @@ encfsw_SOURCES = win/main3.cpp
 encfsw_LDFLAGS = -Wl,--subsystem,windows
 
 libencfsall_la_SOURCES = ${libencfs_la_SOURCES} encfs.cpp main.cpp encfsctl.cpp \
-	win/maingui.cpp win/guiutils.cpp win/drives.cpp win/config.cpp
+	win/maingui.cpp win/guiutils.cpp win/drives.cpp win/config.cpp win/subprocess.cpp
 libencfsall_la_LDFLAGS = -version-info 1:0:0 -no-undefined -Wl,encfs.def -Wl,win/resource.res
 libencfsall_la_LIBADD = @RLOG_LIBS@ \
 	@OPENSSL_LIBS@ \
@@ -144,7 +144,8 @@ noinst_HEADERS = \
     readpassphrase.h \
     SSL_Cipher.h \
     StreamNameIO.h \
-    win/guiutils.h
+    win/guiutils.h \
+    win/subprocess.h
 
 man_MANS=encfs.1 encfsctl.1
 EXTRA_DIST = encfs.pod encfsctl.pod encfs.1 encfsctl.1 encfs-man.html

@@ -2,6 +2,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include "config.hpp"
+#include "subprocess.h"
 
 enum {
 	IDM_MOUNT_MAX = 256,
@@ -33,11 +34,13 @@ public:
 	void Mount(HWND hwnd);
 	void Umount(HWND hwnd);
 	bool Mounted() const { return mounted; }
+	void CheckMounted();
 private:
 	std::string configName;
 	std::string dir;
 	char mnt[4];
 	bool mounted;
+	boost::shared_ptr<SubProcessInformations> subProcess;
 	Drive(const std::string& configName, const std::string& _dir, char drive);
 	void Save();
 	static boost::shared_ptr<Drive> Load(const std::string& name);

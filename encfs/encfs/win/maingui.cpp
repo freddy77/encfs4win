@@ -25,11 +25,25 @@ static INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPA
 #define TRAYICONID	1
 #define SWM_TRAYMSG	WM_APP+100
 
+static void SetPath()
+{
+	char path[MAX_PATH];
+	if (!GetModuleFileName(GetModuleHandle(NULL), path, sizeof(path)))
+		return;
+	char *p = strrchr(path, '\\');
+	if (!p)
+		return;
+	*p = 0;
+	SetCurrentDirectory(path);
+}
+
 extern "C" int main_gui(HINSTANCE /* hInstance */, HINSTANCE /* hPrevInstance */ , LPSTR /* lpCmdLine */ ,int nCmdShow)
 {
 	MSG msg;
 
 	// TODO check Dokan version
+
+	SetPath();
 
 	if (!InitInstance(hInst, nCmdShow))
 		return FALSE;

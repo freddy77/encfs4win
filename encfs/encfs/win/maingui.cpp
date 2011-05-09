@@ -12,7 +12,7 @@
 #include "Cipher.h"
 #include "BlockNameIO.h"
 
-// TODO preference, start at login
+// TODO preferences ??
 
 NOTIFYICONDATA niData;
 
@@ -60,6 +60,40 @@ static bool CheckDokan()
 	return res;
 }
 
+static const char autoStartValueName[] = "{78269e54-bfb5-44ed-a8fd-3e04058428e5}";
+static const char autoStartKeyName[] = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
+
+void EnableAutoStart(bool enable=true)
+{
+	char value[MAX_PATH+20];
+	if (!GetModuleFileName(GetModuleHandle(NULL), value+1, sizeof(value)-20))
+		return;
+	value[0] = '\"';
+	strcat(value, "\" --auto");
+
+	HKEY hkey;
+	if (RegCreateKeyEx(HKEY_CURRENT_USER, autoStartKeyName, 0, NULL, 0, KEY_SET_VALUE, NULL, &hkey, NULL) != ERROR_SUCCESS)
+		return;
+	if (enable)
+		RegSetValueEx(hkey, autoStartValueName, 0, REG_SZ, (const BYTE*) value, strlen(value)+1);
+	else
+		RegDeleteValue(hkey, autoStartValueName);
+	RegCloseKey(hkey);
+}
+
+bool CheckAutoStart()
+{
+	HKEY hkey;
+	if (RegOpenKeyEx(HKEY_CURRENT_USER, autoStartKeyName, 0, KEY_QUERY_VALUE, &hkey) != ERROR_SUCCESS)
+		return false;
+
+	bool res = true;
+	if (RegQueryValueEx(hkey, autoStartValueName, NULL, NULL, NULL, NULL) == ERROR_FILE_NOT_FOUND)
+		res = false;
+	RegCloseKey(hkey);
+	return res;
+}
+
 extern "C" int main_gui(HINSTANCE /* hInstance */, HINSTANCE /* hPrevInstance */ , LPSTR /* lpCmdLine */ ,int nCmdShow)
 {
 	MSG msg;
@@ -70,6 +104,7 @@ extern "C" int main_gui(HINSTANCE /* hInstance */, HINSTANCE /* hPrevInstance */
 	// check Dokan version
 	if (!CheckDokan()) {
 		MessageBox(NULL, "Dokan library not found or wrong version.\r\nencfs4win require Dokan 0.6.0 or later.", "EncFS", MB_ICONERROR);
+		EnableAutoStart(false);
 		return 1;
 	}
 
@@ -340,6 +375,7 @@ ShowContextMenu(HWND hWnd)
 	AppendMenu(hMenu, 0, IDM_OPEN, _T("Open/Create"));
 	AppendMenu(hMenu, MF_MENUBREAK, -1, NULL);
 	Drives::AddMenus(hMenu);
+	AppendMenu(hMenu, CheckAutoStart() ? MF_CHECKED : 0, IDM_AUTOSTART, _T("Start at login"));
 	AppendMenu(hMenu, 0, IDM_ABOUT, _T("About"));
 	AppendMenu(hMenu, 0, IDM_EXIT, _T("Exit"));
 	SetMenuDefaultItem(hMenu, IDM_OPEN, FALSE);
@@ -490,6 +526,9 @@ MainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case IDM_ABOUT:
 			DialogBox(hInst, (LPCTSTR) IDD_ABOUTBOX, hWnd, (DLGPROC) AboutDlgProc);
+			break;
+		case IDM_AUTOSTART:
+			EnableAutoStart(!CheckAutoStart());
 			break;
 		default:
 			if (id >= IDM_MOUNT_START && id < IDM_MOUNT_END) {

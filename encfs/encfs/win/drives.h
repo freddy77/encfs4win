@@ -42,7 +42,7 @@ private:
 	char mnt[4];
 	bool mounted;
 	boost::shared_ptr<SubProcessInformations> subProcess;
-	Drive(const std::string& configName, const std::string& _dir, char drive);
+	Drive(const std::string& configName, const std::string& _dir, char drive, DWORD pid = 0);
 	void Save();
 	static boost::shared_ptr<Drive> Load(const std::string& name);
 };

@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <tlhelp32.h>
 #include <string>
 #include <vector>
 #include <stdio.h>
@@ -8,10 +9,20 @@
 #include "FileUtils.h"
 #include "fuse.h"
 
-Drive::Drive(const std::string& _configName, const std::string& _dir, char drive):
+static HANDLE GetOldSubProject(DWORD pid);
+
+Drive::Drive(const std::string& _configName, const std::string& _dir, char drive, DWORD pid):
 	configName(_configName), dir(_dir), mounted(false)
 {
 	sprintf(mnt, "%c:\\", drive);
+
+	HANDLE hProcess = GetOldSubProject(pid);
+	if (hProcess) {
+		subProcess.reset(new SubProcessInformations);
+		subProcess->pid = pid;
+		subProcess->hProcess = hProcess;
+		mounted = true;
+	}
 }
 
 void Drive::Show(HWND hwnd)
@@ -173,6 +184,27 @@ void Drive::Save()
 	Config::Save(configName, "Pid", buf);
 }
 
+static HANDLE GetOldSubProject(DWORD pid)
+{
+	HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, pid);
+	if (!snap)
+		return NULL;
+
+	MODULEENTRY32 module;
+	if (!Module32First(snap, &module)) {
+		CloseHandle(snap);
+		return NULL;
+	}
+
+	CharLower(module.szExePath);
+	char *p = strstr(module.szExePath, "encfs.exe");
+	CloseHandle(snap);
+	if (p && (p == module.szExePath || p[-1] == '\\' || p[-1] == '\"'))
+		return OpenProcess(SYNCHRONIZE|PROCESS_QUERY_INFORMATION|PROCESS_TERMINATE, FALSE, pid);
+
+	return NULL;
+}
+
 boost::shared_ptr<Drive> Drive::Load(const std::string& name)
 {
 	boost::shared_ptr<Drive> ret;
@@ -193,8 +225,15 @@ boost::shared_ptr<Drive> Drive::Load(const std::string& name)
 		Config::Delete(name);
 		return ret;
 	}
-	// TODO handle resume
-	ret = boost::shared_ptr<Drive>(new Drive(name, dir, c));
+
+	// handle resume
+	unsigned n = strtoul(pid.c_str(), NULL, 10);
+	char mnt[4];
+	sprintf(mnt, "%c:\\", c);
+	if (n <= 0 || GetDriveType(mnt) == DRIVE_NO_ROOT_DIR)
+		n = 0;
+
+	ret.reset(new Drive(name, dir, c, n));
 	return ret;
 }
 

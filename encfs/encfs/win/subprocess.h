@@ -2,7 +2,7 @@
 struct SubProcessInformations
 {
 	SubProcessInformations():
-		creationFlags(CREATE_NEW_PROCESS_GROUP|CREATE_NO_WINDOW),
+		creationFlags(0),
 		pid(0), hProcess(NULL), hIn(NULL), hOut(NULL), hErr(NULL),
 		errorPart(NULL)
 	{ }

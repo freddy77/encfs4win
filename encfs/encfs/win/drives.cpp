@@ -54,7 +54,7 @@ void Drive::Mount(HWND hwnd)
 	char cmd[2048];
 	_snprintf(cmd, sizeof(cmd), "\"%s\" -S \"%s\" %c:", executable, dir.c_str(), mnt[0]);
 	boost::shared_ptr<SubProcessInformations> proc(new SubProcessInformations);
-	proc->creationFlags = CREATE_NO_WINDOW;
+	proc->creationFlags = CREATE_NEW_PROCESS_GROUP|CREATE_NO_WINDOW;
 	if (!CreateSubProcess(cmd, proc.get())) {
 		DWORD err = GetLastError();
 		memset(pass, 0, sizeof(pass));
@@ -99,6 +99,13 @@ void Drive::Mount(HWND hwnd)
 	Save(); // save for resume
 }
 
+extern "C" BOOL WINAPI AttachConsole(DWORD);
+
+static BOOL WINAPI HandlerRoutine(DWORD)
+{
+	return TRUE;
+}
+
 void Drive::Umount(HWND)
 {
 	// check mounted
@@ -112,10 +119,23 @@ void Drive::Umount(HWND)
 	fuse_unmount(mnt, NULL);
 
 	if (subProcess) {
-		GenerateConsoleCtrlEvent(CTRL_C_EVENT, subProcess->pid);
-		GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, subProcess->pid);
-		WaitForSingleObject(subProcess->hProcess, 1000);
-		TerminateProcess(subProcess->hProcess, 0);
+		// attach console to allow sending ctrl-c
+		AttachConsole(subProcess->pid);
+
+		// disable ctrl-c to not exit this process
+		SetConsoleCtrlHandler(HandlerRoutine, TRUE);
+
+		if (!GenerateConsoleCtrlEvent(CTRL_C_EVENT, subProcess->pid)
+		    && !GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, subProcess->pid))
+			TerminateProcess(subProcess->hProcess, 0);
+
+		// force exit
+		if (WaitForSingleObject(subProcess->hProcess, 2000) == WAIT_TIMEOUT)
+			TerminateProcess(subProcess->hProcess, 0);
+			
+		// close the console
+		FreeConsole();
+		SetConsoleCtrlHandler(HandlerRoutine, FALSE);
 	}
 	CheckMounted();
 }

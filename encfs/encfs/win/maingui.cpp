@@ -45,8 +45,14 @@ extern "C" int main_gui(HINSTANCE /* hInstance */, HINSTANCE /* hPrevInstance */
 
 	SetPath();
 
+	// does not allow multiple instances
+	if (CreateMutex(NULL, TRUE, "mtx78269e54-bfb5-44ed-a8fd-3e04058428e5") == NULL)
+		return 1;
+	if (GetLastError() == ERROR_ALREADY_EXISTS)
+		return 0;
+
 	if (!InitInstance(hInst, nCmdShow))
-		return FALSE;
+		return 1;
 
 	while (GetMessage(&msg, NULL, 0, 0)) {
 		if (!IsDialogMessage(msg.hwnd, &msg)) {

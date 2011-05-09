@@ -37,13 +37,41 @@ static void SetPath()
 	SetCurrentDirectory(path);
 }
 
+#define DOKAN_VERSION           600
+
+static bool CheckDokan()
+{
+	bool res = true;
+
+	HMODULE dll = LoadLibraryA("dokan.dll");
+	if (!dll)
+		return false;
+
+	// check version
+	typedef ULONG (__stdcall *DokanVersionType)();
+	DokanVersionType ResolvedDokanVersion;
+	ResolvedDokanVersion=(DokanVersionType)GetProcAddress(dll,"DokanVersion");
+	if (!ResolvedDokanVersion || ResolvedDokanVersion() < DOKAN_VERSION)
+		res = false;
+
+	if (!GetProcAddress(dll,"DokanMain") || !GetProcAddress(dll,"DokanUnmount"))
+		res = false;
+	FreeLibrary(dll);
+	return res;
+}
+
 extern "C" int main_gui(HINSTANCE /* hInstance */, HINSTANCE /* hPrevInstance */ , LPSTR /* lpCmdLine */ ,int nCmdShow)
 {
 	MSG msg;
 
-	// TODO check Dokan version
-
+	// set path in order to find encfs.exe
 	SetPath();
+
+	// check Dokan version
+	if (!CheckDokan()) {
+		MessageBox(NULL, "Dokan library not found or wrong version.\r\nencfs4win require Dokan 0.6.0 or later.", "EncFS", MB_ICONERROR);
+		return 1;
+	}
 
 	// does not allow multiple instances
 	if (CreateMutex(NULL, TRUE, "mtx78269e54-bfb5-44ed-a8fd-3e04058428e5") == NULL)

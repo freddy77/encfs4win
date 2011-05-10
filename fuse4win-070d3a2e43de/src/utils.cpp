@@ -3,17 +3,182 @@
 #include <sys/stat.h>
 #include "utils.h"
 
+typedef unsigned int ICONV_CHAR;
+
+#if defined(__GNUC__) && __GNUC__ >= 3
+# define unlikely(x)	__builtin_expect(!!(x), 0)
+#else
+# define unlikely(x)	(x)
+#endif
+
+#define GET_A2(p) (*((unsigned short*)(p)))
+#define PUT_A2(buf, c) do { *((unsigned short*)(buf)) = (c); } while(0)
+
+static const unsigned char utf8_lengths[256] = {
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 0, 0,
+};
+
+static const unsigned char utf8_masks[7] = {
+	0, 0x7f, 0x1f, 0x0f, 0x07, 0x03, 0x01
+};
+
+static int
+get_utf8(const unsigned char *p, size_t len, ICONV_CHAR *out)
+{
+	ICONV_CHAR uc;
+	size_t l;
+
+	l = utf8_lengths[p[0]];
+	if (unlikely(l == 0))
+		return -EILSEQ;
+	if (unlikely(len < l))
+		return -EINVAL;
+
+	len = l;
+	uc = *p++ & utf8_masks[l];
+	while(--l)
+		uc = (uc << 6) | (*p++ & 0x3f);
+	*out = uc;
+	return len;
+}
+
+static int
+put_utf8(unsigned char *buf, ICONV_CHAR c)
+{
+#define MASK(n) ((0xffffffffu << (n)) & 0xffffffffu)
+	size_t o_len;
+	unsigned mask;
+
+	if ((c & MASK(7)) == 0) {
+		*buf = (unsigned char) c;
+		return 1;
+	}
+
+	o_len = 2;
+	for (;;) {
+		if ((c & MASK(11)) == 0)
+			break;
+		++o_len;
+		if ((c & MASK(16)) == 0)
+			break;
+		++o_len;
+		if ((c & MASK(21)) == 0)
+			break;
+		++o_len;
+		if ((c & MASK(26)) == 0)
+			break;
+		++o_len;
+		if ((c & MASK(31)) != 0)
+			return -EINVAL;
+	}
+
+	buf += o_len;
+	mask = 0xff80;
+	for (;;) {
+		*--buf = 0x80 | (c & 0x3f);
+		c >>= 6;
+		mask >>= 1;
+		if (c < 0x40) {
+			*--buf = mask | c;
+			break;
+		}
+	}
+	return o_len;
+}
+
+static int
+get_utf16(const unsigned char *p, size_t len, ICONV_CHAR *out)
+{
+	ICONV_CHAR c, c2;
+
+	if (len < 2)
+		return -EINVAL;
+	c = GET_A2(p);
+	if ((c & 0xfc00) == 0xd800) {
+		if (len < 4)
+			return -EINVAL;
+		c2 = GET_A2(p+2);
+		if ((c2 & 0xfc00) != 0xdc00)
+			return -EILSEQ;
+		*out = (c << 10) + c2 - ((0xd800 << 10) + 0xdc00 - 0x10000);
+		return 4;
+	}
+	*out = c;
+	return 2;
+}
+
+static int
+put_utf16(unsigned char *buf, ICONV_CHAR c)
+{
+	if (c >= 0x110000u)
+		return -EILSEQ;
+	if (c < 0x10000u) {
+		PUT_A2(buf, c);
+		return 2;
+	}
+	c -= 0x10000u;
+	PUT_A2(buf,   0xd800 + (c >> 10));
+	PUT_A2(buf+2, 0xdc00 + (c & 0x3ffu));
+	return 4;
+}
+
+typedef int (*get_conver_t)(const unsigned char *p, size_t len, ICONV_CHAR *out);
+typedef int (*put_convert_t)(unsigned char *buf, ICONV_CHAR c);
+
+static int convert_char(get_conver_t get_func, put_convert_t put_func, const void *src, size_t src_len, void *dest)
+{
+	size_t il = src_len;
+	const unsigned char* ib = (const unsigned char*) src;
+	unsigned char* ob = (unsigned char*) dest;
+	int total = 0;
+
+	while (il) {
+		ICONV_CHAR out_c;
+		int readed = get_func(ib, il, &out_c);
+		if (unlikely(readed < 0))
+			return -1;
+		il -= readed;
+		ib += readed;
+
+		unsigned char dummy[8];
+		int written = put_func(ob ? ob : dummy, out_c);
+		if (unlikely(written < 0))
+			return -1;
+
+		if (ob)
+			ob += written;
+		total += written;
+	}
+	return total;
+}
+
 static char* wchar_to_utf8(const wchar_t* str)
 {
 	if (str==NULL)
 		return NULL;
 	
 	//Determine required length
-	int ln=WideCharToMultiByte(CP_ACP,0,str,-1,NULL,0,NULL,NULL);
+	int ln=convert_char(get_utf16, put_utf8, str, (wcslen(str)+1)*sizeof(wchar_t), NULL);
+	if (ln <= 0) return NULL;
 	char *res=(char *)malloc(sizeof(char)*ln);
 
 	//Convert to Unicode
-	WideCharToMultiByte(CP_ACP,0,str,-1,res,ln,NULL,NULL);
+	convert_char(get_utf16, put_utf8, str, (wcslen(str)+1)*sizeof(wchar_t), res);
 	return res;
 }
 
@@ -21,13 +186,13 @@ void utf8_to_wchar_buf(const char *src, wchar_t *res, int maxlen)
 {
 	if (res==NULL || maxlen==0) return;
 
-	int ln=MultiByteToWideChar(CP_ACP,0,src,-1,NULL,0)/* | raise_w32_error()*/;
-	if (ln>=maxlen)
+	int ln=convert_char(get_utf8, put_utf16, src, strlen(src)+1, NULL);/* | raise_w32_error()*/;
+	if (ln <= 0 || ln>=maxlen)
 	{
 		*res=L'\0';
 		return;
 	}
-	MultiByteToWideChar(CP_ACP,0,src,-1,res,(int)(strlen(src)+1))/* | raise_w32_error()*/;
+	convert_char(get_utf8, put_utf16, src, strlen(src)+1, res);/* | raise_w32_error()*/;
 }
 
 std::string wchar_to_utf8_cstr(const wchar_t *str)

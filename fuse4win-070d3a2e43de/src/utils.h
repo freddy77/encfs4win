@@ -11,8 +11,6 @@
 #define DLLLOCAL __attribute__ ((visibility("hidden")))
 #endif*/
 
-char* wchar_to_utf8(const wchar_t* str);
-wchar_t* utf8_to_wchar(const char *str);
 void utf8_to_wchar_buf(const char *src, wchar_t *res, int maxlen);
 std::string wchar_to_utf8_cstr(const wchar_t *str);
 

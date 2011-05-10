@@ -3,7 +3,7 @@
 #include <sys/stat.h>
 #include "utils.h"
 
-char* wchar_to_utf8(const wchar_t* str)
+static char* wchar_to_utf8(const wchar_t* str)
 {
 	if (str==NULL)
 		return NULL;
@@ -14,19 +14,6 @@ char* wchar_to_utf8(const wchar_t* str)
 
 	//Convert to Unicode
 	WideCharToMultiByte(CP_ACP,0,str,-1,res,ln,NULL,NULL);
-	return res;
-}
-
-wchar_t* utf8_to_wchar(const char *str)
-{
-	if (str==NULL)
-		return NULL;
-	//Determine required length
-	int ln=MultiByteToWideChar(CP_ACP,0,str,-1,NULL,0)/* | raise_w32_error()*/;
-	wchar_t *res=(wchar_t *)malloc(sizeof(wchar_t)*ln);
-
-	//Convert to Unicode
-	MultiByteToWideChar(CP_ACP,0,str,-1,res,(int)(strlen(str)+1))/* | raise_w32_error()*/;
 	return res;
 }
 

@@ -1,0 +1,26 @@
+#!/bin/bash
+set -e
+pushd ..
+DIR=$PWD
+popd
+DIST=encfs4win
+rm -rf $DIST
+mkdir $DIST
+cd $DIST
+FILES='encfs.exe encfsw.exe encfsctl.exe encfs1.dll'
+for F in $FILES; do
+	cp $DIR/out/bin/$F .
+done
+i586-mingw32msvc-strip $FILES
+cp $DIR/web/encfs_mount.cmd .
+FILES="$FILES encfs_mount.cmd"
+cd ..
+zip -r9 encfs.zip $DIST
+cd $DIST
+rm $FILES
+mv ../encfs.zip .
+MD5=$(md5sum encfs.zip | awk '{print $1}')
+perl -pe "s/\(md5 [^)]+\)/(md5 $MD5)/" < $DIR/web/encfs.html > encfs.html
+cp encfs.html encfs.zip ../remote/soci/homepages/freddy77/
+##rm encfs.html
+echo Ok

@@ -77,6 +77,8 @@ ssize_t pread(int fd, void *buf, size_t count, __int64 offset)
 	ov.Offset = (DWORD) offset;
 	ov.OffsetHigh = (DWORD) (offset>>32);
 	if (!ReadFile(h, buf, count, &len, &ov)) {
+		if (GetLastError() == ERROR_HANDLE_EOF)
+			return 0;
 		errno = EIO;
 		return -1;
 	}

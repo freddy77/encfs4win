@@ -142,8 +142,11 @@ int main()
 	printf("rename to an open file\n");
 	h1 = CreateFile(fn2, SYNCHRONIZE|FILE_WRITE_DATA, FILE_SHARE_WRITE|FILE_SHARE_READ, NULL, CREATE_ALWAYS, 0, NULL);
 	CHECK(h1 != INVALID_HANDLE_VALUE, "create failed");
-	CHECK(!MoveFile(fn, fn2), "move succeeded");
+	CHECK(!MoveFile(fn, fn2) && GetLastError() == ERROR_ALREADY_EXISTS, "move succeeded");
 	CloseHandle(h1);
+	CHECK(!MoveFile(fn, fn2) && GetLastError() == ERROR_ALREADY_EXISTS, "move succeeded");
+	CHECK(MoveFileEx(fn, fn2, MOVEFILE_REPLACE_EXISTING), "move failed");
+	CHECK(MoveFile(fn2, fn), NULL);
 	DeleteFile(fn2);
 
 	printf("time check and attributes\n");

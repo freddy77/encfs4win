@@ -248,6 +248,14 @@ int impl_fuse_context::walk_directory(void *buf, const char *name,
 	WIN32_FIND_DATAW find_data={0};	
 
 	utf8_to_wchar_buf(name,find_data.cFileName,MAX_PATH);
+	// fix name if wrong encoding
+	if (!find_data.cFileName[0]) {
+		struct FUSE_STAT stbuf={0};
+		utf8_to_wchar_buf_old(name,find_data.cFileName,MAX_PATH);
+		std::string new_name = wchar_to_utf8_cstr(find_data.cFileName);
+		if (wd->ctx->ops_.getattr && wd->ctx->ops_.rename && new_name.length() && wd->ctx->ops_.getattr(new_name.c_str(),&stbuf) == -ENOENT)
+			wd->ctx->ops_.rename(name, new_name.c_str());
+	}
 	memset(find_data.cAlternateFileName, 0, sizeof(find_data.cAlternateFileName));
 
 	struct FUSE_STAT stat={0};

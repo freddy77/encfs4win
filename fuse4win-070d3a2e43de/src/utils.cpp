@@ -195,6 +195,20 @@ void utf8_to_wchar_buf(const char *src, wchar_t *res, int maxlen)
 	convert_char(get_utf8, put_utf16, src, strlen(src)+1, res);/* | raise_w32_error()*/;
 }
 
+void utf8_to_wchar_buf_old(const char *src, wchar_t *res, int maxlen)
+{
+	if (res==NULL || maxlen==0) return;
+
+	int ln=MultiByteToWideChar(CP_ACP,0,src,-1,NULL,0)/* | raise_w32_error()*/;
+	if (ln>=maxlen)
+	{
+		*res=L'\0';
+		return;
+	}
+	MultiByteToWideChar(CP_ACP,0,src,-1,res,(int)(strlen(src)+1))/* | raise_w32_error()*/;
+}
+
+
 std::string wchar_to_utf8_cstr(const wchar_t *str)
 {
 	char *utf=wchar_to_utf8(str);

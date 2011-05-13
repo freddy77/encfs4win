@@ -201,7 +201,7 @@ static int DOKAN_CALLBACK FuseCreateFile(
 	}
 	
 	impl_chain_guard guard(impl,DokanFileInfo->ProcessId);
-	return -errno_to_win32_error(impl->create_file(FileName,AccessMode,ShareMode,
+	return -win_error(impl->create_file(FileName,AccessMode,ShareMode,
 		CreationDisposition,FlagsAndAttributes,DokanFileInfo));
 }
 
@@ -225,7 +225,7 @@ static int DOKAN_CALLBACK FuseReadFile(
 			   PDOKAN_FILE_INFO		DokanFileInfo)
 {
 	impl_fuse_context *impl=the_impl;
-	if (impl->debug()) FWPRINTF(stderr, L"ReadFile : %s\n", FileName);
+	if (impl->debug()) FWPRINTF(stderr, L"ReadFile : %s from %I64d len %u\n", FileName, (__int64) Offset, (unsigned) BufferLength);
 	
 	impl_chain_guard guard(impl,DokanFileInfo->ProcessId);
 	return -errno_to_win32_error(impl->read_file(FileName,Buffer,

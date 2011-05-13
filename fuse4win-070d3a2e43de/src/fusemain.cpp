@@ -417,7 +417,7 @@ int impl_fuse_context::delete_directory(LPCWSTR file_name,
 	return ops_.rmdir(fname.c_str());
 }
 
-int impl_fuse_context::create_file(LPCWSTR file_name, DWORD access_mode, 
+win_error impl_fuse_context::create_file(LPCWSTR file_name, DWORD access_mode, 
 								   DWORD share_mode, DWORD creation_disposition, 
 								   DWORD flags_and_attributes, 
 								   PDOKAN_FILE_INFO dokan_file_info)
@@ -470,7 +470,7 @@ int impl_fuse_context::create_file(LPCWSTR file_name, DWORD access_mode,
 				CHECKED(ops_.truncate(fname.c_str(),0));
 			} else if (creation_disposition==CREATE_NEW)
 			{
-				return -EEXIST;
+				return win_error(ERROR_FILE_EXISTS, true);
 			}
 
 			return do_open_file(file_name, share_mode, access_mode, dokan_file_info);
@@ -651,6 +651,9 @@ int impl_fuse_context::move_file(LPCWSTR file_name, LPCWSTR new_file_name,
 	struct FUSE_STAT stbuf={0};
 	if (ops_.getattr(new_name.c_str(),&stbuf)!=-ENOENT)
 	{
+		if (!replace_existing)
+			return -EEXIST;
+
 		//Cannot delete directory
 		if ((stbuf.st_mode&S_IFDIR)!=0) return -EISDIR;
 		if (!ops_.unlink) return -EINVAL;

@@ -46,7 +46,15 @@ public:
 };
 impl_fuse_context* get_cur_impl();
 
-
+class win_error
+{
+public:
+	win_error(int _err): err(errno_to_win32_error(_err)) {}
+	win_error(int _err, bool): err(_err) {}
+	operator int() { return err; }
+private:
+	int err;
+};
 /*
 	FUSE filesystem context
 */
@@ -110,7 +118,7 @@ public:
 
 	int delete_directory(LPCWSTR file_name, PDOKAN_FILE_INFO dokan_file_info);
 
-	int create_file(LPCWSTR file_name, DWORD access_mode, DWORD share_mode,
+	win_error create_file(LPCWSTR file_name, DWORD access_mode, DWORD share_mode,
 		DWORD creation_disposition, DWORD flags_and_attributes,
 		PDOKAN_FILE_INFO dokan_file_info);
 

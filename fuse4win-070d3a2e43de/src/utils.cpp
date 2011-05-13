@@ -291,6 +291,7 @@ static const struct errentry errtable[] = {
 	{  ERROR_BAD_NETPATH,            ENOENT    },  /* 53 */
 	{  ERROR_NETWORK_ACCESS_DENIED,  EACCES    },  /* 65 */
 	{  ERROR_BAD_NET_NAME,           ENOENT    },  /* 67 */
+	{  ERROR_ALREADY_EXISTS,         EEXIST    },  /* 183 */
 	{  ERROR_FILE_EXISTS,            EEXIST    },  /* 80 */
 	{  ERROR_CANNOT_MAKE,            EACCES    },  /* 82 */
 	{  ERROR_FAIL_I24,               EACCES    },  /* 83 */
@@ -311,7 +312,6 @@ static const struct errentry errtable[] = {
 	{  ERROR_BAD_PATHNAME,           ENOENT    },  /* 161 */
 	{  ERROR_MAX_THRDS_REACHED,      EAGAIN    },  /* 164 */
 	{  ERROR_LOCK_FAILED,            EACCES    },  /* 167 */
-	{  ERROR_ALREADY_EXISTS,         EEXIST    },  /* 183 */
 	{  ERROR_FILENAME_EXCED_RANGE,   ENOENT    },  /* 206 */
 	{  ERROR_NESTING_NOT_ALLOWED,    EAGAIN    },  /* 215 */
 	{  ERROR_NOT_ENOUGH_QUOTA,       ENOMEM    }    /* 1816 */

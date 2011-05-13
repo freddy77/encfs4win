@@ -109,14 +109,12 @@ get_utf16(const unsigned char *p, size_t len, ICONV_CHAR *out)
 	if (len < 2)
 		return -EINVAL;
 	c = GET_A2(p);
-	if ((c & 0xfc00) == 0xd800) {
-		if (len < 4)
-			return -EINVAL;
+	if ((c & 0xfc00) == 0xd800 && len >= 4) {
 		c2 = GET_A2(p+2);
-		if ((c2 & 0xfc00) != 0xdc00)
-			return -EILSEQ;
-		*out = (c << 10) + c2 - ((0xd800 << 10) + 0xdc00 - 0x10000);
-		return 4;
+		if ((c2 & 0xfc00) == 0xdc00) {
+			*out = (c << 10) + c2 - ((0xd800 << 10) + 0xdc00 - 0x10000);
+			return 4;
+		}
 	}
 	*out = c;
 	return 2;

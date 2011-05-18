@@ -267,7 +267,7 @@ ssize_t FileNode::read( off_t offset, unsigned char *data, ssize_t size ) const
 bool FileNode::write(off_t offset, unsigned char *data, ssize_t size)
 {
     rLog(Info, "FileNode::write offset %" PRIi64 ", data size %i",
-	    (long long int) offset, (int)size);
+	    offset, (int)size);
 
     IORequest req;
     req.offset = offset;

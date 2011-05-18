@@ -47,7 +47,7 @@ bool
 ConfigReader::load(const char *fileName)
 {
     struct stat stbuf;
-    memset( &stbuf, 0, sizeof(stbuf));
+    memset( &stbuf, 0, sizeof(struct stat));
     if( lstat( fileName, &stbuf ) != 0)
 	return false;
 

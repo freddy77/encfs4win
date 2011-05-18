@@ -301,11 +301,11 @@ ssize_t CipherFileIO::readOneBlock( const IORequest &req ) const
 	if(!ok)
 	{
 	    rDebug("decodeBlock failed for block %" PRIi64 ", size %i",
-		    (long long int)blockNum, (int)readSize );
+		    blockNum, (int)readSize );
 	    readSize = -1;
 	}
     } else
-	rDebug("readSize zero for offset %" PRIi64, (long long int)req.offset);
+	rDebug("readSize zero for offset %" PRIi64, req.offset);
 
     return readSize;
 }
@@ -342,7 +342,7 @@ bool CipherFileIO::writeOneBlock( const IORequest &req )
     } else
     {
 	rDebug("encodeBlock failed for block %" PRIi64 ", size %i",
-		(long long int)blockNum, req.dataLen);
+		blockNum, req.dataLen);
 	ok = false;
     }
     return ok;

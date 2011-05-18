@@ -101,7 +101,7 @@ static int open_readonly_workaround(const char *path, int flags)
 {
     int fd = -1;
     struct stat stbuf;
-    memset(&stbuf, 0, sizeof(stbuf));
+    memset(&stbuf, 0, sizeof(struct stat));
     if(lstat( path, &stbuf ) != -1)
     {
 	// make sure user has read/write permission..
@@ -211,7 +211,7 @@ off_t RawFileIO::getSize() const
     if(!knownSize)
     {
 	struct stat stbuf;
-	memset( &stbuf, 0, sizeof(stbuf));
+	memset( &stbuf, 0, sizeof( struct stat ));
 	int res = lstat( name.c_str(), &stbuf );
 
 	if(res == 0)
@@ -236,7 +236,7 @@ ssize_t RawFileIO::read( const IORequest &req ) const
     if(readSize < 0)
     {
 	rInfo("read failed at offset %" PRIi64 " for %i bytes: %s",
-		(long long int) req.offset, req.dataLen, strerror( errno ));
+		req.offset, req.dataLen, strerror( errno ));
     }
 
     return readSize;
@@ -260,7 +260,7 @@ bool RawFileIO::write( const IORequest &req )
 	{
 	    knownSize = false;
 	    rInfo("write failed at offset %" PRIi64 " for %i bytes: %s",
-		    (long long int) offset, (int)bytes, strerror( errno ));
+		    offset, (int)bytes, strerror( errno ));
 	    return false;
 	}
 	    
@@ -306,7 +306,7 @@ int RawFileIO::truncate( off_t size )
     {
 	int eno = errno;
 	rInfo("truncate failed for %s (%i) size %" PRIi64 ", error %s",
-		name.c_str(), fd, (long long int) size, strerror(eno));
+		name.c_str(), fd, size, strerror(eno));
 	res = -eno;
 	knownSize = false;
     } else

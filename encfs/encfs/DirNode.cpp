@@ -589,7 +589,7 @@ int DirNode::mkdir(const char *plaintextPath, mode_t mode,
 	oldgid = setfsgid( gid );
 #endif
 
-    int res = ::mkdir( cyName.c_str() );
+    int res = ::mkdir( cyName.c_str(), mode );
 
 #if 0
     if(olduid >= 0)
@@ -645,7 +645,7 @@ DirNode::rename( const char *fromPlaintext, const char *toPlaintext )
     try
     {
         struct stat st;
-        bool preserve_mtime = lstat(fromCName.c_str(), &st) == 0;
+        bool preserve_mtime = ::stat(fromCName.c_str(), &st) == 0;
 
 	renameNode( fromPlaintext, toPlaintext );
 	toNode.reset();

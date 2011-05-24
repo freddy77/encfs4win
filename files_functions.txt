@@ -1,0 +1,18 @@
+chmod
+CreateFileA@28
+GetFileAttributesA@4
+GetModuleFileNameA@12 (maingui.cpp)
+mkdir
+open
+opendir
+closedir
+readdir
+rename
+rmdir
+SearchPathA@24 (drives.cpp)
+SetCurrentDirectoryA@4 (maingui.cpp)
+SetFileAttributesA@8
+_stati64
+unlink
+utime
+_utime

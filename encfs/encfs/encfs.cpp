@@ -822,9 +822,9 @@ static uint32_t encfs_win_get_attributes(const char *fn)
     if(!FSRoot)
 	return res;
 
-   std::string path = FSRoot->cipherPath(fn);
+   std::wstring path = utf8_to_wfn(FSRoot->cipherPath(fn));
    // TODO error
-   return GetFileAttributes(path.c_str());
+   return GetFileAttributesW(path.c_str());
 }
 
 static int encfs_win_set_attributes(const char *fn, uint32_t attr)
@@ -836,8 +836,8 @@ static int encfs_win_set_attributes(const char *fn, uint32_t attr)
     if(!FSRoot)
 	return res;
 
-   std::string path = FSRoot->cipherPath(fn);
-   if (SetFileAttributes(path.c_str(), attr))
+   std::wstring path = utf8_to_wfn(FSRoot->cipherPath(fn));
+   if (SetFileAttributesW(path.c_str(), attr))
         return 0;
    return -win32_error_to_errno(GetLastError());
 }
@@ -868,9 +868,9 @@ static int encfs_win_set_times(const char *path, struct fuse_file_info *fi, cons
 	if(!FSRoot)
 	    return res;
 
-	std::string fn = FSRoot->cipherPath(path);
+	std::wstring fn = utf8_to_wfn(FSRoot->cipherPath(path));
 
-	HANDLE f = CreateFile(fn.c_str(), FILE_WRITE_ATTRIBUTES, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	HANDLE f = CreateFileW(fn.c_str(), FILE_WRITE_ATTRIBUTES, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	if (f == INVALID_HANDLE_VALUE)
 	    return -win32_error_to_errno(GetLastError());
 

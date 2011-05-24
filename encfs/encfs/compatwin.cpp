@@ -6,6 +6,7 @@
 //#include <fcntl.h>
 //#include <fuse.h>
 
+#include "encfs.h"
 #include "pthread.h"
 
 #include <errno.h>
@@ -15,6 +16,7 @@
 #include <fcntl.h>
 #include <fuse.h>
 #include <winioctl.h>
+#include <boost/scoped_array.hpp>
 
 void pthread_mutex_init(pthread_mutex_t *mtx, int )
 {
@@ -106,7 +108,7 @@ ssize_t pwrite(int fd, const void *buf, size_t count, __int64 offset)
 
 int truncate(const char *path, __int64 length)
 {
-	int fd = open(path, O_RDWR);
+	int fd = _wopen(utf8_to_wfn(path).c_str(), O_RDWR);
 
 	if (fd < 0) return -1;
 
@@ -283,25 +285,7 @@ utimes(const char *filename, const struct timeval times[2])
 	struct _utimbuf tm;
 	tm.actime  = times[0].tv_sec;
 	tm.modtime = times[1].tv_sec;
-	return _utime(filename, &tm);
-}
-
-int
-my_stat (const char* fn, struct FUSE_STAT* st)
-{
-	char buf[512];
-	_snprintf(buf, 512, "%s", fn);
-	buf[511] = 0;
-
-	for (char *p = buf; *p; ++p)
-		if (*p == '/')
-			*p = '\\';
-
-	size_t l = strlen(buf);
-	if (buf[l-1] == '\\')
-		buf[l-1] = 0;
-
-	return ::_stati64(buf, st);
+	return _wutime(utf8_to_wfn(filename).c_str(), &tm);
 }
 
 int
@@ -338,12 +322,13 @@ set_sparse(HANDLE fd)
 }
 
 int
-my_open(const char *fn, int flags)
+my_open(const char *fn_utf8, int flags)
 {
-	HANDLE f = CreateFile(fn, flags == O_RDONLY ? GENERIC_WRITE : GENERIC_WRITE|GENERIC_READ, FILE_SHARE_DELETE, NULL, OPEN_EXISTING, 0, NULL);
+	std::wstring fn = utf8_to_wfn(fn_utf8);
+	HANDLE f = CreateFileW(fn.c_str(), flags == O_RDONLY ? GENERIC_WRITE : GENERIC_WRITE|GENERIC_READ, FILE_SHARE_DELETE, NULL, OPEN_EXISTING, 0, NULL);
 	if (f == INVALID_HANDLE_VALUE) {
 		int save_errno = win32_error_to_errno(GetLastError());
-		f = CreateFile(fn, flags == O_RDONLY ? GENERIC_WRITE : GENERIC_WRITE|GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+		f = CreateFileW(fn.c_str(), flags == O_RDONLY ? GENERIC_WRITE : GENERIC_WRITE|GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
 		if (f == INVALID_HANDLE_VALUE) {
 			errno = save_errno;
 			return -1;
@@ -360,12 +345,132 @@ my_open(const char *fn, int flags)
 	return fd;
 }
 
-namespace pthread {
-
-int mkdir(const char *fn, int mode)
+int
+open(const char *fn, int flags, ...)
 {
-	return ::mkdir(fn); 
+	int mode = 0;
+	va_list ap;
+	va_start(ap, flags);
+	if (flags & O_CREAT)
+		mode = va_arg(ap, int);
+	va_end(ap);
+	return _wopen(utf8_to_wfn(fn).c_str(), flags, mode);
 }
 
+int
+utime(const char *filename, struct utimbuf *times)
+{
+	return _wutime(utf8_to_wfn(filename).c_str(), (struct _utimbuf*) times);
+}
+
+int
+mkdir(const char *fn, int mode)
+{
+	return _wmkdir(utf8_to_wfn(fn).c_str()); 
+}
+
+int
+rename(const char *oldpath, const char *newpath)
+{
+	return _wrename(utf8_to_wfn(oldpath).c_str(), utf8_to_wfn(newpath).c_str());
+}
+
+int
+unlink(const char *path)
+{
+	return _wunlink(utf8_to_wfn(path).c_str());
+}
+
+int
+rmdir(const char *path)
+{
+	return _wrmdir(utf8_to_wfn(path).c_str());
+}
+
+int
+_stati64(const char *path, struct _stati64 *buffer)
+{
+	std::wstring fn = utf8_to_wfn(path).c_str();
+	if (fn.length() && fn[fn.length()-1] == L'\\')
+		fn.resize(fn.length()-1);
+	return _wstati64(fn.c_str(), buffer);
+}
+
+int
+chmod(const char* path, int mode)
+{
+	return _wchmod(utf8_to_wfn(path).c_str(), mode);
+}
+
+struct MY_DIR
+{
+	HANDLE hff;
+	struct dirent ent;
+	WIN32_FIND_DATAW wfd;
+	int pos;
+};
+
+MY_DIR*
+my_opendir(const char *name)
+{
+	MY_DIR *dir = (MY_DIR*) malloc(sizeof(MY_DIR));
+	if (!dir) {
+		errno = ENOMEM;
+		return NULL;
+	}
+	memset(dir, 0, sizeof(*dir));
+	std::wstring path = utf8_to_wfn(name) + L"\\*";
+	dir->hff = FindFirstFileW(path.c_str(), &dir->wfd);
+	if (dir->hff == INVALID_HANDLE_VALUE) {
+		errno = win32_error_to_errno(GetLastError());
+		free(dir);
+		return NULL;
+	}
+	return dir;
+}
+
+int
+my_closedir(MY_DIR* dir)
+{
+	errno = 0;
+	if (dir && dir->hff != INVALID_HANDLE_VALUE)
+		FindClose(dir->hff);
+	free(dir);
+	return 0;
+}
+
+void utf8_to_wchar_buf(const char *src, wchar_t *res, int maxlen);
+std::string wchar_to_utf8_cstr(const wchar_t *str);
+
+struct dirent*
+my_readdir(MY_DIR* dir)
+{
+	errno = EBADF;
+	if (!dir) return NULL;
+	errno = 0;
+	if (dir->pos < 0) return NULL;
+	if (dir->pos == 0) {
+		++dir->pos;
+	} else if (!FindNextFileW(dir->hff, &dir->wfd)) {
+		errno = GetLastError() == ERROR_NO_MORE_FILES ? 0 : win32_error_to_errno(GetLastError());
+		return NULL;
+	}
+	std::string path = wchar_to_utf8_cstr(dir->wfd.cFileName);
+	strncpy(dir->ent.d_name, path.c_str(), sizeof(dir->ent.d_name));
+	dir->ent.d_name[sizeof(dir->ent.d_name)-1] = 0;
+	dir->ent.d_namlen = strlen(dir->ent.d_name);
+	return &dir->ent;
+}
+
+std::wstring
+utf8_to_wfn(const std::string& src)
+{
+	int len = src.length()+1;
+	boost::scoped_array<wchar_t> buf(new wchar_t[len]);
+	utf8_to_wchar_buf(src.c_str(), buf.get(), len);
+	for (wchar_t *p = buf.get(); *p; ++p)
+		if (*p == L'/')
+			*p = L'\\';
+	return buf.get();
 }
 

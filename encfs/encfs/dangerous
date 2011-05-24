@@ -1,0 +1,8 @@
+#!/bin/bash
+
+while read FN; do
+	FN=($FN)
+	FN=${FN%%@*}
+	echo $FN
+	i586-mingw32msvc-objdump -tC .libs/*.o|grep -w $FN| grep -v ::
+done < ../../files_functions.txt

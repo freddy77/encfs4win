@@ -3,6 +3,8 @@
 
 #include <windows.h>
 #include <stdio.h>
+#include <dirent.h>
+#include <string>
 
 typedef HANDLE pthread_t;
 typedef CRITICAL_SECTION pthread_mutex_t;
@@ -24,13 +26,26 @@ ssize_t pwrite(int fd, const void *buf, size_t count, __int64 offset);
 int truncate(const char *path, __int64 length);
 int statvfs(const char *path, struct statvfs *buf);
 int utimes(const char *filename, const struct timeval times[2]);
-int my_stat (const char* fn, struct FUSE_STAT* st);
-#define lstat my_stat
+int utime(const char *filename, struct utimbuf *times);
+#define lstat stat
 int my_open(const char *fn, int flags);
-namespace pthread {
 int mkdir(const char *fn, int mode);
-}
-using pthread::mkdir;
+int rename(const char *oldpath, const char *newpath);
+int unlink(const char *path);
+int rmdir(const char *path);
+int __MINGW_NOTHROW _stati64(const char *path, struct _stati64 *buffer);
+int chmod (const char*, int);
+
+typedef struct MY_DIR MY_DIR;
+MY_DIR *my_opendir(const char *name);
+int my_closedir(MY_DIR* dir);
+struct dirent* my_readdir(MY_DIR* dir);
+#define DIR MY_DIR
+#define opendir my_opendir
+#define closedir my_closedir
+#define readdir my_readdir
+
+std::wstring utf8_to_wfn(const std::string& src);
 
 #define mlock(a,b) do { } while(0)
 #define munlock(a,b) do { } while(0)

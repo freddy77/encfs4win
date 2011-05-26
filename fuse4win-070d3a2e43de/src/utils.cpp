@@ -185,7 +185,7 @@ void utf8_to_wchar_buf(const char *src, wchar_t *res, int maxlen)
 	if (res==NULL || maxlen==0) return;
 
 	int ln=convert_char(get_utf8, put_utf16, src, strlen(src)+1, NULL);/* | raise_w32_error()*/;
-	if (ln <= 0 || ln>=maxlen)
+	if (ln <= 0 || ln/sizeof(wchar_t) > maxlen)
 	{
 		*res=L'\0';
 		return;

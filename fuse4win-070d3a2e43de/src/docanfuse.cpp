@@ -597,7 +597,8 @@ void fuse_unmount(const char *mountpoint, struct fuse_chan *ch)
 		ch->ResolvedDokanRemoveMountPoint(wmountpoint);
 		return;
 	}
-	ch->ResolvedDokanUnmount(mountpoint[0]); //Ugly :(
+	if (ch->ResolvedDokanUnmount)
+		ch->ResolvedDokanUnmount(mountpoint[0]); //Ugly :(
 }
 
 //Used from fuse_helpers.c

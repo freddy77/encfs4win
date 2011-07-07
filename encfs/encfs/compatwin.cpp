@@ -16,7 +16,10 @@
 #include <fcntl.h>
 #include <fuse.h>
 #include <winioctl.h>
+#include <direct.h>
 #include <boost/scoped_array.hpp>
+
+time_t filetimeToUnixTime(const FILETIME *ft);
 
 void pthread_mutex_init(pthread_mutex_t *mtx, int )
 {
@@ -108,20 +111,26 @@ ssize_t pwrite(int fd, const void *buf, size_t count, __int64 offset)
 
 int truncate(const char *path, __int64 length)
 {
-	int fd = _wopen(utf8_to_wfn(path).c_str(), O_RDWR);
+	std::wstring fn(utf8_to_wfn(path));
+	HANDLE fd = CreateFileW(fn.c_str(), GENERIC_WRITE|GENERIC_READ, FILE_SHARE_DELETE, NULL, OPEN_EXISTING, 0, NULL);
 
-	if (fd < 0) return -1;
+	if (fd == INVALID_HANDLE_VALUE)
+		fd = CreateFileW(fn.c_str(), GENERIC_WRITE|GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+
+	if (fd == INVALID_HANDLE_VALUE) {
+		errno = win32_error_to_errno(GetLastError());
+		return -1;
+	}
 
 	LONG high = length >> 32;
-	HANDLE h = (HANDLE) _get_osfhandle(fd);
-	if (!SetFilePointer(h, length, &high, FILE_BEGIN)
-	    || !SetEndOfFile(h) ) {
+	if (!SetFilePointer(fd, length, &high, FILE_BEGIN)
+	    || !SetEndOfFile(fd) ) {
 		int save_errno = win32_error_to_errno(GetLastError());
-		close(fd);
+		CloseHandle(fd);
 		errno = save_errno;
 		return -1;
 	}
-	close(fd);
+	CloseHandle(fd);
 	return 0;
 }
 
@@ -279,13 +288,40 @@ pthread_cond_broadcast (pthread_cond_t *cv)
 
 #include <sys/utime.h>
 
+static FILETIME
+timevalToFiletime(struct timeval t)
+{
+	// Note that LONGLONG is a 64-bit value
+	LONGLONG ll;
+
+	ll = Int32x32To64(t.tv_sec, 10000000) + 116444736000000000LL + 10u * t.tv_usec;
+	FILETIME res;
+	res.dwLowDateTime = (DWORD)ll;
+	res.dwHighDateTime = (DWORD)(ll >> 32);
+	return res;
+}
+
 int
 utimes(const char *filename, const struct timeval times[2])
 {
-	struct _utimbuf tm;
-	tm.actime  = times[0].tv_sec;
-	tm.modtime = times[1].tv_sec;
-	return _wutime(utf8_to_wfn(filename).c_str(), &tm);
+	std::wstring fn(utf8_to_wfn(filename));
+	HANDLE h = CreateFileW(fn.c_str(), FILE_WRITE_ATTRIBUTES, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+	if (h == INVALID_HANDLE_VALUE)
+		h = CreateFileW(fn.c_str(), FILE_WRITE_ATTRIBUTES, 0, NULL, OPEN_EXISTING, 0, NULL);
+	if (h == INVALID_HANDLE_VALUE) {
+		errno = win32_error_to_errno(GetLastError());
+		return -1;
+	}
+	FILETIME fta = timevalToFiletime(times[0]);
+	FILETIME ftm = timevalToFiletime(times[1]);
+	BOOL res = SetFileTime(h, NULL, &fta, &ftm);
+	DWORD win_err = GetLastError();
+	CloseHandle(h);
+	if (!res) {
+		errno = win32_error_to_errno(win_err);
+		return -1;
+	}
+	return 0;
 }
 
 int
@@ -325,10 +361,10 @@ int
 my_open(const char *fn_utf8, int flags)
 {
 	std::wstring fn = utf8_to_wfn(fn_utf8);
-	HANDLE f = CreateFileW(fn.c_str(), flags == O_RDONLY ? GENERIC_WRITE : GENERIC_WRITE|GENERIC_READ, FILE_SHARE_DELETE, NULL, OPEN_EXISTING, 0, NULL);
+	HANDLE f = CreateFileW(fn.c_str(), flags == O_RDONLY ? GENERIC_WRITE : GENERIC_WRITE|GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
 	if (f == INVALID_HANDLE_VALUE) {
 		int save_errno = win32_error_to_errno(GetLastError());
-		f = CreateFileW(fn.c_str(), flags == O_RDONLY ? GENERIC_WRITE : GENERIC_WRITE|GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+		f = CreateFileW(fn.c_str(), flags == O_RDONLY ? GENERIC_WRITE : GENERIC_WRITE|GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
 		if (f == INVALID_HANDLE_VALUE) {
 			errno = save_errno;
 			return -1;
@@ -360,31 +396,51 @@ open(const char *fn, int flags, ...)
 int
 utime(const char *filename, struct utimbuf *times)
 {
-	return _wutime(utf8_to_wfn(filename).c_str(), (struct _utimbuf*) times);
+	if (!times)
+		return utimes(filename, NULL);
+	
+	struct timeval tm[2];
+	tm[0].tv_sec = times->actime;
+	tm[0].tv_usec = 0;
+	tm[1].tv_sec = times->modtime;
+	tm[1].tv_usec = 0;
+	return utimes(filename, tm);
 }
 
 int
 mkdir(const char *fn, int mode)
 {
-	return _wmkdir(utf8_to_wfn(fn).c_str()); 
+	if (CreateDirectoryW(utf8_to_wfn(fn).c_str(), NULL))
+		return 0;
+	errno = win32_error_to_errno(GetLastError());
+	return -1;
 }
 
 int
 rename(const char *oldpath, const char *newpath)
 {
-	return _wrename(utf8_to_wfn(oldpath).c_str(), utf8_to_wfn(newpath).c_str());
+	if (MoveFileW(utf8_to_wfn(oldpath).c_str(), utf8_to_wfn(newpath).c_str()))
+		return 0;
+	errno = win32_error_to_errno(GetLastError());
+	return -1;
 }
 
 int
 unlink(const char *path)
 {
-	return _wunlink(utf8_to_wfn(path).c_str());
+	if (DeleteFileW(utf8_to_wfn(path).c_str()))
+		return 0;
+	errno = win32_error_to_errno(GetLastError());
+	return -1;
 }
 
 int
 rmdir(const char *path)
 {
-	return _wrmdir(utf8_to_wfn(path).c_str());
+	if (RemoveDirectoryW(utf8_to_wfn(path).c_str()))
+		return 0;
+	errno = win32_error_to_errno(GetLastError());
+	return -1;
 }
 
 int
@@ -393,7 +449,46 @@ _stati64(const char *path, struct _stati64 *buffer)
 	std::wstring fn = utf8_to_wfn(path).c_str();
 	if (fn.length() && fn[fn.length()-1] == L'\\')
 		fn.resize(fn.length()-1);
-	return _wstati64(fn.c_str(), buffer);
+	if (strpbrk(path, "?*") != NULL) {
+		errno = ENOENT;
+		return -1;
+	}
+
+	WIN32_FIND_DATAW wfd;
+	HANDLE hff = FindFirstFileW(fn.c_str(), &wfd);
+	if (hff == INVALID_HANDLE_VALUE) {
+		errno = win32_error_to_errno(GetLastError());
+		return -1;
+	}
+	FindClose(hff);
+
+	int drive;
+	if (path[1] == ':')
+		drive = tolower(path[0]) - 'a';
+	else
+		drive = _getdrive() - 1;
+	
+	unsigned mode;
+	if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		mode = _S_IFDIR|0777;
+	else
+		mode = _S_IFREG|0666;
+	if (wfd.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
+		mode &= ~0222;
+	// TODO executable ?? link ??
+
+	buffer->st_dev = buffer->st_rdev = drive;
+	buffer->st_ino = 0;
+	buffer->st_mode = mode;
+	buffer->st_nlink = 1;
+	buffer->st_uid = 0;
+	buffer->st_gid = 0;
+	buffer->st_size = wfd.nFileSizeHigh * (1llu<<32) + wfd.nFileSizeLow;
+	buffer->st_atime = filetimeToUnixTime(&wfd.ftLastAccessTime);
+	buffer->st_mtime = filetimeToUnixTime(&wfd.ftLastWriteTime);
+	buffer->st_ctime = filetimeToUnixTime(&wfd.ftCreationTime);
+
+	return 0;
 }
 
 int
@@ -419,7 +514,11 @@ my_opendir(const char *name)
 		return NULL;
 	}
 	memset(dir, 0, sizeof(*dir));
-	std::wstring path = utf8_to_wfn(name) + L"\\*";
+	std::wstring path = utf8_to_wfn(name);
+	if(path.length() > 0 && path[path.length()-1] == L'\\')
+		path += L"*";
+	else
+		path += L"\\*";
 	dir->hff = FindFirstFileW(path.c_str(), &dir->wfd);
 	if (dir->hff == INVALID_HANDLE_VALUE) {
 		errno = win32_error_to_errno(GetLastError());
@@ -466,11 +565,20 @@ std::wstring
 utf8_to_wfn(const std::string& src)
 {
 	int len = src.length()+1;
-	boost::scoped_array<wchar_t> buf(new wchar_t[len]);
-	utf8_to_wchar_buf(src.c_str(), buf.get(), len);
-	for (wchar_t *p = buf.get(); *p; ++p)
+	const size_t addSpace = 6;
+	boost::scoped_array<wchar_t> buf(new wchar_t[len+addSpace]);
+	utf8_to_wchar_buf(src.c_str(), buf.get()+addSpace, len);
+	for (wchar_t *p = buf.get()+addSpace; *p; ++p)
 		if (*p == L'/')
 			*p = L'\\';
-	return buf.get();
+	char drive = tolower(buf[addSpace]);
+	if (drive >= 'a' && drive <= 'z' && buf[addSpace+1] == ':') {
+		memcpy(buf.get()+(addSpace-4), L"\\\\?\\", 4*sizeof(wchar_t));
+		return buf.get()+(addSpace-4);
+	} else if (buf[addSpace] == L'\\' && buf[addSpace+1] == L'\\') {
+		memcpy(buf.get()+(addSpace-6), L"\\\\?\\UNC", 7*sizeof(wchar_t));
+		return buf.get()+(addSpace-6);
+	}
+	return buf.get()+addSpace;
 }
 

@@ -293,10 +293,13 @@ bool isDirectory( const char *fileName )
 
 bool isAbsolutePath( const char *fileName )
 {
-    if(fileName && fileName[0] != '\0' && isalpha((unsigned char) fileName[0]) && fileName[1] == ':')
-	return true;
-    else
+    if (!fileName || fileName[0] == '\0')
 	return false;
+    if (isalpha((unsigned char) fileName[0]) && fileName[1] == ':')
+	return true;
+    if (strchr("\\/", fileName[0]) && fileName[1] && strchr("\\/", fileName[1]))
+	return true;
+    return false;
 }
 
 const char *lastPathElement( const char *name )

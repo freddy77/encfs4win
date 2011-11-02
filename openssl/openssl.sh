@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-NAME=openssl-1.0.0d
+NAME=openssl-1.0.0e
 OUT=$PWD/../out
 rm -rf $NAME
 tar zxvf $NAME.tar.gz

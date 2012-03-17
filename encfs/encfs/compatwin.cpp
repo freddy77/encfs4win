@@ -337,7 +337,7 @@ statvfs(const char *path, struct statvfs *fs)
 	fs->f_favail = -1;
 
 	ULARGE_INTEGER avail, free_bytes, bytes;
-	if (!GetDiskFreeSpaceEx(path, &avail, &bytes, &free_bytes)) {
+	if (!GetDiskFreeSpaceExA(path, &avail, &bytes, &free_bytes)) {
 		errno = win32_error_to_errno(GetLastError());
 		return -1;
 	}

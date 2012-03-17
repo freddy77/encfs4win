@@ -22,7 +22,7 @@ static int CALLBACK BrowseProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpDat
 	return 0;
 }
 
-std::string GetExistingDirectory(HWND hwnd, LPCTSTR title, LPCTSTR caption)
+std::tstring GetExistingDirectory(HWND hwnd, LPCTSTR title, LPCTSTR caption)
 {
 	BROWSEINFO bi;
 	ZeroMemory(&bi, sizeof(bi));
@@ -36,7 +36,7 @@ std::string GetExistingDirectory(HWND hwnd, LPCTSTR title, LPCTSTR caption)
 	LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
 	TCHAR path[MAX_PATH];
 	if (!pidl || !SHGetPathFromIDList(pidl, path))
-		return "";
+		return _T("");
 	return path;
 }
 
@@ -47,11 +47,11 @@ bool FillFreeDrive(HWND combo)
 	int i;
 
 	for (i = 2; i < 26; ++i) {
-		char buf[16];
+		TCHAR buf[16];
 
 		if (drives & (1 << i))
 			continue;
-		sprintf(buf, "%c:", 'A' + i);
+		_stprintf(buf, _T("%c:"), 'A' + i);
 		SendMessage(combo, CB_ADDSTRING, 0, (LPARAM) (LPCTSTR) buf);
 		res = true;
 	}
@@ -63,7 +63,7 @@ static INT_PTR CALLBACK
 DriveDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int i;
-	char buf[16];
+	TCHAR buf[16];
 	char *pSelectedDrive = (char*) GetWindowLongPtr(hDlg, GWLP_USERDATA);
 
 	switch (message) {
@@ -104,7 +104,7 @@ char SelectFreeDrive(HWND hwnd)
 }
 
 struct PasswordData {
-	char *buf;
+	TCHAR *buf;
 	size_t len;
 };
 
@@ -134,7 +134,7 @@ PasswordDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-bool GetPassword(HWND hwnd, char *pass, size_t len)
+bool GetPassword(HWND hwnd, TCHAR *pass, size_t len)
 {
 	PasswordData data = { pass, len };
 	

@@ -109,6 +109,7 @@ libencfsall_la_LIBADD = @RLOG_LIBS@ \
 	@FUSE_LIBS@ \
 	@BOOST_SERIALIZATION_LIB@ @BOOST_FILESYSTEM_LIB@ @BOOST_SYSTEM_LIB@ \
 	-luser32 -lgdi32 -lws2_32 -lcomctl32 win/resource.res
+libencfsall_la_CXXFLAGS = -DUNICODE -D_UNICODE
 
 .rc.res:
 	$(RC) -i $< --input-format=rc -o $@ -O coff
@@ -132,6 +133,7 @@ noinst_HEADERS = \
     FSConfig.h \
     Interface.h \
     i18n.h \
+    win/i18n.h \
     MACFileIO.h \
     MemoryPool.h \
     Mutex.h \

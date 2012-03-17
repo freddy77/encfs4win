@@ -12,9 +12,9 @@ static HKEY RootKey()
 {
 	HKEY root = NULL;
 	if (!root) {
-		if (RegCreateKeyEx(HKEY_CURRENT_USER, rootKeyName, 0, NULL, 0, KEY_READ|KEY_WRITE, NULL, &root, NULL) != ERROR_SUCCESS) {
+		if (RegCreateKeyExA(HKEY_CURRENT_USER, rootKeyName, 0, NULL, 0, KEY_READ|KEY_WRITE, NULL, &root, NULL) != ERROR_SUCCESS) {
 			root = NULL;
-			throw runtime_error("accessing configuration");
+			throw truntime_error(_T("accessing configuration"));
 		}
 	}
 	return root;
@@ -30,26 +30,26 @@ private:
 	HKEY key;
 };
 
-void Config::Save(const std::string& name, const std::string& entry, const std::string& value)
+void Config::Save(const std::string& name, const std::tstring& entry, const std::tstring& value)
 {
 	HKEY hkey;
-	if (RegCreateKeyEx(RootKey(), name.c_str(), 0, NULL, 0, KEY_SET_VALUE, NULL, &hkey, NULL) != ERROR_SUCCESS)
-		throw runtime_error("writing configuration");
+	if (RegCreateKeyExA(RootKey(), name.c_str(), 0, NULL, 0, KEY_SET_VALUE, NULL, &hkey, NULL) != ERROR_SUCCESS)
+		throw truntime_error(_T("writing configuration"));
 	AutoDeleteKey key(hkey);
-	if (RegSetValueEx(key, entry.c_str(), 0, REG_SZ, (const BYTE*) value.c_str(), value.length()+1) != ERROR_SUCCESS)
-		throw runtime_error("writing configuration");
+	if (RegSetValueEx(key, entry.c_str(), 0, REG_SZ, (const BYTE*) value.c_str(), sizeof(TCHAR)*(value.length()+1)) != ERROR_SUCCESS)
+		throw truntime_error(_T("writing configuration"));
 }
 
-std::string Config::Load(const std::string& name, const std::string& entry)
+std::tstring Config::Load(const std::string& name, const std::tstring& entry)
 {
 	HKEY hkey;
-	if (RegOpenKeyEx(RootKey(), name.c_str(), 0, KEY_QUERY_VALUE, &hkey) != ERROR_SUCCESS)
-		throw runtime_error("reading configuration");
+	if (RegOpenKeyExA(RootKey(), name.c_str(), 0, KEY_QUERY_VALUE, &hkey) != ERROR_SUCCESS)
+		throw truntime_error(_T("reading configuration"));
 	AutoDeleteKey key(hkey);
-	char buf[512];
+	TCHAR buf[512];
 	DWORD type, len = sizeof(buf);
 	if (RegQueryValueEx(key, entry.c_str(), NULL, &type, (BYTE*) buf, &len) != ERROR_SUCCESS || type != REG_SZ)
-		throw runtime_error("reading configuration");
+		throw truntime_error(_T("reading configuration"));
 	return buf;
 }
 
@@ -59,7 +59,7 @@ void Config::Enum(void (*proc)(const std::string& name, void* param), void *para
 	for (i = 0; ; ++i) {
 		char name[128];
 		DWORD len = sizeof(name);
-		if (RegEnumKeyEx(RootKey(), i, name, &len, NULL, NULL, NULL, NULL) != ERROR_SUCCESS)
+		if (RegEnumKeyExA(RootKey(), i, name, &len, NULL, NULL, NULL, NULL) != ERROR_SUCCESS)
 			break;
 		proc(name, param);
 	}
@@ -67,7 +67,7 @@ void Config::Enum(void (*proc)(const std::string& name, void* param), void *para
 
 void Config::Delete(const std::string& name)
 {
-	RegDeleteKey(RootKey(), name.c_str());
+	RegDeleteKeyA(RootKey(), name.c_str());
 }
 
 std::string Config::NewName()
@@ -77,7 +77,7 @@ std::string Config::NewName()
 		sprintf(name, "Drive%u", n);
 
 		HKEY hkey;
-		if (RegCreateKeyEx(RootKey(), name, 0, NULL, 0, KEY_QUERY_VALUE, NULL, &hkey, NULL) != ERROR_SUCCESS)
+		if (RegCreateKeyExA(RootKey(), name, 0, NULL, 0, KEY_QUERY_VALUE, NULL, &hkey, NULL) != ERROR_SUCCESS)
 			break;
 		AutoDeleteKey key(hkey);
 
@@ -87,6 +87,6 @@ std::string Config::NewName()
 		if (!num)
 			return name;
 	}
-	throw runtime_error("writing configuration");
+	throw truntime_error(_T("writing configuration"));
 }
 

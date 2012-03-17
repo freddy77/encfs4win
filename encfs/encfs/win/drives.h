@@ -38,11 +38,11 @@ public:
 	void CheckMounted();
 private:
 	std::string configName;
-	std::string dir;
-	char mnt[4];
+	std::tstring dir;
+	TCHAR mnt[4];
 	bool mounted;
 	boost::shared_ptr<SubProcessInformations> subProcess;
-	Drive(const std::string& configName, const std::string& _dir, char drive, DWORD pid = 0);
+	Drive(const std::string& configName, const std::tstring& _dir, char drive, DWORD pid = 0);
 	void Save();
 	static boost::shared_ptr<Drive> Load(const std::string& name);
 };
@@ -55,10 +55,10 @@ public:
 	static drive_t GetDrive(int n);
 	static void Load();
 	static void AddMenus(HMENU menu);
-	static drive_t Add(const std::string& dir, char drive);
+	static drive_t Add(const std::tstring& dir, char drive);
 private:
 	static void NewDrive(const std::string& name, void* param);
-	static void AddMenus(HMENU menu, bool mounted, unsigned count, const char *fmt, const char *title, int type);
+	static void AddMenus(HMENU menu, bool mounted, unsigned count, LPCTSTR fmt, LPCTSTR title, int type);
 	static void Delete(drive_t);
 };
 

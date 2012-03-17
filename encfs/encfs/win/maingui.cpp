@@ -5,6 +5,7 @@
 #include <shellapi.h>
 #include <shlwapi.h>
 #include <stdexcept>
+#include "i18n.h"
 #include "guiutils.h"
 #include "drives.h"
 #include "resource.h"
@@ -27,10 +28,10 @@ static INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPA
 
 static void SetPath()
 {
-	char path[MAX_PATH];
-	if (!GetModuleFileName(GetModuleHandle(NULL), path, sizeof(path)))
+	TCHAR path[MAX_PATH];
+	if (!GetModuleFileName(GetModuleHandle(NULL), path, LENGTH(path)))
 		return;
-	char *p = strrchr(path, '\\');
+	TCHAR *p = _tcsrchr(path, _T('\\'));
 	if (!p)
 		return;
 	*p = 0;
@@ -60,22 +61,22 @@ static bool CheckDokan()
 	return res;
 }
 
-static const char autoStartValueName[] = "{78269e54-bfb5-44ed-a8fd-3e04058428e5}";
-static const char autoStartKeyName[] = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
+static const TCHAR autoStartValueName[] = _T("{78269e54-bfb5-44ed-a8fd-3e04058428e5}");
+static const TCHAR autoStartKeyName[] = _T("Software\\Microsoft\\Windows\\CurrentVersion\\Run");
 
 void EnableAutoStart(bool enable=true)
 {
-	char value[MAX_PATH+20];
-	if (!GetModuleFileName(GetModuleHandle(NULL), value+1, sizeof(value)-20))
+	TCHAR value[MAX_PATH+20];
+	if (!GetModuleFileName(GetModuleHandle(NULL), value+1, LENGTH(value)-20))
 		return;
-	value[0] = '\"';
-	strcat(value, "\" --auto");
+	value[0] = _T('\"');
+	_tcscat(value, _T("\" --auto"));
 
 	HKEY hkey;
 	if (RegCreateKeyEx(HKEY_CURRENT_USER, autoStartKeyName, 0, NULL, 0, KEY_SET_VALUE, NULL, &hkey, NULL) != ERROR_SUCCESS)
 		return;
 	if (enable)
-		RegSetValueEx(hkey, autoStartValueName, 0, REG_SZ, (const BYTE*) value, strlen(value)+1);
+		RegSetValueEx(hkey, autoStartValueName, 0, REG_SZ, (const BYTE*) value, (_tcslen(value)+1)*sizeof(value[0]));
 	else
 		RegDeleteValue(hkey, autoStartValueName);
 	RegCloseKey(hkey);
@@ -103,13 +104,13 @@ extern "C" int main_gui(HINSTANCE /* hInstance */, HINSTANCE /* hPrevInstance */
 
 	// check Dokan version
 	if (!CheckDokan()) {
-		MessageBox(NULL, "Dokan library not found or wrong version.\r\nencfs4win require Dokan 0.6.0 or later.", "EncFS", MB_ICONERROR);
+		MessageBox(NULL, _T("Dokan library not found or wrong version.\r\nencfs4win require Dokan 0.6.0 or later."), _T("EncFS"), MB_ICONERROR);
 		EnableAutoStart(false);
 		return 1;
 	}
 
 	// does not allow multiple instances
-	if (CreateMutex(NULL, TRUE, "mtx78269e54-bfb5-44ed-a8fd-3e04058428e5") == NULL)
+	if (CreateMutex(NULL, TRUE, _T("mtx78269e54-bfb5-44ed-a8fd-3e04058428e5")) == NULL)
 		return 1;
 	if (GetLastError() == ERROR_ALREADY_EXISTS)
 		return 0;
@@ -280,10 +281,10 @@ static void createConfig(const std::string& rootDir, bool paranoid, const char* 
 	shared_ptr<Cipher> cipher = Cipher::New( alg.name, keySize );
 	if(!cipher)
 	{
-		char buf[256];
-		_snprintf(buf, sizeof(buf), "Unable to instanciate cipher %s, key size %i, block size %i",
+		TCHAR buf[256];
+		_sntprintf(buf, LENGTH(buf), _T("Unable to instanciate cipher %s, key size %i, block size %i"),
 			alg.name.c_str(), keySize, blockSize);
-		throw std::runtime_error(buf);
+		throw truntime_error(buf);
 	}
     
 	shared_ptr<EncFSConfig> config( new EncFSConfig );
@@ -322,21 +323,21 @@ static void createConfig(const std::string& rootDir, bool paranoid, const char* 
 	delete[] encodedKey;
 
 	if(!volumeKey)
-		throw std::runtime_error("Failure generating new volume key! "
-		                         "Please report this error.");
+		throw truntime_error(_T("Failure generating new volume key! ")
+		                         _T("Please report this error."));
 
 	if (!saveConfig( Config_V6, rootDir, config ))
-		throw std::runtime_error("Error saving configuration file");
+		throw truntime_error(_T("Error saving configuration file"));
 }
 
 struct OptionsData
 {
 	OptionsData():paranoia(false),drive(0) { password[0] = 0; }
 	~OptionsData() { memset(password, 0, sizeof(password)); }
-	std::string rootDir;
+	std::tstring rootDir;
 	bool paranoia;
 	char drive;
-	char password[128];
+	TCHAR password[128];
 };
 
 static BOOL
@@ -409,13 +410,14 @@ OpenOrCreate(HWND hwnd)
 		~Unique() { openAlreadyOpened = false; }
 	} unique;
 
-	std::string dir = GetExistingDirectory(hwnd, "Select a folder which contains or will contain encrypted data.", "Select Crypt Folder");
+	std::tstring dir = GetExistingDirectory(hwnd,
+		_T("Select a folder which contains or will contain encrypted data."), _T("Select Crypt Folder"));
 	if (dir.empty())
 		return;
 
 	// if directory is already configured add and try to mount
 	boost::shared_ptr<EncFSConfig> config(new EncFSConfig);
-	if (readConfig(slashTerminate(dir), config) != Config_None) {
+	if (readConfig(slashTerminate(wchar_to_utf8_cstr(dir.c_str())), config) != Config_None) {
 		char drive = SelectFreeDrive(hwnd);
 		if (drive) {
 			Drives::drive_t dr(Drives::Add(dir, drive));
@@ -433,7 +435,7 @@ OpenOrCreate(HWND hwnd)
 		return;
 
 	// add configuration and add new drive
-	createConfig(slashTerminate(dir), data.paranoia, data.password);
+	createConfig(slashTerminate(wchar_to_utf8_cstr(dir.c_str())), data.paranoia, wchar_to_utf8_cstr(data.password).c_str());
 
 	Drives::drive_t dr(Drives::Add(dir, data.drive));
 	if (dr)
@@ -445,8 +447,8 @@ static INT_PTR CALLBACK
 OptionsDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	OptionsData *pData = (OptionsData*) GetWindowLongPtr(hWnd, GWLP_USERDATA);
-	char buf1[sizeof(pData->password)];
-	char buf2[sizeof(pData->password)];
+	TCHAR buf1[LENGTH(pData->password)];
+	TCHAR buf2[LENGTH(pData->password)];
 	bool diff;
 	int i;
 
@@ -462,13 +464,13 @@ OptionsDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return TRUE;
 		case IDOK:
 			pData->paranoia = (IsDlgButtonChecked(hWnd, IDC_CHKPARANOIA) == BST_CHECKED);
-			GetDlgItemText(hWnd, IDC_PWD1, buf1, sizeof(buf1));
-			GetDlgItemText(hWnd, IDC_PWD2, buf2, sizeof(buf2));
-			diff = (strcmp(buf1, buf2) != 0);
+			GetDlgItemText(hWnd, IDC_PWD1, buf1, LENGTH(buf1));
+			GetDlgItemText(hWnd, IDC_PWD2, buf2, LENGTH(buf2));
+			diff = (_tcscmp(buf1, buf2) != 0);
 			memset(buf1, 0, sizeof(buf1));
 			memset(buf2, 0, sizeof(buf2));
 			if (diff) {
-				MessageBox(hWnd, "Passwords don't match", "EncFS", MB_ICONERROR);
+				MessageBox(hWnd, _T("Passwords don't match"), _T("EncFS"), MB_ICONERROR);
 				return TRUE;
 			}
 			i = SendDlgItemMessage(hWnd, IDC_CMBDRIVE, CB_GETCURSEL, 0, 0);
@@ -477,7 +479,7 @@ OptionsDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				SendDlgItemMessage(hWnd, IDC_CMBDRIVE, CB_GETLBTEXT, i, (LPARAM) (LPTSTR) buf1);
 				pData->drive = buf1[0];
 			}
-			GetDlgItemText(hWnd, IDC_PWD1, pData->password, sizeof(pData->password));
+			GetDlgItemText(hWnd, IDC_PWD1, pData->password, LENGTH(pData->password));
 			EndDialog(hWnd, LOWORD(wParam));
 			return TRUE;
 		}
@@ -559,8 +561,8 @@ MainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return 0;
 	}
-	catch (const std::runtime_error &err) {
-		MessageBox(hWnd, err.what(), "EncFS", MB_ICONERROR);
+	catch (const truntime_error &err) {
+		MessageBox(hWnd, err.what(), _T("EncFS"), MB_ICONERROR);
 		return 1;
 	}
 }

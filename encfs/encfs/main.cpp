@@ -479,6 +479,7 @@ void init_mpool_mutex();
 
 extern "C" int main_encfs(int argc, char *argv[])
 {
+    SetConsoleCP(65001); // set utf-8
     init_mpool_mutex();
 
     // initialize the logging library

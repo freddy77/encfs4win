@@ -11,10 +11,10 @@
 
 static HANDLE GetOldSubProject(DWORD pid);
 
-Drive::Drive(const std::string& _configName, const std::string& _dir, char drive, DWORD pid):
+Drive::Drive(const std::string& _configName, const std::tstring& _dir, char drive, DWORD pid):
 	configName(_configName), dir(_dir), mounted(false)
 {
-	sprintf(mnt, "%c:\\", drive);
+	_stprintf(mnt, _T("%c:\\"), drive);
 
 	HANDLE hProcess = GetOldSubProject(pid);
 	if (hProcess) {
@@ -27,7 +27,7 @@ Drive::Drive(const std::string& _configName, const std::string& _dir, char drive
 
 void Drive::Show(HWND hwnd)
 {
-	ShellExecute(hwnd, "open", mnt, NULL, NULL, SW_SHOWNORMAL);
+	ShellExecute(hwnd, _T("open"), mnt, NULL, NULL, SW_SHOWNORMAL);
 }
 
 void Drive::Mount(HWND hwnd)
@@ -37,13 +37,13 @@ void Drive::Mount(HWND hwnd)
 		char drive = SelectFreeDrive(hwnd);
 		if (!drive)
 			return;
-		sprintf(mnt, "%c:\\", drive);
+		_stprintf(mnt, _T("%c:\\"), drive);
 		Save();
 	}
 
 	// check directory existence
-	if (!isDirectory(dir.c_str())) {
-		if (YesNo(hwnd, "Directory does not exists. Remove from list?"))
+	if (!isDirectory(wchar_to_utf8_cstr(dir.c_str()).c_str())) {
+		if (YesNo(hwnd, _T("Directory does not exists. Remove from list?")))
 			Drives::Delete(shared_from_this());
 		return;
 	}
@@ -51,35 +51,37 @@ void Drive::Mount(HWND hwnd)
 	// TODO check configuration still exists ?? ... no can cause recursion problem
 
 	// search if executable is present
-	char executable[MAX_PATH];
-	if (!SearchPath(NULL, "encfs.exe", NULL, sizeof(executable), executable, NULL))
-		throw std::runtime_error("Unable to find encfs.exe file");
+	TCHAR executable[MAX_PATH];
+	if (!SearchPath(NULL, _T("encfs.exe"), NULL, LENGTH(executable), executable, NULL))
+		throw truntime_error(_T("Unable to find encfs.exe file"));
 
 	// ask a password to mount
-	char pass[128+2];
-	if (!GetPassword(hwnd, pass, sizeof(pass)-2))
+	TCHAR pass[128+2];
+	if (!GetPassword(hwnd, pass, LENGTH(pass)-2))
 		return;
-	strcat(pass, "\r\n");
+	_tcscat(pass, _T("\r\n"));
 
 	// mount using a sort of popen
-	char cmd[2048];
-	_snprintf(cmd, sizeof(cmd), "\"%s\" -S \"%s\" %c:", executable, dir.c_str(), mnt[0]);
+	TCHAR cmd[2048];
+	_sntprintf(cmd, LENGTH(cmd), _T("\"%s\" -S \"%s\" %c:"), executable, dir.c_str(), mnt[0]);
 	boost::shared_ptr<SubProcessInformations> proc(new SubProcessInformations);
 	proc->creationFlags = CREATE_NEW_PROCESS_GROUP|CREATE_NO_WINDOW;
 	if (!CreateSubProcess(cmd, proc.get())) {
 		DWORD err = GetLastError();
 		memset(pass, 0, sizeof(pass));
-		_snprintf(cmd, sizeof(cmd), "Error: %s (%u)", proc->errorPart, (unsigned) err);
-		throw std::runtime_error(cmd);
+		_sntprintf(cmd, LENGTH(cmd), _T("Error: %s (%u)"), proc->errorPart, (unsigned) err);
+		throw truntime_error(cmd);
 	}
 	subProcess = proc;
 
 	// send the password
+	std::string pwd = wchar_to_utf8_cstr(pass);
 	DWORD written;
-	WriteFile(proc->hIn, pass, strlen(pass), &written, NULL);
+	WriteFile(proc->hIn, pwd.c_str(), pwd.length(), &written, NULL);
 	CloseHandle(proc->hIn);	// close input so sub process does not any more
 	proc->hIn = NULL;
 	memset(pass, 0, sizeof(pass));
+	memset((char*) pwd.c_str(), 0, pwd.length());
 
 	mounted = false;
 
@@ -93,16 +95,18 @@ void Drive::Mount(HWND hwnd)
 
 		// process terminated
 		DWORD readed;
+		char output[2048];
 		switch (WaitForSingleObject(subProcess->hProcess, 200)) {
 		case WAIT_OBJECT_0:
 		case WAIT_ABANDONED:
-			if (ReadFile(proc->hOut, cmd, sizeof(cmd)-1, &readed, NULL)) {
-				cmd[readed] = 0;
+			if (ReadFile(proc->hOut, output, sizeof(output)-1, &readed, NULL)) {
+				output[readed] = 0;
+				utf8_to_wchar_buf(output, cmd, LENGTH(cmd));
 			} else {
-				sprintf(cmd, "Unknown error mounting drive %c:", mnt[0]);
+				_stprintf(cmd, _T("Unknown error mounting drive %c:"), mnt[0]);
 			}
 			subProcess.reset();
-			throw std::runtime_error(cmd);
+			throw truntime_error(cmd);
 		}
 	}
 	if (subProcess)
@@ -124,10 +128,10 @@ void Drive::Umount(HWND)
 //	if (GetDriveType(mnt) == DRIVE_NO_ROOT_DIR)
 //		mounted = false;
 	if (!mounted)
-		throw std::runtime_error("Cannot unmount a not mounted drive");
+		throw truntime_error(_T("Cannot unmount a not mounted drive"));
 
 	// unmount
-	fuse_unmount(mnt, NULL);
+	fuse_unmount(wchar_to_utf8_cstr(mnt).c_str(), NULL);
 
 	if (subProcess) {
 		// attach console to allow sending ctrl-c
@@ -173,15 +177,15 @@ void Drive::CheckMounted()
 
 void Drive::Save()
 {
-	Config::Save(configName, "Directory", dir);
-	Config::Save(configName, "Drive", mnt);
+	Config::Save(configName, _T("Directory"), dir);
+	Config::Save(configName, _T("Drive"), mnt);
 
 	// save pid for resume
-	char buf[16];
+	TCHAR buf[16];
 	buf[0] = 0;
 	if (subProcess)
-		sprintf(buf, "%u", (unsigned) subProcess->pid);
-	Config::Save(configName, "Pid", buf);
+		_stprintf(buf, _T("%u"), (unsigned) subProcess->pid);
+	Config::Save(configName, _T("Pid"), buf);
 }
 
 static HANDLE GetOldSubProject(DWORD pid)
@@ -191,13 +195,15 @@ static HANDLE GetOldSubProject(DWORD pid)
 		return NULL;
 
 	MODULEENTRY32 module;
+	memset(&module, 0, sizeof(module));
+	module.dwSize = sizeof(module);
 	if (!Module32First(snap, &module)) {
 		CloseHandle(snap);
 		return NULL;
 	}
 
 	CharLower(module.szExePath);
-	char *p = strstr(module.szExePath, "encfs.exe");
+	TCHAR *p = _tcsstr(module.szExePath, _T("encfs.exe"));
 	CloseHandle(snap);
 	if (p && (p == module.szExePath || p[-1] == '\\' || p[-1] == '\"'))
 		return OpenProcess(SYNCHRONIZE|PROCESS_QUERY_INFORMATION|PROCESS_TERMINATE, FALSE, pid);
@@ -208,13 +214,13 @@ static HANDLE GetOldSubProject(DWORD pid)
 boost::shared_ptr<Drive> Drive::Load(const std::string& name)
 {
 	boost::shared_ptr<Drive> ret;
-	std::string dir, drive, pid;
+	std::tstring dir, drive, pid;
 	try {
-		dir = Config::Load(name, "Directory");
-		drive = Config::Load(name, "Drive");
-		pid = Config::Load(name, "Pid");
+		dir = Config::Load(name, _T("Directory"));
+		drive = Config::Load(name, _T("Drive"));
+		pid = Config::Load(name, _T("Pid"));
 	}
-	catch(const std::runtime_error&) {
+	catch(const truntime_error&) {
 		// ignore
 	}
 
@@ -227,9 +233,9 @@ boost::shared_ptr<Drive> Drive::Load(const std::string& name)
 	}
 
 	// handle resume
-	unsigned n = strtoul(pid.c_str(), NULL, 10);
-	char mnt[4];
-	sprintf(mnt, "%c:\\", c);
+	unsigned n = _tcstoul(pid.c_str(), NULL, 10);
+	TCHAR mnt[4];
+	_stprintf(mnt, _T("%c:\\"), c);
 	if (n <= 0 || GetDriveType(mnt) == DRIVE_NO_ROOT_DIR)
 		n = 0;
 
@@ -262,7 +268,7 @@ void Drives::Load()
 	Config::Enum(NewDrive, NULL);
 }
 
-void Drives::AddMenus(HMENU menu, bool mounted, unsigned count, const char *fmt, const char *title, int type)
+void Drives::AddMenus(HMENU menu, bool mounted, unsigned count, LPCTSTR fmt, LPCTSTR title, int type)
 {
 	if (!count)
 		return;
@@ -276,8 +282,8 @@ void Drives::AddMenus(HMENU menu, bool mounted, unsigned count, const char *fmt,
 		if (((*i)->mounted && !mounted) || (!(*i)->mounted && mounted))
 			continue;
 
-		char buf[512];
-		_snprintf(buf, sizeof(buf), count > 2 ? "%s (%c)" : fmt, (*i)->dir.c_str(), (*i)->mnt[0]);
+		TCHAR buf[512];
+		_sntprintf(buf, LENGTH(buf), count > 2 ? _T("%s (%c)") : fmt, (*i)->dir.c_str(), (*i)->mnt[0]);
 		AppendMenu(addMenu, 0, IDM_MOUNT_ID(n, type), buf);
 	}
 
@@ -302,9 +308,9 @@ void Drives::AddMenus(HMENU menu)
 			++numUnmounted;
 	}
 
-	AddMenus(menu, true, numMounted, "Open %s (%c)", "Open", IDM_TYPE_SHOW);
-	AddMenus(menu, false, numUnmounted, "Mount %s (%c)", "Mount", IDM_TYPE_MOUNT);
-	AddMenus(menu, true, numMounted, "Unmount %s (%c)", "Unmount", IDM_TYPE_UMOUNT);
+	AddMenus(menu, true, numMounted, _T("Open %s (%c)"), _T("Open"), IDM_TYPE_SHOW);
+	AddMenus(menu, false, numUnmounted, _T("Mount %s (%c)"), _T("Mount"), IDM_TYPE_MOUNT);
+	AddMenus(menu, true, numMounted, _T("Unmount %s (%c)"), _T("Unmount"), IDM_TYPE_UMOUNT);
 }
 
 void Drives::Delete(drive_t drive)
@@ -314,7 +320,7 @@ void Drives::Delete(drive_t drive)
 	Config::Delete(drive->configName);
 }
 
-Drives::drive_t Drives::Add(const std::string& dir, char drive)
+Drives::drive_t Drives::Add(const std::tstring& dir, char drive)
 {
 	Drives::drive_t ret;
 	// we do not wants duplicate!

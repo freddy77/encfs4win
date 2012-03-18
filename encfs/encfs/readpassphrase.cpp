@@ -45,8 +45,13 @@ static const char rcsid[] = "$OpenBSD: readpassphrase.c,v 1.12 2001/12/15 05:41:
 #include <cstring>
 #include <cctype>
 #include <conio.h>
-
+#include <windows.h>
+#include <wincon.h>
+#include <tchar.h>
+#include <string>
 #include <readpassphrase.h>
+
+std::string wchar_to_utf8_cstr(const wchar_t *str);
 
 char *
 readpassphrase(const char *prompt, char *buf, size_t bufsiz, int flags)
@@ -57,11 +62,32 @@ readpassphrase(const char *prompt, char *buf, size_t bufsiz, int flags)
         /* I suppose we could alloc on demand in this case (XXX). */
         if (bufsiz == 0) {
                 errno = EINVAL;
-                return(NULL);
+                return NULL ;
         }
 
         printf("%s", prompt);
         fflush(stdout);
+
+	/* try to get a real console */
+	HANDLE in = CreateFile(_T("CONIN$"),GENERIC_READ|GENERIC_WRITE,FILE_SHARE_READ,0,OPEN_EXISTING,0,0);
+	while (in != INVALID_HANDLE_VALUE) {
+		DWORD mode, readed;
+		WCHAR wbuf[256];
+		if (!GetConsoleMode(in, &mode)) break;
+		SetConsoleMode(in, ENABLE_LINE_INPUT|ENABLE_PROCESSED_INPUT);
+		if (!ReadConsoleW(in, wbuf, 255, &readed, NULL)) break;
+		while (readed > 0 && (wbuf[readed-1] == '\r' || wbuf[readed-1] == '\n'))
+			--readed;
+		wbuf[readed] = 0;
+		SetConsoleMode(in, mode);
+		CloseHandle(in);
+		strncpy(buf, wchar_to_utf8_cstr(wbuf).c_str(), bufsiz);
+		buf[bufsiz-1] = 0;
+		printf("\n");
+		return buf;
+	}
+	CloseHandle(in);
+
         end = buf + bufsiz - 1;
         for (p = buf; (ch = getch()) != EOF && ch != '\n' && ch != '\r';) {
                 if (p < end) {

@@ -448,7 +448,7 @@ struct fuse_operations {
 	int (*bmap) (const char *, size_t blocksize, uint64_t *idx);
 
 #ifdef WIN32
-	/* these to support extanted windows calls */
+	/* these to support extented windows calls */
 	uint32_t (*win_get_attributes) (const char *fn);
 	int (*win_set_attributes) (const char *fn, uint32_t attr);
 	int (*win_set_times) (const char *fn, struct fuse_file_info *, const FILETIME *create, const FILETIME *access, const FILETIME *modified);

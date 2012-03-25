@@ -32,6 +32,13 @@ public:
 	void remove_file(const std::string& name);
 };
 
+struct impl_chain_link
+{
+	impl_chain_link *prev_link_;
+	fuse_context call_ctx_;
+	impl_chain_link() { memset(&call_ctx_, 0, sizeof(call_ctx_)); }
+};
+
 /*
 	This class pushes the impl_fuse_context frame on a thread-local stack,
 	this allows to have reentrant FUSE filesystem (if anyone really wants
@@ -39,12 +46,11 @@ public:
 */
 class impl_chain_guard
 {
-	impl_chain_link* cur_link_;
+	impl_chain_link link;
 public:
 	impl_chain_guard(impl_fuse_context* ctx, int caller_pid);
 	~impl_chain_guard();
 };
-impl_fuse_context* get_cur_impl();
 
 class win_error
 {

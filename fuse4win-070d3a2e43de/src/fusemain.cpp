@@ -32,12 +32,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 ////// FUSE frames chain
 ///////////////////////////////////////////////////////////////////////////////////////
-struct impl_chain_link
-{
-	impl_chain_link *prev_link_;
-	fuse_context call_ctx_;
-	impl_fuse_context* ctx_;
-};
 
 #ifdef _MSC_VER
 __declspec(thread) impl_chain_link * cur_impl_chain_link=NULL;
@@ -47,36 +41,22 @@ static __thread impl_chain_link * cur_impl_chain_link=NULL;
 
 impl_chain_guard::impl_chain_guard(impl_fuse_context* ctx, int caller_pid)
 {
-	fuse_context call_ctx={0};
-	call_ctx.pid=caller_pid;
-	call_ctx.private_data=ctx->user_data_;
-	call_ctx.fuse=(struct fuse*)(void*)ctx; //Hack, really...
+	link.call_ctx_.pid=caller_pid;
+	link.call_ctx_.private_data=ctx->user_data_;
+	link.call_ctx_.fuse=(struct fuse*)(void*)ctx; //Hack, really...
 
-	std::auto_ptr<impl_chain_link> link(new impl_chain_link());
-	link->ctx_=ctx;
-	link->call_ctx_=call_ctx;
-	link->prev_link_=cur_impl_chain_link;
+	link.prev_link_ = cur_impl_chain_link;
 
 	//Push current context on the chain stack.
 	//Note, this is thread-safe since we work with a thread-local variable
-	cur_link_=link.get();
-	cur_impl_chain_link=link.release();
+	cur_impl_chain_link = &link;
 }
 
 impl_chain_guard::~impl_chain_guard()
 {
-	if (cur_link_!=cur_impl_chain_link)
+	if (&link != cur_impl_chain_link)
 		abort();//"FUSE frames stack is damaged!"
-	cur_impl_chain_link=cur_link_->prev_link_;
-
-	delete cur_link_;
-}
-
-impl_fuse_context* get_cur_impl()
-{
-	if (cur_impl_chain_link==NULL)
-		abort();//"Can't find FUSE frame!"
-	return cur_impl_chain_link->ctx_;
+	cur_impl_chain_link = link.prev_link_;
 }
 
 struct fuse_context *fuse_get_context(void)

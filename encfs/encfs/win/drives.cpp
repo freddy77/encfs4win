@@ -89,7 +89,8 @@ void Drive::Mount(HWND hwnd)
 	for (unsigned n = 0; n < 5*10; ++n) {
 		// drive appeared
 		if (GetDriveType(mnt) != DRIVE_NO_ROOT_DIR) {
-			Show(hwnd);
+			if (Drives::autoShow)
+				Show(hwnd);
 			break;
 		}
 
@@ -248,6 +249,7 @@ boost::shared_ptr<Drive> Drive::Load(const std::string& name)
 typedef std::vector<Drives::drive_t> drives_t;
 
 static drives_t drives;
+bool Drives::autoShow = true;
 
 Drives::drive_t Drives::GetDrive(int n)
 {

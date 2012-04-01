@@ -90,3 +90,18 @@ std::string Config::NewName()
 	throw truntime_error(_T("writing configuration"));
 }
 
+void Config::SaveGlobal(const std::string& entry, int value)
+{
+	DWORD v = (DWORD) value;
+	if (RegSetValueExA(RootKey(), entry.c_str(), 0, REG_DWORD, (const BYTE*) &v, sizeof(v)) != ERROR_SUCCESS)
+		throw truntime_error(_T("writing configuration"));
+}
+
+int Config::LoadGlobal(const std::string& entry)
+{
+	DWORD v, type, len = sizeof(v);
+	if (RegQueryValueExA(RootKey(), entry.c_str(), NULL, &type, (BYTE*) v, &len) != ERROR_SUCCESS || type != REG_DWORD || len != sizeof(v))
+		throw truntime_error(_T("reading configuration"));
+	return (int) v;
+}
+

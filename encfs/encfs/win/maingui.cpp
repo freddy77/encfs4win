@@ -22,6 +22,7 @@ static BOOL InitInstance(HINSTANCE hInstance, int nCmdShow);
 static INT_PTR CALLBACK MainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 static INT_PTR CALLBACK OptionsDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 static INT_PTR CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+static INT_PTR CALLBACK PreferencesDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 #define TRAYICONID	1
 #define SWM_TRAYMSG	WM_APP+100
@@ -115,6 +116,10 @@ extern "C" int main_gui(HINSTANCE /* hInstance */, HINSTANCE /* hPrevInstance */
 	if (GetLastError() == ERROR_ALREADY_EXISTS)
 		return 0;
 
+	try {
+		Drives::autoShow = Config::LoadGlobal("AutoShow") != 0;
+	}
+	catch (...) {}
 	if (!InitInstance(hInst, nCmdShow))
 		return 1;
 
@@ -376,7 +381,7 @@ ShowContextMenu(HWND hWnd)
 	AppendMenu(hMenu, 0, IDM_OPEN, _T("Open/Create"));
 	AppendMenu(hMenu, MF_MENUBREAK, -1, NULL);
 	Drives::AddMenus(hMenu);
-	AppendMenu(hMenu, CheckAutoStart() ? MF_CHECKED : 0, IDM_AUTOSTART, _T("Start at login"));
+	AppendMenu(hMenu, 0, IDM_PREFERENCES, _T("Preferences"));
 	AppendMenu(hMenu, 0, IDM_ABOUT, _T("About"));
 	AppendMenu(hMenu, 0, IDM_EXIT, _T("Exit"));
 	SetMenuDefaultItem(hMenu, IDM_OPEN, FALSE);
@@ -495,6 +500,46 @@ OptionsDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+static void
+Preferences(HWND hwnd)
+{
+	DialogBoxParam(hInst, (LPCTSTR) IDD_PREFERENCES, hwnd, (DLGPROC) PreferencesDlgProc, (LPARAM) NULL);
+}
+
+static INT_PTR CALLBACK
+PreferencesDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message) {
+	case WM_INITDIALOG:
+		if (CheckAutoStart())
+			SendDlgItemMessage(hWnd, IDC_CHKSTARTUP, BM_SETCHECK, BST_CHECKED, 0);
+		if (Drives::autoShow)
+			SendDlgItemMessage(hWnd, IDC_CHKOPEN, BM_SETCHECK, BST_CHECKED, 0);
+		return TRUE;
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDCANCEL:
+			EndDialog(hWnd, LOWORD(wParam));
+			return TRUE;
+		case IDOK:
+			EnableAutoStart(IsDlgButtonChecked(hWnd, IDC_CHKSTARTUP) == BST_CHECKED);
+			Drives::autoShow = (IsDlgButtonChecked(hWnd, IDC_CHKOPEN) == BST_CHECKED);
+			Config::SaveGlobal("AutoShow", Drives::autoShow ? 1 : 0);
+			EndDialog(hWnd, LOWORD(wParam));
+			return TRUE;
+		}
+		break;
+	case WM_SYSCOMMAND:
+		if ((wParam & 0xFFF0) == SC_MINIMIZE)
+			return 1;
+		break;
+	case WM_CLOSE:
+		EndDialog(hWnd, IDCANCEL);
+		return TRUE;
+	}
+	return 0;
+}
+
 static INT_PTR CALLBACK
 MainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -529,8 +574,8 @@ MainDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case IDM_ABOUT:
 			DialogBox(hInst, (LPCTSTR) IDD_ABOUTBOX, hWnd, (DLGPROC) AboutDlgProc);
 			break;
-		case IDM_AUTOSTART:
-			EnableAutoStart(!CheckAutoStart());
+		case IDM_PREFERENCES:
+			Preferences(hWnd);
 			break;
 		default:
 			if (id >= IDM_MOUNT_START && id < IDM_MOUNT_END) {

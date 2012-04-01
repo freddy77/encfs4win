@@ -7,4 +7,6 @@ struct Config
 	static void Enum(void (*proc)(const std::string& name, void* param), void *param);
 	static void Delete(const std::string& name);
 	static std::string NewName();
+	static void SaveGlobal(const std::string& entry, int value);
+	static int LoadGlobal(const std::string& entry);
 };

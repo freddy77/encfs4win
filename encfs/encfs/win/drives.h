@@ -15,7 +15,7 @@ enum {
 	IDM_EXIT = 2000,
 	IDM_ABOUT,
 	IDM_OPEN,
-	IDM_AUTOSTART,
+	IDM_PREFERENCES,
 	IDM_MOUNT_START,
 	IDM_MOUNT_END = IDM_MOUNT_START + IDM_MOUNT_MAX*IDM_MAX_TYPES
 };
@@ -51,6 +51,7 @@ class Drives
 {
 friend class Drive;
 public:
+	static bool autoShow;
 	typedef boost::shared_ptr<Drive> drive_t;
 	static drive_t GetDrive(int n);
 	static void Load();

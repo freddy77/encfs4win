@@ -1,0 +1,158 @@
+diff -ru rlog-1.4.orig/rlog/Makefile.am rlog-1.4/rlog/Makefile.am
+--- rlog-1.4.orig/rlog/Makefile.am	2012-08-30 21:03:00.942683695 +0100
++++ rlog-1.4/rlog/Makefile.am	2012-08-30 21:05:54.298676445 +0100
+@@ -15,7 +15,8 @@
+     RLogNode.cpp \
+     RLogPublisher.cpp \
+     RLogTime.cpp \
+-    StdioNode.cpp
++    StdioNode.cpp \
++    SyslogNode.cpp
+ 
+ librlog_la_LDFLAGS = -version-info $(LIBRLOG_VERSION) $(USER_LDFLAGS)
+ 
+diff -ru rlog-1.4.orig/rlog/RLogChannel.cpp rlog-1.4/rlog/RLogChannel.cpp
+--- rlog-1.4.orig/rlog/RLogChannel.cpp	2012-08-30 21:03:00.942683695 +0100
++++ rlog-1.4/rlog/RLogChannel.cpp	2012-08-30 21:05:22.262677784 +0100
+@@ -37,10 +37,10 @@
+     // Use GetComponentChannel here because we want to reference the global
+     // versions, not the componentized versions..
+     // We'll use 
+-    RLogChannel *_RLDebugChannel = GetGlobalChannel( "debug", Log_Debug );
+-    RLogChannel *_RLInfoChannel = GetGlobalChannel( "info", Log_Info );
+-    RLogChannel *_RLWarningChannel = GetGlobalChannel( "warning", Log_Warning );
+-    RLogChannel *_RLErrorChannel = GetGlobalChannel( "error", Log_Error );
++    RLOG_DECL RLogChannel *_RLDebugChannel = GetGlobalChannel( "debug", Log_Debug );
++    RLOG_DECL RLogChannel *_RLInfoChannel = GetGlobalChannel( "info", Log_Info );
++    RLOG_DECL RLogChannel *_RLWarningChannel = GetGlobalChannel( "warning", Log_Warning );
++    RLOG_DECL RLogChannel *_RLErrorChannel = GetGlobalChannel( "error", Log_Error );
+ }
+ 
+ 
+diff -ru rlog-1.4.orig/rlog/rlog.h rlog-1.4/rlog/rlog.h
+--- rlog-1.4.orig/rlog/rlog.h	2012-08-30 21:03:00.942683695 +0100
++++ rlog-1.4/rlog/rlog.h	2012-08-30 21:04:10.978680766 +0100
+@@ -171,7 +171,7 @@
+ 	inline void disable() { *enabled = false; }
+ 	inline bool isEnabled() { return *enabled; }
+ 
+-	~PublishLoc();
++	RLOG_DECL ~PublishLoc();
+     };
+ 
+     /*! @fn RLog_Register
+diff -ru rlog-1.4.orig/rlog/RLogTime.cpp rlog-1.4/rlog/RLogTime.cpp
+--- rlog-1.4.orig/rlog/RLogTime.cpp	2012-08-30 21:03:00.942683695 +0100
++++ rlog-1.4/rlog/RLogTime.cpp	2012-08-30 21:04:59.994678716 +0100
+@@ -16,7 +16,10 @@
+  *
+  */
+ 
++#if HAVE_CONFIG_H
+ #include "config.h"
++#endif
++
+ #include "RLogTime.h"
+ 
+ #ifdef _WIN32
+diff -ru rlog-1.4.orig/rlog/RLogTime.h rlog-1.4/rlog/RLogTime.h
+--- rlog-1.4.orig/rlog/RLogTime.h	2012-08-30 21:03:00.942683695 +0100
++++ rlog-1.4/rlog/RLogTime.h	2012-08-30 21:04:50.694679105 +0100
+@@ -32,7 +32,7 @@
+ typedef __int64 rlog_time_interval;
+ typedef LARGE_INTEGER rlog_time;
+ 
+-void sleep(int seconds);
++RLOG_DECL void sleep(int seconds);
+ #else
+ 
+ #include <stdint.h>
+@@ -44,9 +44,9 @@
+ 
+ #endif
+ 
+-void rlog_get_time(rlog_time *pt);
+-rlog_time_interval rlog_time_diff( const rlog_time &end, const rlog_time &start );
++RLOG_DECL void rlog_get_time(rlog_time *pt);
++RLOG_DECL rlog_time_interval rlog_time_diff( const rlog_time &end, const rlog_time &start );
+ 
+-const char *rlog_time_unit();
++RLOG_DECL const char *rlog_time_unit();
+ 
+ #endif // _rlog_time_incl
+Only in rlog-1.4/win32: common.h.msvc80
+diff -ru rlog-1.4.orig/win32/rlog.vcproj rlog-1.4/win32/rlog.vcproj
+--- rlog-1.4.orig/win32/rlog.vcproj	2012-08-30 21:03:00.942683695 +0100
++++ rlog-1.4/win32/rlog.vcproj	2012-08-30 21:08:48.562669156 +0100
+@@ -41,7 +41,7 @@
+ 				Name="VCCLCompilerTool"
+ 				Optimization="0"
+ 				AdditionalIncludeDirectories=".."
+-				PreprocessorDefinitions="RLOG_COMPONENT=&quot;rlog&quot;;_CRT_SECURE_NO_WARNINGS"
++				PreprocessorDefinitions="RLOG_COMPONENT=&quot;rlog&quot;;_CRT_SECURE_NO_WARNINGS;RLOG_EXPORTS"
+ 				MinimalRebuild="true"
+ 				BasicRuntimeChecks="3"
+ 				RuntimeLibrary="3"
+@@ -62,13 +62,6 @@
+ 			/>
+ 			<Tool
+ 				Name="VCLinkerTool"
+-				OutputFile="$(OutDir)/rlog.dll"
+-				LinkIncremental="2"
+-				GenerateDebugInformation="true"
+-				ProgramDatabaseFile="$(OutDir)/rlog.pdb"
+-				SubSystem="2"
+-				ImportLibrary="$(OutDir)/rlog.lib"
+-				TargetMachine="1"
+ 			/>
+ 			<Tool
+ 				Name="VCALinkTool"
+@@ -121,7 +114,7 @@
+ 			<Tool
+ 				Name="VCCLCompilerTool"
+ 				AdditionalIncludeDirectories=".."
+-				PreprocessorDefinitions="RLOG_COMPONENT=&quot;rlog&quot;;_CRT_SECURE_NO_WARNINGS"
++				PreprocessorDefinitions="RLOG_COMPONENT=&quot;rlog&quot;;_CRT_SECURE_NO_WARNINGS;RLOG_EXPORTS"
+ 				RuntimeLibrary="2"
+ 				UsePrecompiledHeader="0"
+ 				WarningLevel="4"
+@@ -212,6 +205,10 @@
+ 				>
+ 			</File>
+ 			<File
++				RelativePath="..\rlog\RLogTime.cpp"
++				>
++			</File>
++			<File
+ 				RelativePath="..\rlog\StdioNode.cpp"
+ 				>
+ 			</File>
+@@ -258,6 +255,10 @@
+ 				>
+ 			</File>
+ 			<File
++				RelativePath="..\rlog\RLogTime.h"
++				>
++			</File>
++			<File
+ 				RelativePath="..\rlog\StdioNode.h"
+ 				>
+ 			</File>
+@@ -281,7 +282,7 @@
+ 				<Tool
+ 					Name="VCCustomBuildTool"
+ 					Description="Creating common.h..."
+-					CommandLine="copy $(InputPath) ..\rlog\common.h"
++					CommandLine="copy &quot;$(InputPath)&quot; ..\rlog\common.h&#x0D;&#x0A;"
+ 					Outputs="..\rlog\common.h"
+ 				/>
+ 			</FileConfiguration>
+@@ -291,7 +292,7 @@
+ 				<Tool
+ 					Name="VCCustomBuildTool"
+ 					Description="Creating common.h..."
+-					CommandLine="copy $(InputPath) ..\rlog\common.h"
++					CommandLine="copy &quot;$(InputPath)&quot; ..\rlog\common.h&#x0D;&#x0A;"
+ 					Outputs="..\rlog\common.h"
+ 				/>
+ 			</FileConfiguration>

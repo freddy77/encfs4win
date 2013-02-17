@@ -354,7 +354,7 @@ int encfs_unlink(const char *path)
 
 int _do_rmdir(EncFS_Context *, const string &cipherPath, int )
 {
-    return rmdir( cipherPath.c_str() );
+    return unix::rmdir( cipherPath.c_str() );
 }
 
 int encfs_rmdir(const char *path)
@@ -497,7 +497,7 @@ int encfs_rename(const char *from, const char *to)
 
 int _do_chmod(EncFS_Context *, const string &cipherPath, mode_t mode)
 {
-    return chmod( cipherPath.c_str(), mode );
+    return unix::chmod( cipherPath.c_str(), mode );
 }
 
 int encfs_chmod(const char *path, mode_t mode)
@@ -537,7 +537,7 @@ int encfs_ftruncate(const char *path, off_t size, struct fuse_file_info *fi)
 
 int _do_utime(EncFS_Context *, const string &cyName, struct utimbuf *buf)
 {
-    int res = utime( cyName.c_str(), buf);
+    int res = unix::utime( cyName.c_str(), buf);
     return (res == -1) ? -errno : ESUCCESS;
 }
 
@@ -555,7 +555,7 @@ int _do_utimens(EncFS_Context *, const string &cyName,
     tv[1].tv_sec = ts[1].tv_sec;
     tv[1].tv_usec = ts[1].tv_nsec / 1000;
 
-    int res = utimes( cyName.c_str(), tv);
+    int res = unix::utimes( cyName.c_str(), tv);
     return (res == -1) ? -errno : ESUCCESS;
 }
 
@@ -694,7 +694,7 @@ int encfs_statfs(const char *path, struct statvfs *st)
 	string cyName = ctx->rootCipherDir;
 
 	rLog(Info, "doing statfs of %s", cyName.c_str());
-	res = statvfs( cyName.c_str(), st );
+	res = unix::statvfs( cyName.c_str(), st );
 	if(!res) 
 	{
 	    // adjust maximum name length..

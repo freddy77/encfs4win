@@ -102,12 +102,12 @@ static int open_readonly_workaround(const char *path, int flags)
     int fd = -1;
     struct stat stbuf;
     memset(&stbuf, 0, sizeof(struct stat));
-    if(lstat( path, &stbuf ) != -1)
+    if(unix::lstat( path, &stbuf ) != -1)
     {
 	// make sure user has read/write permission..
-	chmod( path , stbuf.st_mode | 0600 );
+	unix::chmod( path , stbuf.st_mode | 0600 );
 	fd = ::my_open( path , flags );
-	chmod( path , stbuf.st_mode );
+	unix::chmod( path , stbuf.st_mode );
     } else
     {
 	rInfo("can't stat file %s", path );
@@ -187,7 +187,7 @@ int RawFileIO::open(int flags)
 
 int RawFileIO::getAttr( struct stat *stbuf ) const
 {
-    int res = lstat( name.c_str(), stbuf );
+    int res = unix::lstat( name.c_str(), stbuf );
     int eno = errno;
 
     if(res < 0)
@@ -212,7 +212,7 @@ off_t RawFileIO::getSize() const
     {
 	struct stat stbuf;
 	memset( &stbuf, 0, sizeof( struct stat ));
-	int res = lstat( name.c_str(), &stbuf );
+	int res = unix::lstat( name.c_str(), &stbuf );
 
 	if(res == 0)
 	{
@@ -231,7 +231,7 @@ ssize_t RawFileIO::read( const IORequest &req ) const
 {
     rAssert( fd >= 0 );
 
-    ssize_t readSize = pread( fd, req.data, req.dataLen, req.offset );
+    ssize_t readSize = unix::pread( fd, req.data, req.dataLen, req.offset );
 
     if(readSize < 0)
     {
@@ -254,7 +254,7 @@ bool RawFileIO::write( const IORequest &req )
 
     while( bytes && retrys > 0 )
     {
-	ssize_t writeSize = ::pwrite( fd, buf, bytes, offset );
+	ssize_t writeSize = unix::pwrite( fd, buf, bytes, offset );
 
 	if( writeSize < 0 )
 	{
@@ -295,12 +295,12 @@ int RawFileIO::truncate( off_t size )
 
     if(fd >= 0 && canWrite)
     {
-	res = ::ftruncate( fd, size );
+	res = unix::ftruncate( fd, size );
 #ifndef __FreeBSD__
-	::fdatasync( fd );
+	unix::fdatasync( fd );
 #endif
     } else
-	res = ::truncate( name.c_str(), size );
+	res = unix::truncate( name.c_str(), size );
 
     if(res < 0)
     {

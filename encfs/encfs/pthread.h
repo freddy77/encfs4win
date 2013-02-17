@@ -17,6 +17,9 @@ void pthread_mutex_unlock(pthread_mutex_t *mtx);
 int pthread_create(pthread_t *thread, int, void *(*start_routine)(void*), void *arg);
 void pthread_join(pthread_t thread, int);
 
+int my_open(const char *fn, int flags);
+
+namespace unix {
 int fsync(int fd);
 int fdatasync(int fd);
 
@@ -24,26 +27,26 @@ ssize_t pread(int fd, void *buf, size_t count, __int64 offset);
 ssize_t pwrite(int fd, const void *buf, size_t count, __int64 offset);
 
 int truncate(const char *path, __int64 length);
+int ftruncate(int fd, __int64 length);
 int statvfs(const char *path, struct statvfs *buf);
 int utimes(const char *filename, const struct timeval times[2]);
 int utime(const char *filename, struct utimbuf *times);
-#define lstat stat
-int my_open(const char *fn, int flags);
+int open(const char *fn, int flags, ...);
 int mkdir(const char *fn, int mode);
 int rename(const char *oldpath, const char *newpath);
 int unlink(const char *path);
 int rmdir(const char *path);
-int __MINGW_NOTHROW _stati64(const char *path, struct _stati64 *buffer);
+int stat(const char *path, struct _stati64 *buffer);
+static inline int lstat(const char *path, struct _stati64 *buffer) {
+	return unix::stat(path, buffer);
+}
 int chmod (const char*, int);
 
-typedef struct MY_DIR MY_DIR;
-MY_DIR *my_opendir(const char *name);
-int my_closedir(MY_DIR* dir);
-struct dirent* my_readdir(MY_DIR* dir);
-#define DIR MY_DIR
-#define opendir my_opendir
-#define closedir my_closedir
-#define readdir my_readdir
+struct DIR;
+DIR *opendir(const char *name);
+int closedir(DIR* dir);
+struct dirent* readdir(DIR* dir);
+};
 
 std::wstring utf8_to_wfn(const std::string& src);
 

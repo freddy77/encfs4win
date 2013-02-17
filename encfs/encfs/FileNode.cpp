@@ -196,7 +196,7 @@ int FileNode::mknod(mode_t mode, dev_t rdev, uid_t uid, gid_t gid)
      * were a create method (advised to have)
      */
     if (S_ISREG( mode ) || !(mode & _S_IFMT)) {
-        res = ::open( _cname.c_str(), O_CREAT | O_EXCL | O_WRONLY, mode );
+        res = unix::open( _cname.c_str(), O_CREAT | O_EXCL | O_WRONLY, mode );
         if (res >= 0)
             res = ::close( res );
 #if 0
@@ -296,13 +296,13 @@ int FileNode::sync(bool datasync)
 	int res = -EIO;
 #ifdef linux
 	if(datasync)
-	    res = fdatasync( fh );
+	    res = unix::fdatasync( fh );
 	else
-	    res = fsync( fh );
+	    res = unix::fsync( fh );
 #else
 	// no fdatasync support
 	// TODO: use autoconfig to check for it..
-	res = fsync(fh);
+	res = unix::fsync(fh);
 #endif
 	
 	if(res == -1)

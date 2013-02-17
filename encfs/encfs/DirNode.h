@@ -42,7 +42,7 @@ class EncFS_Context;
 class DirTraverse
 {
 public:
-    DirTraverse(const shared_ptr<DIR> &dirPtr, uint64_t iv, 
+    DirTraverse(const shared_ptr<unix::DIR> &dirPtr, uint64_t iv,
 	        const shared_ptr<NameIO> &naming);
     DirTraverse(const DirTraverse &src);
     ~DirTraverse();
@@ -64,7 +64,7 @@ public:
     std::string nextInvalid();
 private:
 
-    shared_ptr<DIR> dir; // struct DIR
+    shared_ptr<unix::DIR> dir; // struct DIR
     // initialization vector to use.  Not very general purpose, but makes it
     // more efficient to support filename IV chaining..
     uint64_t iv; 

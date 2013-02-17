@@ -57,19 +57,19 @@ void pthread_join(pthread_t thread, int)
 	WaitForSingleObject(thread, INFINITE);
 }
 
-int fsync(int fd)
+int unix::fsync(int fd)
 {
 	FlushFileBuffers((HANDLE) _get_osfhandle(fd));
 	return 0;
 }
 
-int fdatasync(int fd)
+int unix::fdatasync(int fd)
 {
 	FlushFileBuffers((HANDLE) _get_osfhandle(fd));
 	return 0;
 }
 
-ssize_t pread(int fd, void *buf, size_t count, __int64 offset)
+ssize_t unix::pread(int fd, void *buf, size_t count, __int64 offset)
 {
 	HANDLE h = (HANDLE) _get_osfhandle(fd);
 	if (h == INVALID_HANDLE_VALUE) {
@@ -90,7 +90,7 @@ ssize_t pread(int fd, void *buf, size_t count, __int64 offset)
 	return len;
 }
 
-ssize_t pwrite(int fd, const void *buf, size_t count, __int64 offset)
+ssize_t unix::pwrite(int fd, const void *buf, size_t count, __int64 offset)
 {
 	HANDLE h = (HANDLE) _get_osfhandle(fd);
 	if (h == INVALID_HANDLE_VALUE) {
@@ -109,7 +109,11 @@ ssize_t pwrite(int fd, const void *buf, size_t count, __int64 offset)
 	return len;
 }
 
-int truncate(const char *path, __int64 length)
+int unix::ftruncate(int fd, __int64 length) {
+	return ::ftruncate64(fd, length);
+}
+
+int unix::truncate(const char *path, __int64 length)
 {
 	std::wstring fn(utf8_to_wfn(path));
 	HANDLE fd = CreateFileW(fn.c_str(), GENERIC_WRITE|GENERIC_READ, FILE_SHARE_DELETE, NULL, OPEN_EXISTING, 0, NULL);
@@ -302,7 +306,7 @@ timevalToFiletime(struct timeval t)
 }
 
 int
-utimes(const char *filename, const struct timeval times[2])
+unix::utimes(const char *filename, const struct timeval times[2])
 {
 	std::wstring fn(utf8_to_wfn(filename));
 	HANDLE h = CreateFileW(fn.c_str(), FILE_WRITE_ATTRIBUTES, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
@@ -325,7 +329,7 @@ utimes(const char *filename, const struct timeval times[2])
 }
 
 int
-statvfs(const char *path, struct statvfs *fs)
+unix::statvfs(const char *path, struct statvfs *fs)
 {
 	fs->f_bsize = 4096;
 	fs->f_frsize = 4096;
@@ -382,7 +386,7 @@ my_open(const char *fn_utf8, int flags)
 }
 
 int
-open(const char *fn, int flags, ...)
+unix::open(const char *fn, int flags, ...)
 {
 	int mode = 0;
 	va_list ap;
@@ -394,21 +398,21 @@ open(const char *fn, int flags, ...)
 }
 
 int
-utime(const char *filename, struct utimbuf *times)
+unix::utime(const char *filename, struct utimbuf *times)
 {
 	if (!times)
-		return utimes(filename, NULL);
+		return unix::utimes(filename, NULL);
 	
 	struct timeval tm[2];
 	tm[0].tv_sec = times->actime;
 	tm[0].tv_usec = 0;
 	tm[1].tv_sec = times->modtime;
 	tm[1].tv_usec = 0;
-	return utimes(filename, tm);
+	return unix::utimes(filename, tm);
 }
 
 int
-mkdir(const char *fn, int mode)
+unix::mkdir(const char *fn, int mode)
 {
 	if (CreateDirectoryW(utf8_to_wfn(fn).c_str(), NULL))
 		return 0;
@@ -417,7 +421,7 @@ mkdir(const char *fn, int mode)
 }
 
 int
-rename(const char *oldpath, const char *newpath)
+unix::rename(const char *oldpath, const char *newpath)
 {
 	if (MoveFileW(utf8_to_wfn(oldpath).c_str(), utf8_to_wfn(newpath).c_str()))
 		return 0;
@@ -426,7 +430,7 @@ rename(const char *oldpath, const char *newpath)
 }
 
 int
-unlink(const char *path)
+unix::unlink(const char *path)
 {
 	if (DeleteFileW(utf8_to_wfn(path).c_str()))
 		return 0;
@@ -435,7 +439,7 @@ unlink(const char *path)
 }
 
 int
-rmdir(const char *path)
+unix::rmdir(const char *path)
 {
 	if (RemoveDirectoryW(utf8_to_wfn(path).c_str()))
 		return 0;
@@ -444,7 +448,7 @@ rmdir(const char *path)
 }
 
 int
-_stati64(const char *path, struct _stati64 *buffer)
+unix::stat(const char *path, struct _stati64 *buffer)
 {
 	std::wstring fn = utf8_to_wfn(path).c_str();
 	if (fn.length() && fn[fn.length()-1] == L'\\')
@@ -492,12 +496,12 @@ _stati64(const char *path, struct _stati64 *buffer)
 }
 
 int
-chmod(const char* path, int mode)
+unix::chmod(const char* path, int mode)
 {
 	return _wchmod(utf8_to_wfn(path).c_str(), mode);
 }
 
-struct MY_DIR
+struct unix::DIR
 {
 	HANDLE hff;
 	struct dirent ent;
@@ -505,10 +509,10 @@ struct MY_DIR
 	int pos;
 };
 
-MY_DIR*
-my_opendir(const char *name)
+unix::DIR*
+unix::opendir(const char *name)
 {
-	MY_DIR *dir = (MY_DIR*) malloc(sizeof(MY_DIR));
+	unix::DIR *dir = (unix::DIR*) malloc(sizeof(unix::DIR));
 	if (!dir) {
 		errno = ENOMEM;
 		return NULL;
@@ -529,7 +533,7 @@ my_opendir(const char *name)
 }
 
 int
-my_closedir(MY_DIR* dir)
+unix::closedir(unix::DIR* dir)
 {
 	errno = 0;
 	if (dir && dir->hff != INVALID_HANDLE_VALUE)
@@ -542,7 +546,7 @@ void utf8_to_wchar_buf(const char *src, wchar_t *res, int maxlen);
 std::string wchar_to_utf8_cstr(const wchar_t *str);
 
 struct dirent*
-my_readdir(MY_DIR* dir)
+unix::readdir(unix::DIR* dir)
 {
 	errno = EBADF;
 	if (!dir) return NULL;

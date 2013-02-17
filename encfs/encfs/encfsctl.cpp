@@ -577,7 +577,7 @@ static int traverseDirs(const shared_ptr<EncFS_Root> &rootInfo,
         if(dirNode->getAttr(&st))
             return EXIT_FAILURE;
 
-        mkdir(destDir.c_str(), st.st_mode);
+        unix::mkdir(destDir.c_str(), st.st_mode);
     }
 
     // show files in directory
@@ -596,7 +596,7 @@ static int traverseDirs(const shared_ptr<EncFS_Root> &rootInfo,
 
                 int r = EXIT_SUCCESS;
                 struct stat stBuf;
-                if( !lstat( cpath.c_str(), &stBuf ))
+                if( !unix::lstat( cpath.c_str(), &stBuf ))
                 {
                     if( S_ISDIR( stBuf.st_mode ) )
                     {

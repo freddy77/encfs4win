@@ -50,14 +50,14 @@ static RLogChannel *Info = DEF_CHANNEL( "info/DirNode", Log_Info );
 class DirDeleter
 {
 public:
-    void operator () ( DIR *d )
+    void operator () ( unix::DIR *d )
     {
-	::closedir( d );
+	unix::closedir( d );
     }
 };
 
 
-DirTraverse::DirTraverse(const shared_ptr<DIR> &_dirPtr, 
+DirTraverse::DirTraverse(const shared_ptr<unix::DIR> &_dirPtr,
 	uint64_t _iv, const shared_ptr<NameIO> &_naming)
     : dir( _dirPtr )
     , iv( _iv )
@@ -89,10 +89,10 @@ DirTraverse::~DirTraverse()
 }
 
 static
-bool _nextName(struct dirent *&de, const shared_ptr<DIR> &dir, 
+bool _nextName(struct dirent *&de, const shared_ptr<unix::DIR> &dir,
 	int *fileType, ino_t *inode)
 {
-    de = ::readdir( dir.get() );
+    de = unix::readdir( dir.get() );
 
     if(de)
     {
@@ -227,14 +227,14 @@ bool RenameOp::apply()
                     last->oldCName.c_str(), last->newCName.c_str());
 
             struct stat st;
-            bool preserve_mtime = ::stat(last->oldCName.c_str(), &st) == 0;
+            bool preserve_mtime = unix::stat(last->oldCName.c_str(), &st) == 0;
 
             // internal node rename..
             dn->renameNode( last->oldPName.c_str(), 
                             last->newPName.c_str() );
 
             // rename on disk..
-            if(::rename( last->oldCName.c_str(), 
+            if(unix::rename( last->oldCName.c_str(),
                          last->newCName.c_str() ) == -1)
             {
                 rWarning("Error renaming %s: %s",
@@ -249,7 +249,7 @@ bool RenameOp::apply()
                 struct utimbuf ut;
                 ut.actime = st.st_atime;
                 ut.modtime = st.st_mtime;
-                ::utime(last->newCName.c_str(), &ut);
+                unix::utime(last->newCName.c_str(), &ut);
             }
 
             ++last;
@@ -285,7 +285,7 @@ void RenameOp::undo()
         rDebug("undo: renaming %s -> %s", 
                 it->newCName.c_str(), it->oldCName.c_str());
 
-        ::rename( it->newCName.c_str(), it->oldCName.c_str() );
+        unix::rename( it->newCName.c_str(), it->oldCName.c_str() );
         try
         {
             dn->renameNode( it->newPName.c_str(), 
@@ -411,14 +411,14 @@ DirTraverse DirNode::openDir(const char *plaintextPath)
     string cyName = rootDir + naming->encodePath( plaintextPath );
     //rDebug("openDir on %s", cyName.c_str() );
 
-    DIR *dir = ::opendir( cyName.c_str() );
+    unix::DIR *dir = unix::opendir( cyName.c_str() );
     if(dir == NULL)
     {
 	rDebug("opendir error %s", strerror(errno));
-	return DirTraverse( shared_ptr<DIR>(), 0, shared_ptr<NameIO>() );
+	return DirTraverse( shared_ptr<unix::DIR>(), 0, shared_ptr<NameIO>() );
     } else
     {
-        shared_ptr<DIR> dp( dir, DirDeleter() );
+        shared_ptr<unix::DIR> dp( dir, DirDeleter() );
 
 	uint64_t iv = 0;
 	// if we're using chained IV mode, then compute the IV at this
@@ -454,13 +454,13 @@ bool DirNode::genRenameList( list<RenameEl> &renameList,
 
     // generate the real destination path, where we expect to find the files..
     rDebug("opendir %s", sourcePath.c_str() );
-    shared_ptr<DIR> dir = shared_ptr<DIR>(
-	    opendir( sourcePath.c_str() ), DirDeleter() );
+    shared_ptr<unix::DIR> dir = shared_ptr<unix::DIR>(
+	    unix::opendir( sourcePath.c_str() ), DirDeleter() );
     if(!dir)
 	return false;
     
     struct dirent *de = NULL;
-    while((de = ::readdir( dir.get() )) != NULL)
+    while((de = unix::readdir( dir.get() )) != NULL)
     {
 	// decode the name using the oldIV
 	uint64_t localIV = fromIV;
@@ -589,7 +589,7 @@ int DirNode::mkdir(const char *plaintextPath, mode_t mode,
 	oldgid = setfsgid( gid );
 #endif
 
-    int res = ::mkdir( cyName.c_str(), mode );
+    int res = unix::mkdir( cyName.c_str(), mode );
 
 #if 0
     if(olduid >= 0)
@@ -645,11 +645,11 @@ DirNode::rename( const char *fromPlaintext, const char *toPlaintext )
     try
     {
         struct stat st;
-        bool preserve_mtime = ::stat(fromCName.c_str(), &st) == 0;
+        bool preserve_mtime = unix::stat(fromCName.c_str(), &st) == 0;
 
 	renameNode( fromPlaintext, toPlaintext );
 	toNode.reset();
-	res = ::rename( fromCName.c_str(), toCName.c_str() );
+	res = unix::rename( fromCName.c_str(), toCName.c_str() );
 
 	if(res == -1)
 	{
@@ -664,7 +664,7 @@ DirNode::rename( const char *fromPlaintext, const char *toPlaintext )
             struct utimbuf ut;
             ut.actime = st.st_atime;
             ut.modtime = st.st_mtime;
-            ::utime(toCName.c_str(), &ut);
+            unix::utime(toCName.c_str(), &ut);
         }
     } catch( rlog::Error &err )
     {
@@ -834,7 +834,7 @@ int DirNode::unlink( const char *plaintextName )
 #endif
     {
 	string fullName = rootDir + cyName;
-	res = ::unlink( fullName.c_str() );
+	res = unix::unlink( fullName.c_str() );
 	if(res == -1)
 	{
 	    res = -errno;

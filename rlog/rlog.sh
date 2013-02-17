@@ -4,9 +4,10 @@ NAME=rlog-1.4
 OUT=$PWD/../out
 rm -rf $NAME
 tar zxvf $NAME.tar.gz
-patch -p0 < $NAME.diff
-patch -p0 < rlog-1.4-win.diff
 cd $NAME
+patch -p1 < ../$NAME.diff
+patch -p1 < ../rlog-1.4-win.diff
+patch -p1 < ../rlog-1.4-win2.diff
 HOST=unknown
 for h in i386-mingw32 i586-mingw32msvc i686-w64-mingw32; do
 	if $h-gcc --help &> /dev/null; then

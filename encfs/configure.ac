@@ -34,6 +34,8 @@ dnl These can be overridden by command line arguments
 AC_ENABLE_SHARED(yes)
 AC_ENABLE_STATIC(no)
 
+AC_DEFINE(_FILE_OFFSET_BITS_SET_FTRUNCATE, 1, [Avoid problem with MingW define])
+
 AM_CONDITIONAL( BUILD_STATIC, test "x$enable_static" = "xyes" )
 dnl only build either static or shared, not both..
 if test "x$enable_static" = "xyes"; then

@@ -18,9 +18,10 @@
 #ifdef linux
 #define _XOPEN_SOURCE 500 // pick up pread , pwrite
 #endif
-#include <unistd.h>
 
 #include "RawFileIO.h"
+
+#include <unistd.h>
 
 #include <rlog/rlog.h>
 

@@ -248,8 +248,7 @@ off_t FileNode::getSize() const
 {
     Lock _lock( mutex );
 
-    int res = io->getSize();
-    return res;
+    return io->getSize();
 }
 
 ssize_t FileNode::read( off_t offset, unsigned char *data, ssize_t size ) const

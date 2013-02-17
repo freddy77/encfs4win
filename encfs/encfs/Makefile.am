@@ -108,7 +108,7 @@ libencfsall_la_LIBADD = @RLOG_LIBS@ \
 	@OPENSSL_LIBS@ \
 	@FUSE_LIBS@ \
 	@BOOST_SERIALIZATION_LIB@ @BOOST_FILESYSTEM_LIB@ @BOOST_SYSTEM_LIB@ \
-	-luser32 -lgdi32 -lws2_32 -lcomctl32 win/resource.res
+	-luser32 -lgdi32 -lws2_32 -lcomctl32 -lcrypt32 win/resource.res
 libencfsall_la_CXXFLAGS = -DUNICODE -D_UNICODE
 
 .rc.res:

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+OBJDUMP=i686-w64-mingw32-objdump
+
 filter() {
 	FN="$1"
 	LAST=
@@ -32,5 +34,5 @@ while read FN; do
 	FN=${FN%%@*}
 	echo
 	echo $FN
-	i586-mingw32msvc-objdump -tC .libs/*.o|filter "$FN" # grep -w $FN| grep -v ::
+	$OBJDUMP -tC .libs/*.o|filter "$FN" # grep -w $FN| grep -v ::
 done < ../../files_functions.txt

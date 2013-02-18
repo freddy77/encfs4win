@@ -79,10 +79,10 @@ RawFileIO::~RawFileIO()
     swap( _oldfd, oldfd );
 
     if( _oldfd != -1 )
-	close( _oldfd );
+	unix::close( _oldfd );
     
     if( _fd != -1 )
-	close( _fd );
+	unix::close( _fd );
 }
 
 rel::Interface RawFileIO::Interface() const

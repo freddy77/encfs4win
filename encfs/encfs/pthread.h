@@ -36,6 +36,9 @@ int statvfs(const char *path, struct statvfs *buf);
 int utimes(const char *filename, const struct timeval times[2]);
 int utime(const char *filename, struct utimbuf *times);
 int open(const char *fn, int flags, ...);
+static inline int close(int fd) {
+    return ::close(fd);
+}
 int mkdir(const char *fn, int mode);
 int rename(const char *oldpath, const char *newpath);
 int unlink(const char *path);

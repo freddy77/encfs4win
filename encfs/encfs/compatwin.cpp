@@ -109,8 +109,22 @@ ssize_t unix::pwrite(int fd, const void *buf, size_t count, __int64 offset)
 	return len;
 }
 
-int unix::ftruncate(int fd, __int64 length) {
-	return ::ftruncate64(fd, length);
+static int truncate_handle(HANDLE fd, __int64 length)
+{
+	LONG high = length >> 32;
+	if (!SetFilePointer(fd, (LONG) length, &high, FILE_BEGIN)
+	    || !SetEndOfFile(fd) ) {
+		int save_errno = win32_error_to_errno(GetLastError());
+		errno = save_errno;
+		return -1;
+	}
+	return 0;
+}
+
+int unix::ftruncate(int fd, __int64 length)
+{
+	HANDLE h = (HANDLE) _get_osfhandle(fd);
+	return truncate_handle(h, length);
 }
 
 int unix::truncate(const char *path, __int64 length)
@@ -126,16 +140,9 @@ int unix::truncate(const char *path, __int64 length)
 		return -1;
 	}
 
-	LONG high = length >> 32;
-	if (!SetFilePointer(fd, length, &high, FILE_BEGIN)
-	    || !SetEndOfFile(fd) ) {
-		int save_errno = win32_error_to_errno(GetLastError());
-		CloseHandle(fd);
-		errno = save_errno;
-		return -1;
-	}
+	int res = truncate_handle(fd, length);
 	CloseHandle(fd);
-	return 0;
+	return res;
 }
 
 int 

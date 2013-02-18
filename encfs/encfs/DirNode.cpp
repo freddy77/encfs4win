@@ -89,7 +89,7 @@ DirTraverse::~DirTraverse()
 }
 
 static
-bool _nextName(struct dirent *&de, const shared_ptr<unix::DIR> &dir,
+bool _nextName(struct unix::dirent *&de, const shared_ptr<unix::DIR> &dir,
 	int *fileType, ino_t *inode)
 {
     de = unix::readdir( dir.get() );
@@ -121,7 +121,7 @@ bool _nextName(struct dirent *&de, const shared_ptr<unix::DIR> &dir,
 
 std::string DirTraverse::nextPlaintextName(int *fileType, ino_t *inode)
 {
-    struct dirent *de=0;
+    struct unix::dirent *de=0;
     while(_nextName(de, dir, fileType, inode))
     {
 	try
@@ -140,7 +140,7 @@ std::string DirTraverse::nextPlaintextName(int *fileType, ino_t *inode)
 
 std::string DirTraverse::nextInvalid()
 {
-    struct dirent *de=0;
+    struct unix::dirent *de=0;
     // find the first name which produces a decoding error...
     while(_nextName(de, dir, (int*)0, (ino_t*)0))
     {
@@ -461,7 +461,7 @@ bool DirNode::genRenameList( list<RenameEl> &renameList,
     if(!dir)
 	return false;
     
-    struct dirent *de = NULL;
+    struct unix::dirent *de = NULL;
     while((de = unix::readdir( dir.get() )) != NULL)
     {
 	// decode the name using the oldIV

@@ -545,7 +545,7 @@ unix::closedir(unix::DIR* dir)
 void utf8_to_wchar_buf(const char *src, wchar_t *res, int maxlen);
 std::string wchar_to_utf8_cstr(const wchar_t *str);
 
-struct dirent*
+struct unix::dirent*
 unix::readdir(unix::DIR* dir)
 {
 	errno = EBADF;

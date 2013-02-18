@@ -46,6 +46,17 @@ static inline int lstat(const char *path, struct _stati64 *buffer) {
 }
 int chmod (const char*, int);
 
+#if !defined(_WIN32)
+using ::dirent;
+#else
+struct dirent
+{
+        long            d_ino;          /* Always zero. */
+        unsigned short  d_namlen;       /* Length of name in d_name. */
+        char            d_name[FILENAME_MAX]; /* File name. */
+};
+#endif
+
 struct DIR;
 DIR *opendir(const char *name);
 int closedir(DIR* dir);

@@ -100,7 +100,7 @@ void Config::SaveGlobal(const std::string& entry, int value)
 int Config::LoadGlobal(const std::string& entry)
 {
 	DWORD v, type, len = sizeof(v);
-	if (RegQueryValueExA(RootKey(), entry.c_str(), NULL, &type, (BYTE*) v, &len) != ERROR_SUCCESS || type != REG_DWORD || len != sizeof(v))
+	if (RegQueryValueExA(RootKey(), entry.c_str(), NULL, &type, (BYTE*) &v, &len) != ERROR_SUCCESS || type != REG_DWORD || len != sizeof(v))
 		throw truntime_error(_T("reading configuration"));
 	return (int) v;
 }

@@ -3,8 +3,13 @@
 
 #include <windows.h>
 #include <stdio.h>
+#include <io.h>
 #include <dirent.h>
+#include <sys/stat.h>
+#include <sys/utime.h>
 #include <string>
+
+#define stat _stati64
 
 typedef HANDLE pthread_t;
 typedef CRITICAL_SECTION pthread_mutex_t;

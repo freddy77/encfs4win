@@ -743,7 +743,7 @@ shared_ptr<FileNode> DirNode::renameNode( const char *from, const char *to,
 	{
 	    // rename error! - put it back 
 	    rError("renameNode failed");
-	    throw ERROR("Internal node name change failed!");
+	    throw RLOG_ERROR("Internal node name change failed!");
 	}
     }
 

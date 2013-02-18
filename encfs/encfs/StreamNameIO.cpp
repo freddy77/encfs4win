@@ -148,7 +148,7 @@ int StreamNameIO::decodeName( const char *encodedName, int length,
     int decodedStreamLen = decLen256 - 2;
 
     if(decodedStreamLen <= 0)
-	throw ERROR("Filename too small to decode");
+	throw RLOG_ERROR("Filename too small to decode");
 
     BUFFER_INIT( tmpBuf, 32, (unsigned int)length );
 
@@ -193,7 +193,7 @@ int StreamNameIO::decodeName( const char *encodedName, int length,
     {
 	rDebug("checksum mismatch: expected %u, got %u", mac, mac2);
 	rDebug("on decode of %i bytes", decodedStreamLen);
-	throw ERROR( "checksum mismatch in filename decode" );
+	throw RLOG_ERROR( "checksum mismatch in filename decode" );
     }
 
     return decodedStreamLen;

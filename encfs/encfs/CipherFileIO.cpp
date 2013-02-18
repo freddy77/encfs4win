@@ -209,7 +209,7 @@ void CipherFileIO::initHeader( )
 	do
 	{
 	    if(!cipher->randomize( buf, 8, false ))
-                throw ERROR("Unable to generate a random file IV");
+                throw RLOG_ERROR("Unable to generate a random file IV");
 
 	    fileIV = 0;
 	    for(int i=0; i<8; ++i)

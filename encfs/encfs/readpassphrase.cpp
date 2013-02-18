@@ -89,7 +89,7 @@ readpassphrase(const char *prompt, char *buf, size_t bufsiz, int flags)
 	CloseHandle(in);
 
         end = buf + bufsiz - 1;
-        for (p = buf; (ch = getch()) != EOF && ch != '\n' && ch != '\r';) {
+        for (p = buf; (ch = _getch()) != EOF && ch != '\n' && ch != '\r';) {
                 if (p < end) {
                         ch &= 0xff;
                         if ((flags & RPP_SEVENBIT))

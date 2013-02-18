@@ -146,7 +146,9 @@ int RawFileIO::open(int flags)
 	if( flags & O_LARGEFILE )
 	    finalFlags |= O_LARGEFILE;
 #else
-#warning O_LARGEFILE not supported
+#  ifndef _WIN32
+#    warning O_LARGEFILE not supported
+#  endif
 #endif
 
 	int newFd = ::my_open( name.c_str(), finalFlags );

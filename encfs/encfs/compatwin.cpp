@@ -487,7 +487,7 @@ unix::stat(const char *path, struct _stati64 *buffer)
 	buffer->st_nlink = 1;
 	buffer->st_uid = 0;
 	buffer->st_gid = 0;
-	buffer->st_size = wfd.nFileSizeHigh * (1llu<<32) + wfd.nFileSizeLow;
+	buffer->st_size = wfd.nFileSizeHigh * (((uint64_t)1)<<32) + wfd.nFileSizeLow;
 	buffer->st_atime = filetimeToUnixTime(&wfd.ftLastAccessTime);
 	buffer->st_mtime = filetimeToUnixTime(&wfd.ftLastWriteTime);
 	buffer->st_ctime = filetimeToUnixTime(&wfd.ftCreationTime);

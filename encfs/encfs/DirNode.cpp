@@ -101,7 +101,9 @@ bool _nextName(struct dirent *&de, const shared_ptr<unix::DIR> &dir,
 #if defined(_DIRENT_HAVE_D_TYPE) || defined(__FreeBSD__)
 	    *fileType = de->d_type;
 #else
+#ifndef _WIN32
 #warning "struct dirent.d_type not supported"
+#endif
 	    *fileType = 0;
 #endif
 	}

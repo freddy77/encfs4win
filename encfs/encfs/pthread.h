@@ -19,6 +19,10 @@ void pthread_join(pthread_t thread, int);
 
 int my_open(const char *fn, int flags);
 
+#if defined(_WIN32)
+typedef int ssize_t;
+#endif
+
 namespace unix {
 int fsync(int fd);
 int fdatasync(int fd);

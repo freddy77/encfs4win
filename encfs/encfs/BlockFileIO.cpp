@@ -24,7 +24,8 @@
 
 #include "i18n.h"
 
-template<typename Type>
+#undef min
+template<class Type>
 inline Type min( Type A, Type B )
 {
     return (B < A) ? B : A;

@@ -479,7 +479,7 @@ CipherKey SSL_Cipher::newRandomKey()
 {
     const int bufLen = MAX_KEYLENGTH;
     unsigned char tmpBuf[ bufLen ];
-    int saltLen = 20;
+    const int saltLen = 20;
     unsigned char saltBuf[ saltLen ];
 
     if(!randomize(tmpBuf, bufLen, true) ||

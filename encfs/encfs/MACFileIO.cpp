@@ -212,8 +212,8 @@ ssize_t MACFileIO::readOneBlock( const IORequest &req ) const
                 if(test != stored)
                 {
                     // uh oh.. 
-                    long blockNum = req.offset / bs;
-                    rWarning(_("MAC comparison failure in block %li"), 
+                    int64_t blockNum = req.offset / bs;
+                    rWarning(_("MAC comparison failure in block %" PRIi64),
                             blockNum);
                     if( !warnOnly )
                     {

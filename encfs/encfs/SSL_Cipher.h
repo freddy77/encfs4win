@@ -22,7 +22,7 @@
 #include "Cipher.h"
 #include "Interface.h"
 
-struct SSLKey;
+class SSLKey;
 #ifndef EVP_CIPHER
 struct evp_cipher_st;
 typedef struct evp_cipher_st EVP_CIPHER;

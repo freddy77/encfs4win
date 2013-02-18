@@ -1129,7 +1129,7 @@ RootPtr createV6Config( EncFS_Context *ctx,
     shared_ptr<EncFSConfig> config( new EncFSConfig );
 
     config->cfgType = Config_V6;
-    config->cipherIface = cipher->interface();
+    config->cipherIface = cipher->Interface();
     config->keySize = keySize;
     config->blockSize = blockSize;
     config->nameIface = nameIOIface;
@@ -1250,9 +1250,9 @@ void showFSInfo( const boost::shared_ptr<EncFSConfig> &config )
 	else
 	{
 	    // if we're using a newer interface, show the version number
-            if( config->cipherIface != cipher->interface() )
+            if( config->cipherIface != cipher->Interface() )
 	    {
-		Interface iface = cipher->interface();
+		Interface iface = cipher->Interface();
 		// xgroup(diag)
 		cout << autosprintf(_(" (using %i:%i:%i)\n"),
 			iface.current(), iface.revision(), iface.age());
@@ -1276,9 +1276,9 @@ void showFSInfo( const boost::shared_ptr<EncFSConfig> &config )
 	} else
 	{
 	    // if we're using a newer interface, show the version number
-            if( config->nameIface != nameCoder->interface() )
+            if( config->nameIface != nameCoder->Interface() )
 	    {
-		Interface iface = nameCoder->interface();
+		Interface iface = nameCoder->Interface();
 		cout << autosprintf(_(" (using %i:%i:%i)\n"),
 			iface.current(), iface.revision(), iface.age());
 	    } else

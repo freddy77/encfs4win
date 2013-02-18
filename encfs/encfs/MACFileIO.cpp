@@ -79,8 +79,7 @@ MACFileIO::~MACFileIO()
 {
 }
 
-#undef interface
-rel::Interface MACFileIO::interface() const
+rel::Interface MACFileIO::Interface() const
 {
     return MACFileIO_iface;
 }

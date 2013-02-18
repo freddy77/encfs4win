@@ -88,7 +88,7 @@ NameIO::GetAlgorithmList( bool includeHidden )
 }
 
 bool NameIO::Register( const char *name, const char *description,
-	const Interface &iface, Constructor constructor,
+	const rel::Interface &iface, Constructor constructor,
 	bool hidden )
 {
     if( !gNameIOMap )
@@ -120,7 +120,7 @@ shared_ptr<NameIO> NameIO::New( const string &name,
     return result;
 }
 
-shared_ptr<NameIO> NameIO::New( const Interface &iface, 
+shared_ptr<NameIO> NameIO::New( const rel::Interface &iface,
 	const shared_ptr<Cipher> &cipher, const CipherKey &key )
 {
     shared_ptr<NameIO> result;

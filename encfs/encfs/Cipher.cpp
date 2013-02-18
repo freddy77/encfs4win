@@ -93,7 +93,7 @@ Cipher::GetAlgorithmList( bool includeHidden )
 }
 
 bool Cipher::Register(const char *name, const char *description,
-	const Interface &iface, CipherConstructor fn, bool hidden)
+	const rel::Interface &iface, CipherConstructor fn, bool hidden)
 {
     Range keyLength(-1,-1,1);
     Range blockSize(-1,-1,1);
@@ -102,7 +102,7 @@ bool Cipher::Register(const char *name, const char *description,
 }
 
 bool Cipher::Register(const char *name, const char *description,
-	const Interface &iface, const Range &keyLength, 
+	const rel::Interface &iface, const Range &keyLength,
 	const Range &blockSize, 
 	CipherConstructor fn, bool hidden)
 {
@@ -139,7 +139,7 @@ shared_ptr<Cipher> Cipher::New(const string &name, int keyLen)
     return result;
 }
 
-shared_ptr<Cipher> Cipher::New( const Interface &iface, int keyLen )
+shared_ptr<Cipher> Cipher::New( const rel::Interface &iface, int keyLen )
 {
     shared_ptr<Cipher> result;
     if(gCipherMap)

@@ -73,7 +73,7 @@ CipherFileIO::~CipherFileIO()
 {
 }
 
-rel::Interface CipherFileIO::interface() const
+rel::Interface CipherFileIO::Interface() const
 {
     return CipherFileIO_iface;
 }

@@ -81,8 +81,7 @@ public:
     Cipher();
     virtual ~Cipher();
 
-#undef interface
-    virtual rel::Interface interface() const =0;
+    virtual rel::Interface Interface() const =0;
 
     // create a new key based on a password
     // if iterationCount == 0, then iteration count will be determined

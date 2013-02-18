@@ -29,7 +29,7 @@ public:
 
     virtual ~NullNameIO();
 
-    virtual rel::Interface interface() const;
+    virtual rel::Interface Interface() const;
 
     virtual int maxEncodedNameLen( int plaintextNameLen ) const;
     virtual int maxDecodedNameLen( int encodedNameLen ) const;

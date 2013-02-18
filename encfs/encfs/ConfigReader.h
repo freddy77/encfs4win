@@ -40,7 +40,7 @@
     creating new config example:
 
     ConfigReader cfg;
-    cfg["cipher"] << cipher->interface();
+    cfg["cipher"] << cipher->Interface();
 */
 class ConfigReader
 {

@@ -295,7 +295,7 @@ static void createConfig(const std::string& rootDir, bool paranoid, const char* 
 	shared_ptr<EncFSConfig> config( new EncFSConfig );
 
 	config->cfgType = Config_V6;
-	config->cipherIface = cipher->interface();
+	config->cipherIface = cipher->Interface();
 	config->keySize = keySize;
 	config->blockSize = blockSize;
 	config->nameIface = nameIOIface;

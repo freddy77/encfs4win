@@ -26,7 +26,6 @@
 #include "Interface.h"
 #include "CipherKey.h"
 
-#undef interface
 using boost::shared_ptr;
 class Cipher;
 
@@ -59,7 +58,7 @@ public:
     NameIO();
     virtual ~NameIO();
 
-    virtual rel::Interface interface() const =0;
+    virtual rel::Interface Interface() const =0;
 
     void setChainedNameIV( bool enable );
     bool getChainedNameIV() const;

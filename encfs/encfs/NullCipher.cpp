@@ -69,7 +69,7 @@ public:
 
 shared_ptr<AbstractCipherKey> gNullKey( new NullKey(), NullDestructor() );
 
-NullCipher::NullCipher(const Interface &iface_)
+NullCipher::NullCipher(const rel::Interface &iface_)
 {
     this->iface = iface_;
 }
@@ -78,7 +78,7 @@ NullCipher::~NullCipher()
 {
 }
 
-Interface NullCipher::interface() const
+Interface NullCipher::Interface() const
 {
     return iface;
 }

@@ -353,8 +353,8 @@ void initKey(const shared_ptr<SSLKey> &key, const EVP_CIPHER *_blockCipher,
 
 static RLogChannel * CipherInfo = DEF_CHANNEL( "info/cipher", Log_Info );
 
-SSL_Cipher::SSL_Cipher(const Interface &iface_,
-	const Interface &realIface_,
+SSL_Cipher::SSL_Cipher(const rel::Interface &iface_,
+	const rel::Interface &realIface_,
 	const EVP_CIPHER *blockCipher, 
 	const EVP_CIPHER *streamCipher,
 	int keySize_)
@@ -386,7 +386,7 @@ SSL_Cipher::~SSL_Cipher()
 {
 }
 
-Interface SSL_Cipher::interface() const
+Interface SSL_Cipher::Interface() const
 {
     return realIface;
 }

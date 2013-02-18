@@ -44,7 +44,7 @@ NullNameIO::~NullNameIO()
 {
 }
 
-Interface NullNameIO::interface() const
+Interface NullNameIO::Interface() const
 {
     return NNIOIface;
 }

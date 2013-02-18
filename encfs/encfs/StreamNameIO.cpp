@@ -65,7 +65,7 @@ static bool StreamIO_registered = NameIO::Register("Stream",
 Interface StreamNameIO::CurrentInterface()
 {
     // implement major version 2, 1, and 0
-    return Interface("nameio/stream", 2, 1, 2);
+    return rel::Interface("nameio/stream", 2, 1, 2);
 }
 
 StreamNameIO::StreamNameIO( const rel::Interface &iface,
@@ -82,7 +82,7 @@ StreamNameIO::~StreamNameIO()
 {
 }
 
-Interface StreamNameIO::interface() const
+Interface StreamNameIO::Interface() const
 {
     return CurrentInterface();
 }

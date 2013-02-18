@@ -85,8 +85,7 @@ RawFileIO::~RawFileIO()
 	close( _fd );
 }
 
-#undef interface
-rel::Interface RawFileIO::interface() const
+rel::Interface RawFileIO::Interface() const
 {
     return RawFileIO_iface;
 }

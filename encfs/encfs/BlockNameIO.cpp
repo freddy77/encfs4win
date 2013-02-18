@@ -68,7 +68,7 @@ static bool BlockIO_registered = NameIO::Register("Block",
 Interface BlockNameIO::CurrentInterface()
 {
     // implement major version 3 and 2
-    return Interface("nameio/block", 3, 0, 1);
+	return rel::Interface("nameio/block", 3, 0, 1);
 }
 
 BlockNameIO::BlockNameIO( const rel::Interface &iface,
@@ -87,8 +87,7 @@ BlockNameIO::~BlockNameIO()
 {
 }
 
-#undef interface
-Interface BlockNameIO::interface() const
+Interface BlockNameIO::Interface() const
 {
     return CurrentInterface();
 }

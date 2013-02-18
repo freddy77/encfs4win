@@ -38,7 +38,7 @@ public:
                   const FSConfigPtr &cfg);
     virtual ~CipherFileIO();
 
-    virtual rel::Interface interface() const;
+    virtual rel::Interface Interface() const;
 
     virtual void setFileName( const char *fileName );
     virtual const char *getFileName() const;

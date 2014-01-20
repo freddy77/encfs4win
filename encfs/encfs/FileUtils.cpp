@@ -346,11 +346,21 @@ bool userAllowMkdir( const char *path, mode_t mode )
 ConfigType readConfig_load( ConfigInfo *nm, const char *path, 
 	const boost::shared_ptr<EncFSConfig> &config )
 {
+	char szConf2[255];
+	char *szConf = szConf2;
     if( nm->loadFunc )
     {
 	try
 	{
-	    if( (*nm->loadFunc)( path, config, nm ))
+		strcpy(szConf, path);
+		if (szConf[0]=='"') szConf+=1;
+		if (strlen(szConf)>0)
+		{
+			if (szConf[strlen(szConf)-1]=='"') szConf[strlen(szConf)-1]='\0';
+		}
+		rError( _("XFound config file %s, but failed to load"), szConf);
+
+	    if( (*nm->loadFunc)( szConf, config, nm ))
             {
                 config->cfgType = nm->type;
 		return nm->type;

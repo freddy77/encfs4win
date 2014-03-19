@@ -4,6 +4,8 @@
 #include "ScopeGuard.h"
 #include "docanfuse.h"
 #include <stdio.h>
+#include <set>
+#include <string>
 
 #ifdef __CYGWIN__
 #define FWPRINTF dummy_fwprintf
@@ -20,6 +22,9 @@ int dummy_fwprintf(FILE*, const wchar_t*, ...)
 #define the_impl reinterpret_cast<impl_fuse_context*>(DokanFileInfo->DokanOptions->GlobalContext)
 
 HINSTANCE hFuseDllInstance;
+
+// hack to work around delete-on-close bug in Dokan
+static std::set<std::wstring> delete_on_close_files;
 
 extern "C" BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 {
@@ -62,7 +67,20 @@ static int DOKAN_CALLBACK FuseCleanup(
 	if (impl->debug()) FWPRINTF(stderr, L"Cleanup: %s\n\n", FileName);
 	
 	impl_chain_guard guard(impl,DokanFileInfo->ProcessId);
-	return -errno_to_win32_error(impl->cleanup(FileName,DokanFileInfo));
+
+	std::set<std::wstring>::iterator it = delete_on_close_files.find(FileName);
+	if (it == delete_on_close_files.end()) {
+		return -errno_to_win32_error(impl->cleanup(FileName,DokanFileInfo));
+	}
+	else {
+		delete_on_close_files.erase(it);
+		if (DokanFileInfo->IsDirectory) {
+			return -errno_to_win32_error(impl->delete_directory(FileName,DokanFileInfo));
+		}
+		else {
+			return -errno_to_win32_error(impl->delete_file(FileName,DokanFileInfo));
+		}
+	}
 }
 
 static int DOKAN_CALLBACK FuseCreateDirectory(
@@ -199,10 +217,15 @@ static int DOKAN_CALLBACK FuseCreateFile(
 		FWPRINTF(stderr, L"\tFlags: %u (0x%x)\n", FlagsAndAttributes, FlagsAndAttributes);
 		fflush(stderr);
 	}
-	
+
 	impl_chain_guard guard(impl,DokanFileInfo->ProcessId);
-	return -win_error(impl->create_file(FileName,AccessMode,ShareMode,
+
+	int err = -win_error(impl->create_file(FileName,AccessMode,ShareMode,
 		CreationDisposition,FlagsAndAttributes,DokanFileInfo));
+	if (err == 0 && FlagsAndAttributes & FILE_FLAG_DELETE_ON_CLOSE) {
+		delete_on_close_files.insert(std::wstring(FileName));
+	}
+	return err;
 }
 
 static int DOKAN_CALLBACK FuseCloseFile(
